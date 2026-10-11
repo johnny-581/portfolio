@@ -11,6 +11,13 @@ export interface Vec {
   y: number
 }
 
+/** World point or vector: X right, Y up, Z toward the viewer. */
+export interface Vec3 {
+  x: number
+  y: number
+  z: number
+}
+
 export interface Box {
   x: number
   y: number
