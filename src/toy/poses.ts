@@ -68,6 +68,8 @@ export const ITEM_SPECS: Record<ItemId, ItemSpec> = {
     size: [128, 128],
     pivot: [64, 64],
     restHeight: 50,
+    // A tomato is slightly flattened, so it settles stem-up, give or take a little tilt.
+    restAngles: [[-20, 20]],
     hit: { type: 'circle', x: 0, y: 0, r: 54 },
     zone: { r: 50, offset: [0, 0] },
     shadow: { w: 96, offset: [0, 0], rotates: false },
@@ -77,6 +79,11 @@ export const ITEM_SPECS: Record<ItemId, ItemSpec> = {
     size: [340, 340],
     pivot: [24, 170],
     restHeight: 30,
+    // Lying on its side, leaves to the right or to the left.
+    restAngles: [
+      [-16, 16],
+      [164, 196],
+    ],
     hit: { type: 'capsule', ax: 16, ay: 0, bx: 250, by: 0, r: 36 },
     zone: { r: 70, offset: [140, 0] },
     shadow: { w: 250, offset: [130, 0], rotates: true },
@@ -89,8 +96,13 @@ export const ITEM_SPECS: Record<ItemId, ItemSpec> = {
   banana: {
     size: [240, 240],
     pivot: [120, 120],
-    restHeight: 38,
-    hit: { type: 'capsule', ax: -90, ay: 0, bx: 90, by: 0, r: 42 },
+    restHeight: 40,
+    // Lying flat, stem to the right or to the left.
+    restAngles: [
+      [-12, 12],
+      [168, 192],
+    ],
+    hit: { type: 'capsule', ax: -92, ay: 0, bx: 92, by: 0, r: 48 },
     zone: { r: 72, offset: [0, 0] },
     shadow: { w: 190, offset: [0, 6], rotates: true },
     frames: { a: 'items/banana-a.svg', b: 'items/banana-b.svg' },

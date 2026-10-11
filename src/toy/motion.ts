@@ -76,3 +76,22 @@ export function nearestTurn(target: number, current: number): number {
 }
 
 export const rand = (r: () => number, lo: number, hi: number) => lo + (hi - lo) * r()
+
+/** The nearest angle to `deg` inside any of the ranges (any number of whole turns away). */
+export function snapToRest(deg: number, ranges: readonly [number, number][]): number {
+  let best = deg
+  let bestD = Infinity
+  for (const [a, b] of ranges) {
+    const k = Math.round((deg - (a + b) / 2) / 360)
+    for (const turn of [k - 1, k, k + 1]) {
+      const lo = a + 360 * turn
+      const hi = b + 360 * turn
+      const v = Math.min(hi, Math.max(lo, deg))
+      if (Math.abs(v - deg) < bestD) {
+        bestD = Math.abs(v - deg)
+        best = v
+      }
+    }
+  }
+  return best
+}

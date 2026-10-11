@@ -331,30 +331,45 @@ function tomato(): string {
 
 function banana(side: 'a' | 'b'): string {
   const [cx, cy] = ITEM_SPECS.banana.pivot
-  // Stem at the +x end on both sides; side b is the bunch flipped over its long axis.
+  // Stem at the +x end on both sides; side b is the bunch flipped over its long axis
+  // (the curve bends the other way and the greener underside shows).
   const bend = side === 'a' ? 1 : -1
   const fill = side === 'a' ? C.banana : C.bananaB
-  const crown = { x: cx + 86, y: cy - 4 * bend }
+  const shade = '#e1ad35'
+  const crown = { x: cx + 82, y: cy - 2 * bend }
+  const Y = (dy: number) => cy + dy * bend
+  // Back to front, each finger a full crescent ~36 thick in the middle, tapering at the tip.
   const fingers = [-1, 0, 1]
     .map((k) => {
-      const tipX = cx - 98 + Math.abs(k) * 12
-      const tipY = cy + k * 22 - 10 * bend
-      const midY = cy + k * 18 + 30 * bend
-      const d =
-        `M ${crown.x} ${crown.y + k * 9} Q ${cx} ${midY + 14 * bend} ${tipX} ${tipY} ` +
-        `Q ${cx - 8} ${midY - 8 * bend} ${crown.x} ${crown.y + k * 9 - 13 * bend} Z`
-      const ridge = `M ${crown.x - 16} ${crown.y + k * 9 - 5 * bend} Q ${cx} ${midY + 1 * bend} ${tipX + 14} ${tipY}`
+      const tip = { x: cx - 96 + Math.abs(k) * 12, y: Y(-40 + k * 27) }
+      const base = { x: crown.x - 6, y: Y(k * 8) }
+      const top = { x: cx - 8, y: Y(-74 + k * 27) }
+      const bot = { x: cx - 8, y: Y(4 + k * 27) }
+      const tipR = { x: tip.x - 2, y: tip.y + 5 * bend }
+      const body =
+        `M ${n(base.x)} ${n(base.y - 9 * bend)} Q ${n(top.x)} ${n(top.y)} ${n(tip.x)} ${n(tip.y)} ` +
+        `Q ${n(tipR.x - 6)} ${n(tipR.y)} ${n(tipR.x)} ${n(tipR.y + 4 * bend)} ` +
+        `Q ${n(bot.x)} ${n(bot.y)} ${n(base.x)} ${n(base.y + 9 * bend)} Z`
+      // Darker underside band along the lower edge.
+      const under =
+        `M ${n(base.x)} ${n(base.y + 9 * bend)} Q ${n(bot.x)} ${n(bot.y)} ${n(tipR.x)} ${n(tipR.y + 4 * bend)} ` +
+        `Q ${n(bot.x + 6)} ${n(bot.y - 12 * bend)} ${n(base.x)} ${n(base.y + 2 * bend)} Z`
+      const ridge = `M ${n(base.x - 10)} ${n(base.y - 3 * bend)} Q ${n(cx - 6)} ${n(Y(-38 + k * 27))} ${n(tip.x + 16)} ${n(tip.y + 4 * bend)}`
       return (
-        paperPath(d, fill) +
+        paperPath(body, fill) +
+        `<path d="${under}" fill="${shade}"/>` +
         `<path d="${ridge}" fill="none" stroke="${C.ink}" stroke-width="2.6" stroke-linecap="round"/>` +
-        `<circle cx="${tipX + 2}" cy="${tipY}" r="4.5" fill="${C.stem}"/>`
+        `<ellipse cx="${n(tip.x + 1)}" cy="${n(tip.y + 2 * bend)}" rx="6" ry="5" fill="${C.stem}"/>`
       )
     })
     .join('')
   return (
     fingers +
-    `<path d="M ${crown.x - 6} ${crown.y} l 26 ${-9 * bend}" stroke="${side === 'a' ? '#5e6b2a' : '#4f7a2e'}" stroke-width="10" stroke-linecap="round"/>` +
-    `<circle cx="${crown.x + 21}" cy="${crown.y - 9 * bend}" r="5.5" fill="${C.stem}"/>`
+    paperPath(
+      `M ${crown.x - 14} ${n(crown.y - 12)} L ${crown.x + 14} ${n(crown.y - 8 * bend - 6)} L ${crown.x + 16} ${n(crown.y - 8 * bend + 8)} L ${crown.x - 14} ${n(crown.y + 12)} Z`,
+      side === 'a' ? '#6f7a2e' : '#5f8a32',
+    ) +
+    `<rect x="${crown.x + 12}" y="${n(crown.y - 8 * bend - 9)}" width="16" height="17" rx="5" fill="${C.stem}"/>`
   )
 }
 

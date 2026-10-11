@@ -11,7 +11,7 @@ import type { Ray } from './camera.ts'
 import { config, type Material } from './config.ts'
 import { rotate } from './hit.ts'
 import { project, type Layout } from './layout.ts'
-import { arcLengthTable, clamp, dampedSine, lerp, nearestTurn, quadBezier, smoothstep, spring, type Spring } from './motion.ts'
+import { arcLengthTable, clamp, dampedSine, lerp, nearestTurn, quadBezier, smoothstep, snapToRest, spring, type Spring } from './motion.ts'
 import {
   bounceHeight,
   bounces,
@@ -290,6 +290,18 @@ export class Item {
     const l = this.layout!
     const screenDx = project(l, { x: target.x, y: rest, z: target.z }).x - project(l, p0).x
     const radius = this.spec.hit.type === 'circle' ? this.spec.hit.r : 36
+    const airSpeed = Math.hypot(v0.x, v0.z)
+    const travel = airSpeed * land.t + ground.dist
+    // Where it would naturally stop turning, settled onto the nearest stable resting pose.
+    let spin = 0
+    let rotEnd: number
+    if (this.id === 'tomato') {
+      const natural = this.rot + (Math.sign(screenDx) || 1) * (DEG / radius) * travel
+      rotEnd = snapToRest(natural, this.spec.restAngles)
+      spin = travel > 1 ? (rotEnd - this.rot) / travel : 0
+    } else {
+      rotEnd = snapToRest(opts.rotEnd ?? this.rot, this.spec.restAngles)
+    }
     const plan: Throw = {
       t: 0,
       p0,
@@ -301,10 +313,10 @@ export class Item {
       dir,
       ground,
       curve,
-      airSpeed: Math.hypot(v0.x, v0.z),
+      airSpeed,
       rot0: this.rot,
-      rotEnd: opts.rotEnd ?? this.rot,
-      spin: this.id === 'tomato' ? (Math.sign(screenDx) || 1) * (DEG / radius) : 0,
+      rotEnd,
+      spin,
       rock: m.rock,
       end: land.t + Math.max(ground.T, hop.end) + (m.rock > 0 ? 1 : 0.02),
     }
@@ -461,7 +473,7 @@ export class Item {
 
     if (t >= p.end) {
       this.pos = { x: p.target.x, y: rest, z: p.target.z }
-      if (this.id !== 'tomato') this.rot = p.rotEnd
+      this.rot = p.rotEnd
       this.mode = { kind: 'rest' }
     }
   }

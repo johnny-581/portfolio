@@ -18,7 +18,7 @@ import {
   type MachineEvent,
   type MachineState,
 } from './machine.ts'
-import { mulberry32, nearestTurn, rand } from './motion.ts'
+import { mulberry32, nearestTurn, rand, snapToRest } from './motion.ts'
 import { flightLanding, stoppingDistance } from './physics.ts'
 import type { ItemId, Vec, Vec3 } from './types.ts'
 import { ITEM_IDS } from './types.ts'
@@ -259,8 +259,11 @@ function build(stage: HTMLElement, assets: Assets, opts: MountOptions): () => vo
 
   /** Final rotation for items that turn as they go, and the banana's landing side. */
   const finish = (id: ItemId, rot0: number): ThrowOptions => {
-    if (id === 'radish') return { rotEnd: rot0 + (r() < 0.5 ? -1 : 1) * rand(r, 60, 120) }
-    if (id === 'banana') return { rotEnd: nearestTurn(r() < 0.5 ? 0 : 180, rot0) + rand(r, -12, 12), side: r() < 0.5 ? 'a' : 'b' }
+    const rest = c.items[id].restAngles
+    if (id === 'radish') return { rotEnd: snapToRest(rot0 + (r() < 0.5 ? -1 : 1) * rand(r, 60, 120), rest) }
+    if (id === 'banana') {
+      return { rotEnd: snapToRest(nearestTurn(r() < 0.5 ? 0 : 180, rot0) + rand(r, -12, 12), rest), side: r() < 0.5 ? 'a' : 'b' }
+    }
     return {}
   }
 
@@ -290,8 +293,9 @@ function build(stage: HTMLElement, assets: Assets, opts: MountOptions): () => vo
 
   /** Let go (or knocked): fly from where it is and come to rest somewhere that fits. */
   const throwItem = (it: Item, v0: Vec3) => {
-    const plan = planThrow(it, it.pos, v0, placedExcept(it.id), it.rot)
-    it.throwTo(v0, plan.target)
+    const rotEnd = snapToRest(it.rot, it.spec.restAngles)
+    const plan = planThrow(it, it.pos, v0, placedExcept(it.id), rotEnd)
+    it.throwTo(v0, plan.target, { rotEnd })
   }
 
   /** Dropped on the fallen bag: it rolls off its side, onto the floor in front. */

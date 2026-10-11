@@ -173,3 +173,4 @@ All five milestones are in. Differences from the plan above:
 - **Gravity is 11,000 units/s²** (real gravity at this scale), not the ~5,000 the depth doc first estimated.
 - **The anchor's aspect ratio** in `src/App.css` follows `uprightBox` in `bag.json`; update it after regenerating if the box changes.
 - **Testing note:** the in-app browser pane throttles animation frames to ~2/s when hidden. With the 50 ms frame-time cap that plays everything in slow motion; it's the pane, not the toy. Set `__toy.config.maxDt = 1` under `?debug` to check timing there.
+- **Predefined resting poses:** each item lists the screen rotations it can come to rest at (`restAngles` in `bag.json`): radish and banana lie flat (leaves or stem to either side), the tomato sits stem-up. Every roll ends on the nearest one; the tomato's spin is scaled by a few percent to get there.

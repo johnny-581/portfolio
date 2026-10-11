@@ -276,6 +276,12 @@
         64
       ],
       "restHeight": 50,
+      "restAngles": [
+        [
+          -20,
+          20
+        ]
+      ],
       "hit": {
         "type": "circle",
         "x": 0,
@@ -311,6 +317,16 @@
         170
       ],
       "restHeight": 30,
+      "restAngles": [
+        [
+          -16,
+          16
+        ],
+        [
+          164,
+          196
+        ]
+      ],
       "hit": {
         "type": "capsule",
         "ax": 16,
@@ -349,14 +365,24 @@
         120,
         120
       ],
-      "restHeight": 38,
+      "restHeight": 40,
+      "restAngles": [
+        [
+          -12,
+          12
+        ],
+        [
+          168,
+          192
+        ]
+      ],
       "hit": {
         "type": "capsule",
-        "ax": -90,
+        "ax": -92,
         "ay": 0,
-        "bx": 90,
+        "bx": 92,
         "by": 0,
-        "r": 42
+        "r": 48
       },
       "zone": {
         "r": 72,

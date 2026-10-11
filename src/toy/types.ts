@@ -48,6 +48,12 @@ export interface ItemSpec {
   pivot: [number, number]
   /** Height of the pivot above the floor when the item lies still (world units). */
   restHeight: number
+  /**
+   * Screen rotations (degree ranges) the item can come to rest at: the stable ways it lies on
+   * the floor. A roll ends on the nearest one (a radish lies on its side, a tomato sits stem-up
+   * or on its side).
+   */
+  restAngles: [number, number][]
   hit: HitShape
   /** Circle used by the landing zone and overlap checks, offset from the pivot in item-local pixels. */
   zone: { r: number; offset: [number, number] }

@@ -9,6 +9,7 @@ import {
   groundMotion,
   stoppingDistance,
 } from '../src/toy/physics.ts'
+import { snapToRest } from '../src/toy/motion.ts'
 
 const g = 11000
 
@@ -58,5 +59,22 @@ describe('physics', () => {
     const v = capSpeed({ x: 3000, y: 400, z: -1000 }, 600)
     expect(Math.hypot(v.x, v.y, v.z)).toBeCloseTo(600, 6)
     expect(capSpeed({ x: 10, y: 0, z: 0 }, 600)).toEqual({ x: 10, y: 0, z: 0 })
+  })
+})
+
+describe('resting poses', () => {
+  const radish: [number, number][] = [
+    [-16, 16],
+    [164, 196],
+  ]
+  it('keeps an angle that is already a stable pose', () => {
+    expect(snapToRest(10, radish)).toBe(10)
+    expect(snapToRest(370, radish)).toBe(370)
+  })
+  it('settles onto the nearest stable pose, any number of turns away', () => {
+    expect(snapToRest(60, radish)).toBe(16)
+    expect(snapToRest(120, radish)).toBe(164)
+    expect(snapToRest(-231, radish)).toBe(-196)
+    expect(snapToRest(1000, [[-20, 20]])).toBe(1060)
   })
 })
