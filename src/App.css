@@ -1,0 +1,215 @@
+/* Hero replica: name + nav on top, headline bottom-left, bag top-right. */
+
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 480px;
+  overflow: hidden;
+}
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px var(--gutter);
+}
+
+.site-name {
+  font-weight: 600;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 56px;
+  font-size: 22px;
+}
+
+.headline {
+  position: absolute;
+  z-index: 2;
+  left: var(--gutter);
+  bottom: 40px;
+  margin: 0;
+  font-weight: 400;
+  font-size: clamp(36px, 3.6vw, 64px);
+  letter-spacing: -0.01em;
+  /* Items roll under it and must stay grabbable. */
+  pointer-events: none;
+}
+
+.below {
+  padding: 96px var(--gutter);
+  font-size: 22px;
+  min-height: 60vh;
+}
+
+/* Where the upright bag (with its contents) sits. layout.ts maps the art onto this box. */
+.bag-anchor {
+  position: absolute;
+  left: 53%;
+  top: 22%;
+  height: clamp(220px, 34%, 440px);
+  aspect-ratio: 590 / 676;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .site-name {
+    font-size: 22px;
+  }
+  .site-nav {
+    gap: 24px;
+    font-size: 17px;
+  }
+  /* Anchored from the right so the fallen bag (which lies ~0.7 bag-widths to the left) still fits. */
+  .bag-anchor {
+    left: auto;
+    right: 5%;
+    top: 15%;
+    height: min(26%, 50vw);
+  }
+  .headline {
+    bottom: 32px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Toy. Only transform and opacity change at runtime. */
+
+.toy-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toy-stage img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.toy-bag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+.toy-rotor,
+.toy-frames,
+.toy-upright,
+.toy-homed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toy-frame,
+.toy-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toy-bag-shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 80px;
+  transform-origin: 0 0;
+  background: radial-gradient(closest-side, rgba(70, 45, 20, 0.22), rgba(70, 45, 20, 0));
+}
+
+.toy-bag-hit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 50%;
+  touch-action: none;
+}
+
+.toy-bag-hit.is-tippable,
+.toy-bag-hit.is-grabbable {
+  pointer-events: auto;
+}
+
+.toy-bag-hit.is-grabbable {
+  cursor: grab;
+}
+
+.toy-bag-hit.is-held {
+  cursor: grabbing;
+}
+
+.toy-layer-shadows,
+.toy-layer-loose {
+  position: absolute;
+  inset: 0;
+}
+
+.toy-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.toy-item-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toy-item-hit {
+  position: absolute;
+  touch-action: none;
+}
+
+.toy-item.is-grabbable .toy-item-hit {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.toy-item.is-held .toy-item-hit {
+  cursor: grabbing;
+}
+
+.toy-shadow {
+  position: absolute;
+  left: -50px;
+  top: -50px;
+  width: 100px;
+  height: 100px;
+  transform-origin: 50% 50%;
+  background: radial-gradient(closest-side, rgba(70, 45, 20, 0.26), rgba(70, 45, 20, 0));
+  will-change: transform, opacity;
+}
+
+.toy-debug {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  pointer-events: none;
+  overflow: visible;
+  font-family: ui-monospace, monospace;
+}
+
+/* While anything is dragged, don't select the page's text. */
+:root.toy-dragging,
+:root.toy-dragging * {
+  user-select: none;
+  -webkit-user-select: none;
+}

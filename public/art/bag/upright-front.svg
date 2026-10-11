@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+<g transform="translate(720 1040) translate(0 0) rotate(0) translate(0 0) scale(1 1)"><polygon points="0,0 100,8 100,-472 50,-476 0,-480" fill="#b48650" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="100,8 410,-6 410,-486 341.8,-482.9 270.5,-479.7 202.3,-476.6 100,-472" fill="#c9a06a" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="100,-472 202.3,-476.6 270.5,-479.7 341.8,-482.9 410,-486 410,-460 341.8,-456.9 270.5,-453.7 202.3,-450.6 100,-446" fill="#bb8f5b" stroke="none"/>
+<polyline points="100,-446 202.3,-450.6 270.5,-453.7 341.8,-456.9 410,-460" fill="none" stroke="#2a1d17" stroke-width="3"/>
+<line x1="100" y1="8" x2="100" y2="-472" stroke="#2a1d17" stroke-width="4"/>
+<line x1="40" y1="3" x2="40" y2="-470" stroke="#2a1d17" stroke-width="3"/>
+
+<path d="M 150 -468 C 170 -610, 350 -620, 372 -480" fill="none" stroke="#2a1d17" stroke-width="22" stroke-linecap="round"/>
+<path d="M 150 -468 C 170 -610, 350 -620, 372 -480" fill="none" stroke="#c9a06a" stroke-width="15" stroke-linecap="round"/>
+<path d="M 26 -500 L 30 -610 Q -4 -680 -94 -470" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 26 -500 L 30 -610 Q -4 -680 -94 -470" fill="none" stroke="#6fa84a" stroke-width="9" stroke-linecap="round"/>
+<path d="M 40 -500 L 44 -618 Q 10 -688 -98 -454" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 40 -500 L 44 -618 Q 10 -688 -98 -454" fill="none" stroke="#5e9b3e" stroke-width="9" stroke-linecap="round"/>
+<path d="M 54 -500 L 58 -626 Q 24 -696 -102 -438" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 54 -500 L 58 -626 Q 24 -696 -102 -438" fill="none" stroke="#6fa84a" stroke-width="9" stroke-linecap="round"/>
+<path d="M 66 -500 L 70 -634 Q 36 -704 -108 -422" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 66 -500 L 70 -634 Q 36 -704 -108 -422" fill="none" stroke="#5e9b3e" stroke-width="9" stroke-linecap="round"/>
+<rect x="14" y="-530" width="62" height="12" rx="4" fill="#c0392b" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></g>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+<g transform="translate(720 1040) translate(0 0) rotate(-87) translate(0 0) scale(1 1)"><polygon points="-11,-484 313,-511 423,-495 351.3,-468.5 276.3,-478.1 204.6,-451.6 97,-470" fill="#7a5631" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 70 -490 C 90 -640, 250 -650, 262 -513" fill="none" stroke="#2a1d17" stroke-width="22" stroke-linecap="round"/>
+<path d="M 70 -490 C 90 -640, 250 -650, 262 -513" fill="none" stroke="#b48650" stroke-width="15" stroke-linecap="round"/>
+<path d="M 79 -394 Q 79 -380 93 -380 L 151 -380 Q 165 -380 165 -394 L 165 -540 Q 165 -580 147 -598 L 147 -610 L 97 -610 L 97 -598 Q 79 -580 79 -540 Z" fill="#fafaf7" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 153 -536 L 153 -400" stroke="#a9b8bf" stroke-width="7" stroke-linecap="round"/>
+<rect x="89" y="-510" width="66" height="44" rx="4" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="122" y="-478" font-size="26" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#c0392b">牛奶</text>
+<rect x="92" y="-620" width="60" height="16" rx="5" fill="#f2e6c9" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="93" y1="-608" x2="151" y2="-608" stroke="#c0392b" stroke-width="3"/>
+<path d="M 26 -380 L 26 -500" stroke="#2a1d17" stroke-width="16" stroke-linecap="round"/><path d="M 26 -380 L 26 -500" stroke="#f3f1e4" stroke-width="10" stroke-linecap="round"/>
+<path d="M 40 -380 L 40 -500" stroke="#2a1d17" stroke-width="16" stroke-linecap="round"/><path d="M 40 -380 L 40 -500" stroke="#f3f1e4" stroke-width="10" stroke-linecap="round"/>
+<path d="M 54 -380 L 54 -500" stroke="#2a1d17" stroke-width="16" stroke-linecap="round"/><path d="M 54 -380 L 54 -500" stroke="#f3f1e4" stroke-width="10" stroke-linecap="round"/>
+<path d="M 66 -380 L 66 -500" stroke="#2a1d17" stroke-width="16" stroke-linecap="round"/><path d="M 66 -380 L 66 -500" stroke="#f3f1e4" stroke-width="10" stroke-linecap="round"/></g>
+
+<g transform="translate(720 1040) translate(0 0) rotate(-87) translate(0 0) scale(1 1)"><polygon points="0,0 100,8 97,-470 43,-464.4 -11,-484" fill="#b48650" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="100,8 410,-6 423,-495 351.3,-468.5 276.3,-478.1 204.6,-451.6 97,-470" fill="#c9a06a" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="97,-470 204.6,-451.6 276.3,-478.1 351.3,-468.5 423,-495 423,-469 351.3,-442.5 276.3,-452.1 204.6,-425.6 97,-444" fill="#bb8f5b" stroke="none"/>
+<polyline points="97,-444 204.6,-425.6 276.3,-452.1 351.3,-442.5 423,-469" fill="none" stroke="#2a1d17" stroke-width="3"/>
+<line x1="100" y1="8" x2="97" y2="-470" stroke="#2a1d17" stroke-width="4"/>
+<line x1="40" y1="3" x2="40" y2="-474" stroke="#2a1d17" stroke-width="3"/>
+<path d="M 160 -328 l 60 30 l -20 50 M 300 -221 l 50 -20 l 10 60" fill="none" stroke="#2a1d17" stroke-width="3" opacity="0.75"/>
+<path d="M 150 -466 C 170 -610, 350 -620, 372 -489" fill="none" stroke="#2a1d17" stroke-width="22" stroke-linecap="round"/>
+<path d="M 150 -466 C 170 -610, 350 -620, 372 -489" fill="none" stroke="#c9a06a" stroke-width="15" stroke-linecap="round"/>
+<path d="M 26 -500 L 30 -610 Q -24 -640 -144 -620" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 26 -500 L 30 -610 Q -24 -640 -144 -620" fill="none" stroke="#6fa84a" stroke-width="9" stroke-linecap="round"/>
+<path d="M 40 -500 L 44 -618 Q -10 -648 -148 -604" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 40 -500 L 44 -618 Q -10 -648 -148 -604" fill="none" stroke="#5e9b3e" stroke-width="9" stroke-linecap="round"/>
+<path d="M 54 -500 L 58 -626 Q 4 -656 -152 -588" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 54 -500 L 58 -626 Q 4 -656 -152 -588" fill="none" stroke="#6fa84a" stroke-width="9" stroke-linecap="round"/>
+<path d="M 66 -500 L 70 -634 Q 16 -664 -158 -572" fill="none" stroke="#2a1d17" stroke-width="15" stroke-linecap="round"/>
+<path d="M 66 -500 L 70 -634 Q 16 -664 -158 -572" fill="none" stroke="#5e9b3e" stroke-width="9" stroke-linecap="round"/>
+<rect x="14" y="-530" width="62" height="12" rx="4" fill="#c0392b" stroke="#2a1d17" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></g>
+</svg>

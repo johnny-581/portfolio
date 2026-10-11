@@ -1,0 +1,346 @@
+{
+  "version": 1,
+  "frameSize": [
+    1200,
+    1200
+  ],
+  "pivot": [
+    720,
+    1040
+  ],
+  "rockPivot": [
+    1130,
+    1034
+  ],
+  "bodyHeight": 480,
+  "uprightBox": {
+    "x": 620,
+    "y": 380,
+    "w": 590,
+    "h": 676
+  },
+  "fps": 12,
+  "upright": {
+    "back": "bag/upright-back.svg",
+    "front": "bag/upright-front.svg"
+  },
+  "fall": [
+    {
+      "f": 1,
+      "src": "bag/fall/01.svg",
+      "empty": "bag/fall-empty/01.svg",
+      "hold": 2,
+      "angle": 3
+    },
+    {
+      "f": 2,
+      "src": "bag/fall/02.svg",
+      "empty": "bag/fall-empty/02.svg",
+      "hold": 1,
+      "angle": -5
+    },
+    {
+      "f": 3,
+      "src": "bag/fall/03.svg",
+      "empty": "bag/fall-empty/03.svg",
+      "hold": 1,
+      "angle": -10
+    },
+    {
+      "f": 4,
+      "src": "bag/fall/04.svg",
+      "empty": "bag/fall-empty/04.svg",
+      "hold": 1,
+      "angle": -20
+    },
+    {
+      "f": 5,
+      "src": "bag/fall/05.svg",
+      "empty": "bag/fall-empty/05.svg",
+      "hold": 1,
+      "angle": -35
+    },
+    {
+      "f": 6,
+      "src": "bag/fall/06.svg",
+      "empty": "bag/fall-empty/06.svg",
+      "hold": 1,
+      "angle": -55
+    },
+    {
+      "f": 7,
+      "src": "bag/fall/07.svg",
+      "empty": "bag/fall-empty/07.svg",
+      "hold": 1,
+      "angle": -90
+    },
+    {
+      "f": 8,
+      "src": "bag/fall/08.svg",
+      "empty": "bag/fall-empty/08.svg",
+      "hold": 1,
+      "angle": -90
+    },
+    {
+      "f": 9,
+      "src": "bag/fall/09.svg",
+      "empty": "bag/fall-empty/09.svg",
+      "hold": 1,
+      "angle": -84
+    },
+    {
+      "f": 10,
+      "src": "bag/fall/10.svg",
+      "empty": "bag/fall-empty/10.svg",
+      "hold": 1,
+      "angle": -90
+    },
+    {
+      "f": 11,
+      "src": "bag/fall/11.svg",
+      "empty": "bag/fall-empty/11.svg",
+      "hold": 1,
+      "angle": -87
+    },
+    {
+      "f": 12,
+      "src": "bag/fall/12.svg",
+      "empty": "bag/fall-empty/12.svg",
+      "hold": 2,
+      "angle": -90
+    }
+  ],
+  "right": [
+    {
+      "f": 12,
+      "src": "bag/fall-empty/12.svg",
+      "angle": -90
+    },
+    {
+      "f": "L1",
+      "src": "bag/right/L1.svg",
+      "angle": -70
+    },
+    {
+      "f": 6,
+      "src": "bag/fall-empty/06.svg",
+      "angle": -55
+    },
+    {
+      "f": 5,
+      "src": "bag/fall-empty/05.svg",
+      "angle": -35
+    },
+    {
+      "f": 4,
+      "src": "bag/fall-empty/04.svg",
+      "angle": -20
+    },
+    {
+      "f": 3,
+      "src": "bag/fall-empty/03.svg",
+      "angle": -10
+    },
+    {
+      "f": 2,
+      "src": "bag/fall-empty/02.svg",
+      "angle": -5
+    }
+  ],
+  "restAngle": -90,
+  "exits": {
+    "radish": {
+      "frame": 10,
+      "x": 318.1,
+      "y": 696.1,
+      "rot": -146,
+      "vx": -696.2,
+      "vy": -73.2,
+      "image": "items/radish-roll-1.svg"
+    },
+    "tomato": {
+      "frame": 7,
+      "x": 274.7,
+      "y": 473.6,
+      "rot": -55,
+      "vx": -901.1,
+      "vy": -630.9,
+      "image": "items/tomato.svg"
+    },
+    "banana": {
+      "frame": 9,
+      "x": 104.3,
+      "y": 735,
+      "rot": -166,
+      "vx": -800,
+      "vy": 0,
+      "image": "items/banana-a.svg"
+    }
+  },
+  "homes": {
+    "radish": {
+      "x": 1020,
+      "y": 730,
+      "rot": -62,
+      "scale": 1,
+      "image": "items/radish-roll-1.svg"
+    },
+    "tomato": {
+      "x": 935,
+      "y": 535,
+      "rot": 0,
+      "scale": 1,
+      "image": "items/tomato.svg"
+    },
+    "banana": {
+      "x": 1025,
+      "y": 500,
+      "rot": -76,
+      "scale": 1,
+      "image": "items/banana-a.svg"
+    }
+  },
+  "mouth": {
+    "upright": {
+      "x": 925,
+      "y": 557,
+      "w": 410
+    },
+    "fallen": {
+      "x": 227,
+      "y": 1040
+    }
+  },
+  "hitboxes": {
+    "upright": {
+      "cx": 915,
+      "cy": 718,
+      "w": 590,
+      "h": 676,
+      "rot": 0
+    },
+    "fallen": {
+      "cx": 477,
+      "cy": 835,
+      "w": 410,
+      "h": 490,
+      "rot": -90
+    }
+  },
+  "items": {
+    "tomato": {
+      "size": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        80
+      ],
+      "hit": {
+        "type": "circle",
+        "x": 0,
+        "y": 0,
+        "r": 66
+      },
+      "zone": {
+        "r": 62,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "shadow": {
+        "w": 118,
+        "h": 26,
+        "offset": [
+          0,
+          56
+        ],
+        "rotates": false
+      },
+      "frames": {
+        "base": "items/tomato.svg",
+        "squash": "items/tomato-squash.svg"
+      },
+      "highlight": "items/tomato-highlight.svg"
+    },
+    "radish": {
+      "size": [
+        360,
+        360
+      ],
+      "pivot": [
+        30,
+        180
+      ],
+      "hit": {
+        "type": "capsule",
+        "ax": 16,
+        "ay": 0,
+        "bx": 270,
+        "by": 0,
+        "r": 42
+      },
+      "zone": {
+        "r": 78,
+        "offset": [
+          150,
+          0
+        ]
+      },
+      "shadow": {
+        "w": 290,
+        "h": 30,
+        "offset": [
+          150,
+          34
+        ],
+        "rotates": true
+      },
+      "frames": {
+        "roll1": "items/radish-roll-1.svg",
+        "roll2": "items/radish-roll-2.svg",
+        "roll3": "items/radish-roll-3.svg"
+      }
+    },
+    "banana": {
+      "size": [
+        260,
+        260
+      ],
+      "pivot": [
+        130,
+        130
+      ],
+      "hit": {
+        "type": "capsule",
+        "ax": -96,
+        "ay": 0,
+        "bx": 96,
+        "by": 0,
+        "r": 52
+      },
+      "zone": {
+        "r": 82,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "shadow": {
+        "w": 210,
+        "h": 34,
+        "offset": [
+          0,
+          40
+        ],
+        "rotates": true
+      },
+      "frames": {
+        "a": "items/banana-a.svg",
+        "b": "items/banana-b.svg"
+      }
+    }
+  }
+}

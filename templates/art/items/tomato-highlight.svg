@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+<defs><clipPath id="t"><circle cx="80" cy="80" r="60"/></clipPath></defs>
+<g clip-path="url(#t)">
+<circle cx="102" cy="104" r="58" fill="#a92a22" opacity="0.35"/>
+<ellipse cx="56" cy="54" rx="17" ry="9" transform="rotate(-35 56 54)" fill="#fff" opacity="0.85"/>
+<circle cx="44" cy="72" r="4" fill="#fff" opacity="0.8"/>
+</g>
+<g id="guides" fill="none" stroke="#e0218a" stroke-width="2"><rect x="1" y="1" width="158" height="158" stroke-dasharray="8 8"/><path d="M 68 80 H 92 M 80 68 V 92"/><circle cx="80" cy="80" r="5.4"/><text x="8" y="22" font-size="16" font-family="sans-serif" fill="#e0218a" stroke="none">tomato · highlight (never rotates)</text></g>
+</svg>
