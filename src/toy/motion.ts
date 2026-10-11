@@ -1,11 +1,9 @@
-// Motion helpers: springs, easings, damped wobble, hops, curves. Pure math.
+// Motion helpers: springs, damped settle, curves, a seedable PRNG. Pure math.
 
 import type { Vec } from './types.ts'
 
 export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t
-export const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
-export const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 export const smoothstep = (t: number) => t * t * (3 - 2 * t)
 
 export interface Spring {
@@ -27,17 +25,6 @@ export function spring(s: Spring, target: number, dt: number, k: number, c: numb
 export const springAtRest = (s: Spring, target: number, eps = 0.01) =>
   Math.abs(s.x - target) < eps && Math.abs(s.v) < eps * 10
 
-/** Ease from 0→1 that starts at normalized speed m0 (so a handoff keeps its velocity) and ends at rest. */
-export function hermite01(t: number, m0: number): number {
-  const t2 = t * t
-  const t3 = t2 * t
-  return (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2)
-}
-
-export function hermite01Deriv(t: number, m0: number): number {
-  return (3 * t * t - 4 * t + 1) * m0 + (-6 * t * t + 6 * t)
-}
-
 /** Decaying wobble that starts at 0 and settles to 0. */
 export function dampedSine(t: number, amp: number, freq: number, decay: number): number {
   if (t <= 0) return 0
@@ -49,13 +36,6 @@ export function quadBezier(p0: Vec, c: Vec, p1: Vec, u: number): Vec {
   const b = 2 * (1 - u) * u
   const d = u * u
   return { x: a * p0.x + b * c.x + d * p1.x, y: a * p0.y + b * c.y + d * p1.y }
-}
-
-export function quadBezierDeriv(p0: Vec, c: Vec, p1: Vec, u: number): Vec {
-  return {
-    x: 2 * (1 - u) * (c.x - p0.x) + 2 * u * (p1.x - c.x),
-    y: 2 * (1 - u) * (c.y - p0.y) + 2 * u * (p1.y - c.y),
-  }
 }
 
 /** Arc length along a parametric curve, sampled once, queried by parameter. */
@@ -74,48 +54,6 @@ export function arcLengthTable(fn: (u: number) => Vec, samples = 48) {
       const f = clamp(u, 0, 1) * samples
       const i = Math.min(samples - 1, Math.floor(f))
       return lens[i] + (lens[i + 1] - lens[i]) * (f - i)
-    },
-  }
-}
-
-/**
- * Height above the floor over time: a fall from h0 with upward speed vh0, then `hops`
- * smaller bounces. Closed form, so any time can be evaluated directly.
- */
-export function hopProfile(h0: number, vh0: number, g: number, hops: number, restitution: number) {
-  interface Seg {
-    t0: number
-    h0: number
-    v0: number
-    t1: number
-  }
-  const segs: Seg[] = []
-  // Initial flight: h0 + v t - g t²/2 = 0
-  const t1 = (vh0 + Math.sqrt(Math.max(0, vh0 * vh0 + 2 * g * Math.max(0, h0)))) / g
-  segs.push({ t0: 0, h0: Math.max(0, h0), v0: vh0, t1 })
-  let impact = Math.abs(vh0 - g * t1)
-  let t = t1
-  for (let i = 0; i < hops; i++) {
-    const v = impact * restitution
-    const dur = (2 * v) / g
-    if (dur < 0.02) break
-    segs.push({ t0: t, h0: 0, v0: v, t1: t + dur })
-    t += dur
-    impact = v
-  }
-  return {
-    end: t,
-    landTimes: segs.map((s) => s.t1),
-    /** Apex time of each bounce after the first landing. */
-    apexTimes: segs.slice(1).map((s) => s.t0 + s.v0 / g),
-    height(time: number): number {
-      for (const s of segs) {
-        if (time <= s.t1) {
-          const k = Math.max(0, time - s.t0)
-          return Math.max(0, s.h0 + s.v0 * k - 0.5 * g * k * k)
-        }
-      }
-      return 0
     },
   }
 }

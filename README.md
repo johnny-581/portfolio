@@ -13,7 +13,7 @@ npm run build        # tsc -b + vite build
 
 ## Swapping in hand-drawn art
 
-1. Open the matching file in `templates/art/` (it has a guides layer: frame number, pivot, floor line, exit arrows) and draw over it at the same canvas size.
+1. Open the matching file in `templates/art/` (it has a guides layer: frame number, origin, floor grid, light direction, exit arrows) and draw over it at the same canvas size. The `bag/shadow/` files are generated from the 3D pose; don't draw those.
 2. Export to `public/art/` with the same path. To switch format (e.g. `.webp`), change the paths in `public/art/bag.json`.
 3. If an item ends up somewhere different in your drawing, update its `exits` / `homes` entry in `bag.json` and check it with `?debug`.
 

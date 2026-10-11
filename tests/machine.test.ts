@@ -19,19 +19,14 @@ const falling = run([{ type: 'bump' }], armed).s
 const messy = run([...spawnAll, { type: 'fallDone' }], falling).s
 const upright = run([{ type: 'pressBag' }, { type: 'releaseBag', progress: 0.8 }, { type: 'bagSettled', upright: true }], messy).s
 
-describe('idle / wobble', () => {
+describe('idle', () => {
   it('does nothing until armed (assets decoded, motion allowed)', () => {
     expect(run([{ type: 'bump' }]).s.name).toBe('idle')
-    expect(run([{ type: 'near' }]).s.name).toBe('idle')
+    expect(run([{ type: 'pressBag' }]).s.name).toBe('idle')
   })
-  it('proximity wobbles, leaving the radius returns to idle', () => {
-    const { s } = run([{ type: 'near' }], armed)
-    expect(s.name).toBe('wobble')
-    expect(run([{ type: 'far' }], s).s.name).toBe('idle')
-  })
-  it('a bump or a tap tips it over, from idle or wobble', () => {
+  it('a bump or a tap tips it over', () => {
     expect(run([{ type: 'bump' }], armed)).toMatchObject({ s: { name: 'falling' }, effects: ['startFall'] })
-    expect(run([{ type: 'near' }, { type: 'pressBag' }], armed).s.name).toBe('falling')
+    expect(run([{ type: 'pressBag' }], armed).s.name).toBe('falling')
   })
   it('homed items are not draggable', () => {
     expect(run([{ type: 'grabItem', id: 'tomato' }], armed).s.drag).toBeNull()
@@ -98,8 +93,8 @@ describe('righting', () => {
 })
 
 describe('upright', () => {
-  it('bumps, taps and wobble are ignored while items are missing', () => {
-    expect(run([{ type: 'bump' }, { type: 'pressBag' }, { type: 'near' }], upright).s).toEqual(upright)
+  it('bumps and taps are ignored while items are missing', () => {
+    expect(run([{ type: 'bump' }, { type: 'pressBag' }], upright).s).toEqual(upright)
   })
   it('mouth drop snaps home; floor drop stays', () => {
     const snap = run([{ type: 'grabItem', id: 'tomato' }, { type: 'dropItem', id: 'tomato', over: 'mouth' }], upright)

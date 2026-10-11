@@ -11,7 +11,7 @@ This doc covers the depth model only. Orientation, the fall frames, the art styl
 A normal perspective camera looks slightly down at the floor, so you see a little into the bag, as in the reference. You never tune its height or lens directly; both are worked out from two settings.
 
 - **World units:** 1 unit = 1 frame pixel at the bag's depth. The art keeps its current scale, and the bag is drawn at 1×.
-- **Near scale = 1.25×:** how much bigger things are at the bottom of the first screen than at the bag.
+- **Near scale = 1.5×:** how much bigger things are at the bottom of the first screen than at the bag (raised from 1.25× for a more dramatic perspective).
 - **Tilt = about 20°:** how steeply you look down. It sets how flattened shadows look, about 0.34:1.
 
 **What a real camera gives for free:**
@@ -23,7 +23,7 @@ A normal perspective camera looks slightly down at the floor, so you see a littl
 
 The earlier linear rule (scale grows with screen height) is almost exactly what this camera produces, within about 1–2% over this depth range. Same look, derived properly, so heights, sideways movement and shadows come out right too.
 
-**Left out on purpose:** items stay flat drawings that always face the camera. Over a 1.25× depth change the viewing angle shifts about 3°, which nobody perceives, and each pose stays one drawing.
+**Left out on purpose:** items stay flat drawings that always face the camera. Over this depth range the viewing angle shifts only a few degrees, which nobody perceives, and each pose stays one drawing.
 
 ## 2. Move things in the world, not on the screen
 
@@ -99,12 +99,12 @@ Starting values, and what each looks like when pushed too far.
 
 | Setting | Start at | Too much looks like |
 | --- | --- | --- |
-| Near scale | 1.25× | Above 1.35×, things zoom like a fish-eye lens |
+| Near scale | 1.5× | Higher still starts to look like a fish-eye lens |
 | Camera tilt | 20° | Above 30°, it looks like a top-down game |
 | Light | Top-left, 45° | Must match the art, or the scene feels off |
 | Contact shadow | 25%, tight | Dark and hard looks pasted on |
 | Soft shadow | 10%, grows with height | No growth: items float without leaving the floor |
-| Gravity | ~5,000 units/s² (real gravity at this scale) | Lower looks like the moon |
+| Gravity | 11,000 units/s² (real gravity: the 480-unit bag ≈ 40 cm) | Lower looks like the moon |
 | Ramp curve | 0.15 bag heights | 0 gives a visible kink as items start lifting |
 | Held lift | 10 units | Much more reads as floating, not holding |
 | Release speed cap | 600 units/s | No cap: items get flung across the page |

@@ -128,4 +128,4 @@ The placeholders move to the reference's flat cut-paper look: flat color, hand-c
 | --- | --- |
 | Keep the fallen bag's "trying to get up" nudge? | No. The grab cursor plus the bump-off (an item dropped on the fallen bag rolls off) show it has to stand first |
 | Fall frame rate | 12fps, about 10 drawings |
-| Near scale | 1.25× (tunable live in the debug panel) |
+| Near scale | 1.5× (raised from 1.25× for a more dramatic perspective; set in `src/toy/poses.ts` as `NEAR_SCALE`, then `npm run gen`) |

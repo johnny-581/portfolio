@@ -11,15 +11,18 @@ export interface Assets {
 }
 
 export function contractPaths(c: Contract): string[] {
-  const set = new Set<string>([c.upright.back, c.upright.front])
+  const set = new Set<string>([c.upright.back, c.upright.front, c.upright.shadow])
   for (const f of c.fall) {
     set.add(f.src)
     set.add(f.empty)
+    set.add(f.shadow)
   }
-  for (const r of c.right) set.add(r.src)
+  for (const r of c.right) {
+    set.add(r.src)
+    set.add(r.shadow)
+  }
   for (const spec of Object.values(c.items)) {
     for (const p of Object.values(spec.frames)) set.add(p)
-    if (spec.highlight) set.add(spec.highlight)
   }
   return [...set]
 }

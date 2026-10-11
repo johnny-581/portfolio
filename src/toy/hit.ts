@@ -1,7 +1,13 @@
 // Hit tests: circles, capsules and rotated rectangles. Pure math.
 
 import type { Box, RotRect, Vec } from './types.ts'
-import { rotate } from './poses.ts'
+
+/** Rotate a screen vector by `deg` (clockwise, y down). */
+export function rotate(v: Vec, deg: number): Vec {
+  const c = Math.cos((deg * Math.PI) / 180)
+  const s = Math.sin((deg * Math.PI) / 180)
+  return { x: v.x * c - v.y * s, y: v.x * s + v.y * c }
+}
 
 export function inCircle(p: Vec, c: Vec, r: number): boolean {
   return (p.x - c.x) ** 2 + (p.y - c.y) ** 2 <= r * r
@@ -62,6 +68,25 @@ export function circleHitsBox(c: Vec, r: number, b: Box): boolean {
   const nx = Math.max(b.x, Math.min(c.x, b.x + b.w))
   const ny = Math.max(b.y, Math.min(c.y, b.y + b.h))
   return (c.x - nx) ** 2 + (c.y - ny) ** 2 < r * r
+}
+
+ /** Is p inside the polygon (any winding)? */
+export function inPolygon(p: Vec, poly: readonly Vec[]): boolean {
+  let inside = false
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i]
+    const b = poly[j]
+    if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) inside = !inside
+  }
+  return inside
+}
+
+/** Does a circle touch the polygon (inside it, or within r of an edge)? */
+export function circleHitsPolygon(c: Vec, r: number, poly: readonly Vec[]): boolean {
+  if (poly.length < 3) return false
+  if (inPolygon(c, poly)) return true
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) if (distToSegment(c, poly[j], poly[i]) < r) return true
+  return false
 }
 
 export const inBox = (p: Vec, b: Box) => p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h

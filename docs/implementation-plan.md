@@ -160,3 +160,16 @@ That's 2 + 10 + 10 + 10 + 1 + 3 + 2 = **38 SVGs**; `L1`, `tomato-squash` and `to
 ## 12. Out of scope
 
 Hand-drawn art, sprite sheets (`scripts/build-sheets.ts`), sound, the rest of the portfolio pages, and moving the shell to Next.js.
+
+## 13. As built
+
+All five milestones are in. Differences from the plan above:
+
+- **Near scale is 1.5×**, not 1.25×, for a more dramatic perspective. It lives in `src/toy/poses.ts` (`NEAR_SCALE`) because the frames are drawn through the camera; change it and run `npm run gen`.
+- **39 SVGs, not 38:** there is also `bag/shadow/00.svg`, the upright bag's shadow.
+- **The fallen bag's no-landing area is its real floor outline** (`footprint` in `bag.json`, a polygon), not a screen rectangle. The rectangle covered the floor in front of the mouth, so short-sliding items couldn't escape it.
+- **Landing spots** are searched on the floor: the item's own path first (shortened if needed), then deflected directions widening toward the viewer, then the nearest fitting point. Stress run: 0 violations at 375 / 768 / 1440 wide; 20–27% of spots are short nudges away from a neighbour or the bag.
+- **Held items move on pointer move**, not on the next frame, so a quick release is judged where the pointer let go.
+- **Gravity is 11,000 units/s²** (real gravity at this scale), not the ~5,000 the depth doc first estimated.
+- **The anchor's aspect ratio** in `src/App.css` follows `uprightBox` in `bag.json`; update it after regenerating if the box changes.
+- **Testing note:** the in-app browser pane throttles animation frames to ~2/s when hidden. With the 50 ms frame-time cap that plays everything in slow motion; it's the pane, not the toy. Set `__toy.config.maxDt = 1` under `?debug` to check timing there.

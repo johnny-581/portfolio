@@ -1,74 +1,80 @@
-// Loose items: tomato, radish, banana. Each one is a canvas-sized element moved only with
-// transforms. While home it lives inside the bag (frame pixels); while loose it lives on the
-// stage (stage pixels) with depth scale and a soft shadow.
+// Loose items: tomato, radish, banana. Each is a canvas-sized element moved only with
+// transforms. Its state is a world position (the pivot) and a screen rotation; the camera
+// turns that into stage position and size every frame.
 //
-// Motion while rolling is closed-form over time (hops + eased travel + damped settle), so a
-// roll always ends exactly on the landing spot that was picked for it.
+// Motion is world physics in closed form: a flight under gravity, small bounces, then a slide
+// or roll that slows at a constant rate and stops exactly on the spot the zone picked.
 
 import type { Assets } from './assets.ts'
 import type { Bag } from './bag.ts'
-import { config, type ItemMotion } from './config.ts'
-import { depthFactor, type Layout } from './layout.ts'
+import type { Ray } from './camera.ts'
+import { config, type Material } from './config.ts'
+import { rotate } from './hit.ts'
+import { project, type Layout } from './layout.ts'
+import { arcLengthTable, clamp, dampedSine, lerp, nearestTurn, quadBezier, smoothstep, spring, type Spring } from './motion.ts'
 import {
-  arcLengthTable,
-  clamp,
-  dampedSine,
-  easeInOutCubic,
-  hermite01,
-  hopProfile,
-  lerp,
-  nearestTurn,
-  quadBezier,
-  quadBezierDeriv,
-  rand,
-  smoothstep,
-  spring,
-  springAtRest,
-  type Spring,
-} from './motion.ts'
-import { rotate } from './poses.ts'
-import type { Exit, ItemId, ItemSpec, Vec } from './types.ts'
-import { clampIntoZone, type Placed } from './zone.ts'
+  bounceHeight,
+  bounces,
+  capSpeed,
+  flightAt,
+  flightLanding,
+  groundAt,
+  groundMotion,
+  timeToHeight,
+  type Bounces,
+  type Ground,
+  type Landing,
+} from './physics.ts'
+import { rampPoint } from './ramp.ts'
+import type { ItemId, ItemSpec, Vec, Vec3 } from './types.ts'
+import { ITEM_IDS } from './types.ts'
+import type { FloorPoint, Placed } from './zone.ts'
 
 const DEG = 180 / Math.PI
-const SETTLE_TIME = 1.2
 
-interface RollPlan {
+interface Throw {
   t: number
-  g0: Vec
-  ctrl: Vec
-  target: Vec
-  arc: ReturnType<typeof arcLengthTable>
-  travel: number
-  m0: number
-  hop: ReturnType<typeof hopProfile>
-  end: number
+  p0: Vec3
+  v0: Vec3
+  land: Landing
+  hop: Bounces
+  start: FloorPoint
+  target: FloorPoint
+  dir: FloorPoint
+  ground: Ground
+  /** Curved ground path (radish), by arc length. */
+  curve: { at(s: number): FloorPoint } | null
+  /** Horizontal speed in the air. */
+  airSpeed: number
   rot0: number
-  /** Rotation at the end of the travel (before settle). */
   rotEnd: number
-  kind: 'spin' | 'sweep' | 'turn'
-  spinDir: number
-  settle: { amp: number; freq: number; decay: number }
-  /** Banana: image to swap to at the top of the first bounce. */
-  flipTo: string | null
-  flipAt: number
-  squashAt: number | null
+  /** Tomato: screen degrees per unit of distance travelled (signed). */
+  spin: number
+  rock: number
+  end: number
 }
 
 type Mode =
   | { kind: 'home' }
-  | { kind: 'roll'; plan: RollPlan }
+  | { kind: 'throw'; plan: Throw }
   | { kind: 'rest' }
-  | { kind: 'drag' }
-  | { kind: 'snap'; t: number; p0: Vec; k0: number; inBag: boolean }
+  | { kind: 'held' }
+  | { kind: 'dropIn'; t: number; p0: Vec3; T: number; rot0: number; inBag: boolean }
+
+export interface ThrowOptions {
+  /** Final screen rotation for items that turn as they go (radish sweep, banana lying flat). */
+  rotEnd?: number
+  /** Image to land on (banana side). */
+  side?: string
+}
 
 export class Item {
   readonly id: ItemId
   readonly spec: ItemSpec
   readonly el: HTMLDivElement
   readonly hitEl: HTMLDivElement
-  readonly shadowEl: HTMLDivElement
-  private hlEl: HTMLDivElement | null = null
+  private contactEl: HTMLDivElement
+  private softEl: HTMLDivElement
   private imgs = new Map<string, HTMLImageElement>()
   private image = ''
   private bag: Bag
@@ -76,24 +82,17 @@ export class Item {
   private looseLayer: HTMLElement
   private mode: Mode = { kind: 'home' }
 
-  // Loose state (stage pixels)
-  ground: Vec = { x: 0, y: 0 }
-  h = 0
+  /** World position of the pivot. */
+  pos: Vec3 = { x: 0, y: 0, z: 0 }
+  /** Screen rotation, degrees. */
   rot = 0
-  private lift: Spring = { x: 1, v: 0 }
-  private height: Spring = { x: 0, v: 0 }
-  private tilt: Spring = { x: 0, v: 0 }
-  /** Dragged pivot position on screen (springs toward the pointer). */
-  private sx: Spring = { x: 0, v: 0 }
-  private sy: Spring = { x: 0, v: 0 }
-  private dragTarget: Vec = { x: 0, y: 0 }
-  private grabOffset: Vec = { x: 0, y: 0 }
-  private dragVx = 0
-  private rotSpring: Spring = { x: 0, v: 0 }
-  private snapPos: Vec = { x: 0, y: 0 }
-  private snapScale = 1
-  /** Target spot of the current roll (debug overlay draws it). */
-  landing: Vec | null = null
+  /** Where the current throw comes to rest (debug overlay, overlap checks). */
+  landing: FloorPoint | null = null
+
+  private ray: Ray | null = null
+  private lift: Spring = { x: 0, v: 0 }
+  private vel: Vec3 = { x: 0, y: 0, z: 0 }
+  private flipTo: string | null = null
 
   constructor(id: ItemId, assets: Assets, bag: Bag, looseLayer: HTMLElement, shadowLayer: HTMLElement) {
     this.id = id
@@ -112,14 +111,6 @@ export class Item {
       img.style.opacity = '0'
       this.el.append(img)
       this.imgs.set(name, img)
-    }
-    if (this.spec.highlight) {
-      this.hlEl = document.createElement('div')
-      this.hlEl.className = 'toy-item toy-item-hl'
-      Object.assign(this.hlEl.style, { width: `${w}px`, height: `${h}px`, transformOrigin: `${px}px ${py}px` })
-      const img = assets.img(this.spec.highlight)
-      img.className = 'toy-item-img'
-      this.hlEl.append(img)
     }
 
     this.hitEl = document.createElement('div')
@@ -149,10 +140,11 @@ export class Item {
     }
     this.el.append(this.hitEl)
 
-    this.shadowEl = document.createElement('div')
-    this.shadowEl.className = 'toy-shadow'
-    this.shadowEl.style.opacity = '0'
-    shadowLayer.append(this.shadowEl)
+    this.softEl = document.createElement('div')
+    this.contactEl = document.createElement('div')
+    this.softEl.className = this.contactEl.className = 'toy-shadow'
+    this.softEl.style.opacity = this.contactEl.style.opacity = '0'
+    shadowLayer.append(this.softEl, this.contactEl)
 
     this.goHome()
   }
@@ -166,48 +158,45 @@ export class Item {
     return this.mode.kind
   }
 
-  get isRolling() {
-    return this.mode.kind === 'roll'
+  get isMoving() {
+    return this.mode.kind === 'throw' || this.mode.kind === 'dropIn'
   }
 
-  /** Stage position of the item's visual center (pivot + zone offset), for zone checks. */
-  centerOf(ground: Vec, rot: number, k = this.scaleAt(ground.y)): Vec {
-    const o = rotate({ x: this.spec.zone.offset[0] * k, y: this.spec.zone.offset[1] * k }, rot)
-    return { x: ground.x + o.x, y: ground.y + o.y }
+  get material(): Material {
+    return config.items[this.id]
   }
 
-  zoneRadius(groundY: number): number {
-    return this.spec.zone.r * this.scaleAt(groundY)
+  // ---------------------------------------------------------------------------
+  // Geometry
+
+  /** Stage circle of the item resting on floor point p with screen rotation rot. */
+  restCircle(p: FloorPoint, rot = this.rot): Placed {
+    const s = project(this.layout!, { x: p.x, y: this.spec.restHeight, z: p.z })
+    const o = rotate({ x: this.spec.zone.offset[0] * s.scale, y: this.spec.zone.offset[1] * s.scale }, rot)
+    return { x: s.x + o.x, y: s.y + o.y, r: this.spec.zone.r * s.scale }
   }
 
+  /** Stage circle where it is (or will come to rest, while moving). */
   placed(): Placed {
-    const c = this.centerOf(this.ground, this.rot)
-    return { ...c, r: this.zoneRadius(this.ground.y) }
+    if (this.landing && this.mode.kind === 'throw') return this.restCircle(this.landing, this.mode.plan.rotEnd)
+    return this.restCircle({ x: this.pos.x, z: this.pos.z })
   }
 
-  /** Screen point under the visual center (what the pointer is "holding"). */
+  /** Stage point of the visual centre right now. */
   screenCenter(): Vec {
-    const c = this.centerOf(this.ground, this.rot)
-    return { x: c.x, y: c.y - this.h }
+    const s = project(this.layout!, this.pos)
+    const o = rotate({ x: this.spec.zone.offset[0] * s.scale, y: this.spec.zone.offset[1] * s.scale }, this.rot)
+    return { x: s.x + o.x, y: s.y + o.y }
   }
 
-  /**
-   * Where the item is being let go: the pointer's spot while dragging (the sprite may still
-   * be springing toward it after a quick flick), otherwise its current center.
-   */
-  releaseCenter(): Vec {
-    if (this.mode.kind !== 'drag') return this.screenCenter()
-    const off = this.centerOf({ x: 0, y: 0 }, this.rot, this.scaleAt(this.ground.y) * this.lift.x)
-    return { x: this.dragTarget.x + off.x, y: this.dragTarget.y + off.y }
-  }
-
-  private scaleAt(groundY: number): number {
-    const l = this.layout!
-    return l.scale * depthFactor(l, groundY)
+  /** Stage point of the pivot right now. */
+  pivotStage(): Vec {
+    const s = project(this.layout!, this.pos)
+    return { x: s.x, y: s.y }
   }
 
   private setImage(name: string) {
-    if (this.image === name) return
+    if (this.image === name || !this.imgs.has(name)) return
     if (this.image) this.imgs.get(this.image)!.style.opacity = '0'
     this.imgs.get(name)!.style.opacity = '1'
     this.image = name
@@ -224,264 +213,204 @@ export class Item {
   goHome() {
     const home = this.bag.contract.homes[this.id]
     this.mode = { kind: 'home' }
+    this.pos = { x: home.x, y: home.y, z: home.z }
+    this.rot = home.rot
     this.setImage(this.imageName(home.image))
     this.insertIntoBag()
-    this.shadowEl.style.opacity = '0'
+    this.softEl.style.opacity = this.contactEl.style.opacity = '0'
     this.landing = null
     this.render()
   }
 
   private insertIntoBag() {
-    const order: ItemId[] = ['radish', 'tomato', 'banana']
     const homed = this.bag.homedEl
-    const after = order.slice(order.indexOf(this.id) + 1)
+    const after = ITEM_IDS.slice(ITEM_IDS.indexOf(this.id) + 1)
     const next = [...homed.children].find((c) => after.some((id) => c.classList.contains(`toy-item-${id}`)))
     homed.insertBefore(this.el, next ?? null)
-    if (this.hlEl) homed.insertBefore(this.hlEl, this.el.nextSibling)
+    this.el.style.zIndex = ''
   }
 
-  private insertLoose() {
+  /** Leave the bag frame at its exit and fly, land and roll to `target`. */
+  spawn(p0: Vec3, v0: Vec3, rot0: number, image: string, target: FloorPoint, opts: ThrowOptions = {}) {
     this.looseLayer.append(this.el)
-    if (this.hlEl) this.looseLayer.append(this.hlEl)
-  }
-
-  /** Take over from the bag frame at the exit point and roll to `target` (the item's pivot). */
-  spawn(exit: Exit, target: Vec, motion: ItemMotion, r: () => number, finalRot: number, side: string | null) {
-    const l = this.layout!
-    const s = this.bag.toStage({ x: exit.x, y: exit.y })
-    const v = rotate({ x: exit.vx * l.scale, y: exit.vy * l.scale }, this.bag.rotor.x)
-    const rot0 = exit.rot + this.bag.rotor.x
-    this.insertLoose()
-    this.setImage(this.imageName(exit.image))
-    const back = l.zone.back
-    const g0 = { x: s.x, y: Math.max(s.y, back) }
-    this.ground = g0
-    this.h = g0.y - s.y
+    this.setImage(this.imageName(image))
+    this.pos = { ...p0 }
     this.rot = rot0
-    this.mode = { kind: 'roll', plan: this.plan(g0, this.h, v, target, motion, r, rot0, finalRot, side) }
-    this.landing = target
-    this.render()
+    this.throwTo(v0, target, opts)
   }
 
-  private plan(
-    g0: Vec,
-    h0: number,
-    v0: Vec,
-    target: Vec,
-    m: ItemMotion,
-    r: () => number,
-    rot0: number,
-    finalRot: number,
-    side: string | null,
-    vhOverride?: number,
-  ): RollPlan {
-    const l = this.layout!
-    const dx = target.x - g0.x
-    const dy = target.y - g0.y
-    const len = Math.hypot(dx, dy)
-    // Bow the path toward the viewer (down the screen).
-    let nx = -dy / (len || 1)
-    let ny = dx / (len || 1)
-    if (ny < 0) {
-      nx = -nx
-      ny = -ny
+  /** Fly from where it is with velocity v0 and come to rest on `target`. */
+  throwTo(v0: Vec3, target: FloorPoint, opts: ThrowOptions = {}) {
+    const m = this.material
+    const g = config.gravity
+    const rest = this.spec.restHeight
+    const p0 = { ...this.pos, y: Math.max(this.pos.y, rest) }
+    const land = flightLanding(p0, v0, g, rest)
+    const hop = bounces(-land.v.y, m.restitution, m.bounces, g)
+    const start = { x: land.p.x, z: land.p.z }
+    const dx = target.x - start.x
+    const dz = target.z - start.z
+    const dist = Math.hypot(dx, dz)
+    const dir = dist > 1e-6 ? { x: dx / dist, z: dz / dist } : { x: 0, z: 0 }
+    let speed = Math.hypot(land.v.x, land.v.z)
+    // Pushed from standstill (a nudge): the speed that friction brings to rest exactly there.
+    if (dist > 0.5 && speed < 1) speed = Math.sqrt(2 * m.mu * g * dist)
+    let ground = groundMotion(speed, dist)
+
+    let curve: Throw['curve'] = null
+    if (m.curve > 0 && dist > 1) {
+      // Bow toward the viewer: the radish rolls in a curve around its thin tip.
+      let nx = -dir.z
+      let nz = dir.x
+      if (nz < 0) {
+        nx = -nx
+        nz = -nz
+      }
+      const s0 = { x: start.x, y: start.z }
+      const s1 = { x: target.x, y: target.z }
+      const c = { x: (s0.x + s1.x) / 2 + nx * m.curve * dist, y: (s0.y + s1.y) / 2 + nz * m.curve * dist }
+      const arc = arcLengthTable((u) => quadBezier(s0, c, s1, u))
+      ground = groundMotion(speed, arc.total)
+      curve = {
+        at(s: number) {
+          // Parameter for arc length s, by bisection on the table.
+          let lo = 0
+          let hi = 1
+          for (let i = 0; i < 18; i++) {
+            const mid = (lo + hi) / 2
+            if (arc.at(mid) < s) lo = mid
+            else hi = mid
+          }
+          const q = quadBezier(s0, c, s1, (lo + hi) / 2)
+          return { x: q.x, z: q.y }
+        },
+      }
     }
-    const bow = { x: (g0.x + target.x) / 2 + nx * m.curve * len, y: (g0.y + target.y) / 2 + ny * m.curve * len }
-    const nominal = ((m.dist[0] + m.dist[1]) / 2) * l.bagH
-    const travel = Math.max(0.2, m.travel * clamp(len / Math.max(1, nominal), 0.6, 1.3))
-    // Start the ground path along the exit's horizontal velocity (height handles the vertical),
-    // so the sprite keeps its speed through the handoff; then bend toward the target.
-    const reach = clamp((v0.x * travel) / 2, -0.6 * len, 0.6 * len)
-    const ctrl = Math.abs(v0.x) > 1 ? { x: lerp(bow.x, g0.x + reach, 0.7), y: lerp(bow.y, g0.y, 0.7) } : bow
-    const fn = (u: number) => quadBezier(g0, ctrl, target, u)
-    const arc = arcLengthTable(fn)
 
-    // Match the handoff speed along the path so the sprite doesn't lurch.
-    const d0 = quadBezierDeriv(g0, ctrl, target, 0)
-    const d0len = Math.hypot(d0.x, d0.y) || 1
-    const along = (v0.x * d0.x + v0.y * d0.y) / d0len
-    const m0 = arc.total > 1 ? clamp((along * travel) / arc.total, 0, 2.8) : 0
-    const groundVy0 = (d0.y * m0) / travel
-    const vh0 = vhOverride ?? groundVy0 - v0.y
-    const g = config.gravity * l.scale
-    const hop = hopProfile(h0, vh0, g, m.hops, m.restitution)
-
-    const spinDir = dx < 0 ? -1 : 1
-    const kind: RollPlan['kind'] = this.id === 'tomato' ? 'spin' : this.id === 'radish' ? 'sweep' : 'turn'
-    const radius = (this.spec.hit.type === 'circle' ? this.spec.hit.r : 40) * l.scale
-    const rotEnd = kind === 'spin' ? rot0 + (spinDir * arc.total) / radius * DEG : finalRot
-
-    return {
+    const l = this.layout!
+    const screenDx = project(l, { x: target.x, y: rest, z: target.z }).x - project(l, p0).x
+    const radius = this.spec.hit.type === 'circle' ? this.spec.hit.r : 36
+    const plan: Throw = {
       t: 0,
-      g0,
-      ctrl,
-      target,
-      arc,
-      travel,
-      m0,
+      p0,
+      v0,
+      land,
       hop,
-      end: Math.max(travel, hop.end) + SETTLE_TIME,
-      rot0,
-      rotEnd,
-      kind,
-      spinDir,
-      settle: { amp: m.settleAmp * (r() < 0.5 ? -1 : 1), freq: m.settleFreq, decay: m.settleDecay },
-      flipTo: side && side !== this.image ? side : null,
-      flipAt: hop.apexTimes[0] ?? hop.landTimes[0] * 0.6,
-      squashAt: this.id === 'tomato' && this.spec.frames.squash ? hop.landTimes[0] : null,
+      start,
+      target,
+      dir,
+      ground,
+      curve,
+      airSpeed: Math.hypot(v0.x, v0.z),
+      rot0: this.rot,
+      rotEnd: opts.rotEnd ?? this.rot,
+      spin: this.id === 'tomato' ? (Math.sign(screenDx) || 1) * (DEG / radius) : 0,
+      rock: m.rock,
+      end: land.t + Math.max(ground.T, hop.end) + (m.rock > 0 ? 1 : 0.02),
     }
-  }
-
-  /** Stop wherever it is (grabbed mid-roll). */
-  cancelRoll() {
-    if (this.mode.kind === 'roll') {
-      if (this.id === 'tomato') this.setImage('base')
-      this.mode = { kind: 'rest' }
-    }
-  }
-
-  beginDrag(pointer: Vec) {
-    this.cancelRoll()
-    this.mode = { kind: 'drag' }
-    const p = { x: this.ground.x, y: this.ground.y - this.h }
-    this.sx = { x: p.x, v: 0 }
-    this.sy = { x: p.y, v: 0 }
-    this.dragTarget = { ...p }
-    this.grabOffset = { x: pointer.x - p.x, y: pointer.y - p.y }
-    this.height = { x: this.h, v: 0 }
-    this.lift = { x: this.lift.x, v: 0 }
-    this.tilt = { x: 0, v: 0 }
-  }
-
-  /** Ground point under where the pointer let go (or the current one when not dragging). */
-  private releaseGround(): Vec {
-    return this.mode.kind === 'drag' ? { x: this.dragTarget.x, y: this.dragTarget.y + this.h } : this.ground
-  }
-
-  /** Fold the drag tilt into the rotation so letting go doesn't snap it straight. */
-  private endDrag() {
-    if (this.mode.kind !== 'drag') return
-    this.rot += this.tilt.x
-    this.tilt = { x: 0, v: 0 }
-    this.mode = { kind: 'rest' }
-  }
-
-  dragTo(pointer: Vec, vx: number) {
-    this.dragTarget = { x: pointer.x - this.grabOffset.x, y: pointer.y - this.grabOffset.y }
-    this.dragVx = vx
-  }
-
-  /** Dropped on the floor: little hop, then stay (eased back into the zone if needed). */
-  settle(placed: Placed[], r: () => number) {
-    // Land where the pointer let go, even if the sprite is still catching up.
-    const release = this.releaseGround()
-    this.endDrag()
-    const l = this.layout!
-    const target = this.clampPivot(release, placed)
-    this.mode = {
-      kind: 'roll',
-      plan: this.plan(this.ground, this.h, { x: 0, y: 0 }, target, quick(0.28, 1, 0.3), r, this.rot, this.rot, null, 140 * l.scale),
-    }
+    this.flipTo = opts.side && opts.side !== this.image ? opts.side : null
+    this.mode = { kind: 'throw', plan }
     this.landing = target
   }
 
-  /** Dropped on the fallen bag: pop up and roll 40–80px away from it. */
-  bumpOff(from: Vec, placed: Placed[], r: () => number) {
-    const g = this.releaseGround()
-    this.endDrag()
-    const l = this.layout!
-    const dx = g.x - from.x
-    const dy = g.y - from.y + 40
-    const d = Math.hypot(dx, dy) || 1
-    const dist = rand(r, config.bumpOffMin, config.bumpOffMax)
-    const raw = { x: g.x + (dx / d) * dist, y: Math.max(g.y, l.zone.back) + (dy / d) * dist }
-    const target = this.clampPivot(raw, placed)
-    const spin = this.id === 'tomato' ? this.rot : this.rot + rand(r, -25, 25)
-    this.mode = {
-      kind: 'roll',
-      plan: this.plan(this.ground, this.h, { x: 0, y: 0 }, target, quick(0.5, 1, 0.35), r, this.rot, spin, null, 360 * l.scale),
-    }
-    this.landing = target
-  }
-
-  /** Ease back inside the zone after a resize. */
-  reclamp(placed: Placed[], r: () => number) {
-    if (this.mode.kind !== 'rest') return
-    const target = this.clampPivot(this.ground, placed)
-    if (Math.hypot(target.x - this.ground.x, target.y - this.ground.y) < 0.5) return
-    this.mode = {
-      kind: 'roll',
-      plan: this.plan(this.ground, 0, { x: 0, y: 0 }, target, quick(0.45, 0, 0), r, this.rot, this.rot, null, 0),
-    }
-    this.landing = target
-  }
-
-  /** Pivot position whose visual center fits the zone, as close to `pivot` as possible. */
-  private clampPivot(pivot: Vec, placed: Placed[]): Vec {
-    const l = this.layout!
-    const c = this.centerOf(pivot, this.rot)
-    const k = this.scaleAt(pivot.y)
-    const fit = clampIntoZone(c, this.spec.zone.r * k, l.zone, placed, config.itemGap)
-    return { x: pivot.x + (fit.x - c.x), y: pivot.y + (fit.y - c.y) }
-  }
-
-  snapHome() {
-    this.endDrag()
-    const k0 = this.scaleAt(this.ground.y) * this.lift.x
-    this.mode = { kind: 'snap', t: 0, p0: { x: this.ground.x, y: this.ground.y - this.h }, k0, inBag: false }
-    this.shadowEl.style.opacity = '0'
-    this.rotSpring = { x: this.rot, v: 0 }
+  /** Grabbed: stop wherever it is. */
+  beginHold() {
+    this.mode = { kind: 'held' }
     this.landing = null
+    this.lift = { x: Math.max(0, this.pos.y - this.spec.restHeight), v: 0 }
+    this.vel = { x: 0, y: 0, z: 0 }
+    this.ray = null
+    this.lastFollow = performance.now() / 1000
+    this.el.style.zIndex = '5000'
+  }
+
+  /** The line from the camera through the cursor (minus the grab offset). Moves it right away, so a quick release lands where the pointer let go. */
+  holdRay(ray: Ray, dt = 0) {
+    this.ray = ray
+    if (this.mode.kind === 'held') {
+      this.followRay(dt)
+      this.render()
+    }
+  }
+
+  /** Put the held item on the ramp where the cursor's ray meets it; track its velocity. */
+  private followRay(dt: number) {
+    if (!this.ray) return
+    const prev = this.pos
+    const hit = rampPoint(this.ray, {
+      base: this.spec.restHeight + this.lift.x,
+      wallZ: 0,
+      radius: config.rampCurve * this.bag.contract.bodyHeight,
+    })
+    this.pos = { x: hit.x, y: hit.y, z: hit.z }
+    const now = performance.now() / 1000
+    const step = dt > 0 ? dt : now - this.lastFollow
+    this.lastFollow = now
+    if (step > 1e-3 && step < 0.25) {
+      const k = 0.35
+      this.vel = {
+        x: this.vel.x * (1 - k) + ((this.pos.x - prev.x) / step) * k,
+        y: this.vel.y * (1 - k) + ((this.pos.y - prev.y) / step) * k,
+        z: this.vel.z * (1 - k) + ((this.pos.z - prev.z) / step) * k,
+      }
+    }
+  }
+
+  private lastFollow = 0
+
+  /** Velocity to carry into the fall when let go, capped. */
+  releaseVelocity(): Vec3 {
+    return capSpeed(this.vel, config.releaseCap)
+  }
+
+  /** Let go over the upright bag's mouth: fall in, easing into the slot on the way down. */
+  dropIn() {
+    const home = this.bag.contract.homes[this.id]
+    const p0 = { ...this.pos }
+    const fall = p0.y > home.y ? timeToHeight(p0.y, 0, config.gravity, home.y) : 0
+    this.mode = { kind: 'dropIn', t: 0, p0, T: Math.max(0.22, fall), rot0: this.rot, inBag: false }
+    this.landing = null
+    this.softEl.style.opacity = this.contactEl.style.opacity = '0'
   }
 
   // ---------------------------------------------------------------------------
 
-  /** Advance; returns true while still moving. `onArrive` fires when a snap lands. */
+  /** Advance; returns true while still moving. `onArrive` fires when a drop-in lands home. */
   tick(dt: number, onArrive: (id: ItemId) => void): boolean {
     const m = this.mode
     switch (m.kind) {
       case 'home':
       case 'rest':
         return false
-      case 'roll':
-        this.tickRoll(m.plan, dt)
+      case 'throw':
+        this.tickThrow(m.plan, dt)
         break
-      case 'drag': {
-        const sx = this.sx
-        const sy = this.sy
-        spring(sx, this.dragTarget.x, dt, config.springK, config.springC)
-        spring(sy, this.dragTarget.y, dt, config.springK, config.springC)
-        spring(this.height, config.liftHeight, dt, config.springK, config.springC)
-        spring(this.lift, config.dragLift, dt, config.springK, config.springC)
-        const vx = (this.dragVx + sx.v) / 2
-        spring(this.tilt, clamp(vx * config.tiltFactor, -config.tiltMax, config.tiltMax), dt, config.rotK, config.rotC)
-        this.dragVx *= Math.exp(-10 * dt)
-        this.h = this.height.x
-        // The pivot is held on screen; the ground point (and shadow) sits h below it.
-        this.ground = { x: sx.x, y: sy.x + this.h }
+      case 'held': {
+        // Only the lift eases in here; the pointer moves it directly (holdRay).
+        const before = this.lift.x
+        spring(this.lift, config.heldLift, dt, config.liftK, config.liftC)
+        if (Math.abs(this.lift.x - before) > 1e-3) this.followRay(0)
+        // Velocity decays while the pointer rests, so letting go of a still item drops it straight down.
+        const decay = Math.exp(-8 * dt)
+        this.vel = { x: this.vel.x * decay, y: this.vel.y * decay, z: this.vel.z * decay }
         break
       }
-      case 'snap': {
+      case 'dropIn': {
         m.t += dt
-        const tau = Math.min(1, m.t / config.snapDuration)
         const home = this.bag.contract.homes[this.id]
-        const p1 = this.bag.toStage({ x: home.x, y: home.y })
-        const ctrl = { x: (m.p0.x + p1.x) / 2, y: Math.min(m.p0.y, p1.y) - config.snapArc * (this.layout!.scale / 0.35) }
-        const p = quadBezier(m.p0, ctrl, p1, easeInOutCubic(tau))
-        spring(this.rotSpring, nearestTurn(home.rot + this.bag.rotor.x, this.rotSpring.x), dt, config.rotK, config.rotC)
-        spring(this.lift, 1, dt, config.springK, config.springC)
-        this.rot = this.rotSpring.x
-        const k = lerp(m.k0, this.layout!.scale * home.scale, smoothstep(tau))
-        if (!m.inBag && tau >= 0.5) {
-          // Top of the arc: drop in between the back and front layers.
+        const tau = Math.min(1, m.t / m.T)
+        const e = smoothstep(tau)
+        const y =
+          m.p0.y > home.y ? Math.max(home.y, m.p0.y - 0.5 * config.gravity * m.t * m.t) : lerp(m.p0.y, home.y, e)
+        this.pos = { x: lerp(m.p0.x, home.x, e), y, z: lerp(m.p0.z, home.z, e) }
+        this.rot = lerp(m.rot0, nearestTurn(home.rot, m.rot0), e)
+        if (!m.inBag && (y < this.bag.contract.mouth.rimY + 40 || tau >= 0.5)) {
+          // Past the rim: between the back and front layers from here on.
           m.inBag = true
           this.insertIntoBag()
           this.setImage(this.imageName(home.image))
         }
-        this.snapPos = p
-        this.snapScale = k
-        const rotTarget = nearestTurn(home.rot + this.bag.rotor.x, this.rotSpring.x)
-        if (tau >= 1 && springAtRest(this.rotSpring, rotTarget, 0.3)) {
+        if (tau >= 1) {
           this.goHome()
           onArrive(this.id)
           return false
@@ -493,45 +422,46 @@ export class Item {
     return true
   }
 
-  private tickRoll(p: RollPlan, dt: number) {
+  private tickThrow(p: Throw, dt: number) {
     p.t += dt
-    spring(this.lift, 1, dt, config.springK, config.springC)
     const t = p.t
-    const tau = Math.min(1, t / p.travel)
-    const u = hermite01(tau, p.m0)
-    this.ground = quadBezier(p.g0, p.ctrl, p.target, u)
-    this.h = p.hop.height(t)
+    const g = config.gravity
+    const rest = this.spec.restHeight
+    const airDist = p.airSpeed * p.land.t
+    let travelled: number
+    let onGround = 0
+    if (t < p.land.t) {
+      this.pos = flightAt(p.p0, p.v0, g, t)
+      travelled = p.airSpeed * t
+    } else {
+      const tau = t - p.land.t
+      onGround = groundAt(p.ground, tau)
+      const xz = p.curve ? p.curve.at(onGround) : { x: p.start.x + p.dir.x * onGround, z: p.start.z + p.dir.z * onGround }
+      this.pos = { x: xz.x, y: rest + bounceHeight(p.hop, g, tau), z: xz.z }
+      travelled = airDist + onGround
+    }
 
-    let rot: number
-    if (p.kind === 'spin') {
-      rot = p.rot0 + ((p.rotEnd - p.rot0) * p.arc.at(u)) / Math.max(1, p.arc.total)
-    } else if (p.kind === 'sweep') {
-      rot = lerp(p.rot0, p.rotEnd, u)
-      // Roll cycle frames advance with distance travelled.
-      const step = (2 * Math.PI * 38 * this.layout!.scale) / 3
-      const travelled = p.arc.at(u) + Math.abs(p.rotEnd - p.rot0) * (Math.PI / 180) * 60 * this.layout!.scale
+    if (this.id === 'tomato') {
+      this.rot = p.rot0 + p.spin * travelled
+    } else if (this.id === 'radish') {
+      const frac = p.ground.dist > 0 ? clamp(onGround / p.ground.dist, 0, 1) : 1
+      this.rot = lerp(p.rot0, p.rotEnd, frac)
+      // Roll cycle: the rings move around the body as it rolls.
+      const step = (2 * Math.PI * 34) / 3
       this.setImage(`roll${(Math.floor(travelled / step) % 3) + 1}`)
     } else {
-      const firstLand = p.hop.landTimes[1] ?? p.hop.landTimes[0]
-      rot = lerp(p.rot0, p.rotEnd, smoothstep(Math.min(1, t / Math.max(0.05, Math.min(firstLand, p.travel)))))
+      this.rot = lerp(p.rot0, p.rotEnd, smoothstep(clamp(t / (p.land.t + 0.2), 0, 1)))
+      const stopped = t - p.land.t - p.ground.T
+      if (stopped > 0) this.rot += dampedSine(stopped, p.rock, 2.6, 6)
     }
-    if (t > p.travel) rot += dampedSine(t - p.travel, p.settle.amp, p.settle.freq, p.settle.decay)
-    this.rot = rot
-
-    if (p.flipTo && t >= p.flipAt) {
-      this.setImage(p.flipTo)
-      p.flipTo = null
-    }
-    if (p.squashAt !== null) {
-      const fps = this.bag.contract.fps
-      this.setImage(t >= p.squashAt && t < p.squashAt + 2 / fps ? 'squash' : 'base')
-      if (t >= p.squashAt + 2 / fps) p.squashAt = null
+    if (this.flipTo && t >= p.land.t * 0.6) {
+      this.setImage(this.flipTo)
+      this.flipTo = null
     }
 
     if (t >= p.end) {
-      this.ground = { ...p.target }
-      this.h = 0
-      this.rot = p.rotEnd
+      this.pos = { x: p.target.x, y: rest, z: p.target.z }
+      if (this.id !== 'tomato') this.rot = p.rotEnd
       this.mode = { kind: 'rest' }
     }
   }
@@ -542,67 +472,68 @@ export class Item {
     const l = this.layout
     if (!l) return
     const m = this.mode
-
-    if (m.kind === 'home') {
-      const home = this.bag.contract.homes[this.id]
-      this.place(home.x, home.y, home.rot, home.scale)
+    const c = this.bag.contract
+    if (m.kind === 'home' || (m.kind === 'dropIn' && m.inBag)) {
+      // Frame pixels, inside the bag.
+      const q = l.camera.project(this.pos)
+      const scale = m.kind === 'home' ? c.homes[this.id].scale : 1
+      this.place(c.origin[0] + q.x, c.origin[1] + q.y, this.rot, q.scale * scale)
       return
     }
-    if (m.kind === 'snap') {
-      if (m.inBag) {
-        const f = this.bag.toFrame(this.snapPos)
-        this.place(f.x, f.y, this.rot - this.bag.rotor.x, this.snapScale / l.scale)
-      } else {
-        this.place(this.snapPos.x, this.snapPos.y, this.rot, this.snapScale)
-      }
-      return
-    }
+    const s = project(l, this.pos)
+    this.place(s.x, s.y, this.rot, s.scale)
+    this.el.style.zIndex = m.kind === 'held' ? '5000' : String(Math.round(2000 + this.pos.z))
+    this.renderShadows()
+  }
 
-    const k = this.scaleAt(this.ground.y) * this.lift.x
-    const rot = this.rot + (m.kind === 'drag' ? this.tilt.x : 0)
-    this.place(this.ground.x, this.ground.y - this.h, rot, k)
-
-    // Shadow on the floor under the item; smaller and fainter the higher it is.
+  private renderShadows() {
+    const l = this.layout!
+    const [lx, ly, lz] = this.bag.contract.light
+    const h = Math.max(0, this.pos.y - this.spec.restHeight)
     const sh = this.spec.shadow
-    const lifted = clamp(this.h / (120 * l.scale + 1), 0, 1)
-    const so = sh.rotates ? rotate({ x: sh.offset[0] * k, y: sh.offset[1] * k }, this.rot) : { x: sh.offset[0] * k, y: sh.offset[1] * k }
-    const sw = sh.w * k * (1 - 0.35 * lifted)
-    const shh = sh.h * k * (1 - 0.2 * lifted)
-    const cx = this.ground.x + so.x
-    const cy = this.ground.y + so.y + 6 * lifted * l.scale
-    this.shadowEl.style.opacity = String(0.9 - 0.5 * lifted)
-    this.shadowEl.style.transform =
-      `translate(${cx}px, ${cy}px) rotate(${sh.rotates ? this.rot : 0}deg) scale(${sw / 100}, ${shh / 100})`
+    const aspect = l.camera.floorAspect
+    const ellipse = (el: HTMLElement, at: Vec3, w: number, thick: number, opacity: number) => {
+      const s = project(l, { x: at.x, y: 0, z: at.z })
+      const o = sh.rotates ? rotate({ x: sh.offset[0] * s.scale, y: sh.offset[1] * s.scale }, this.rot) : { x: 0, y: 0 }
+      const rot = sh.rotates ? this.rot : 0
+      el.style.opacity = String(opacity)
+      el.style.transform =
+        `translate(${s.x + o.x}px, ${s.y + o.y * aspect}px) scale(1, ${aspect}) rotate(${rot}deg) ` +
+        `scale(${(w * s.scale) / 100}, ${(thick * s.scale) / 100})`
+    }
+    const thick = (w: number) => (sh.rotates ? w * 0.34 : w)
+    // Contact: tight and dark, only while touching the floor.
+    ellipse(this.contactEl, this.pos, sh.w, thick(sh.w), (config.contactShadow / 0.26) * clamp(1 - h / 10, 0, 1))
+    // Soft: cast along the light; grows, blurs and fades as the item rises.
+    const k = h / -ly
+    const softAt = { x: this.pos.x + lx * k, y: 0, z: this.pos.z + lz * k }
+    const sw = sh.w * (1.3 + h / 160)
+    ellipse(this.softEl, softAt, sw, thick(sw) * 1.3, config.softShadow / 0.26 / (1 + h / 220))
   }
 
   /** Put the pivot at (x, y) in the current parent's coordinates. */
   private place(x: number, y: number, rot: number, k: number) {
     const [px, py] = this.spec.pivot
     this.el.style.transform = `translate(${x - px}px, ${y - py}px) rotate(${rot}deg) scale(${k})`
-    if (this.hlEl) this.hlEl.style.transform = `translate(${x - px}px, ${y - py}px) scale(${k})`
   }
 
   /** Debug: zone circle in stage pixels. */
   debugCircle(): Placed | null {
-    if (this.mode.kind === 'home' || this.mode.kind === 'snap' || !this.layout) return null
-    return this.placed()
+    if (this.mode.kind === 'home' || this.mode.kind === 'dropIn' || !this.layout) return null
+    const c = this.screenCenter()
+    return { ...c, r: this.restCircle({ x: this.pos.x, z: this.pos.z }).r }
   }
 
   /** Debug: current hit shape endpoints in stage pixels. */
   debugHit(): { a: Vec; b: Vec; r: number } | null {
-    if (this.mode.kind === 'home' || this.mode.kind === 'snap' || !this.layout) return null
-    const k = this.scaleAt(this.ground.y) * this.lift.x
+    if (this.mode.kind === 'home' || this.mode.kind === 'dropIn' || !this.layout) return null
+    const s = project(this.layout, this.pos)
     const hs = this.spec.hit
-    const base = { x: this.ground.x, y: this.ground.y - this.h }
     const at = (x: number, y: number) => {
-      const v = rotate({ x: x * k, y: y * k }, this.rot)
-      return { x: base.x + v.x, y: base.y + v.y }
+      const v = rotate({ x: x * s.scale, y: y * s.scale }, this.rot)
+      return { x: s.x + v.x, y: s.y + v.y }
     }
-    if (hs.type === 'circle') return { a: at(hs.x, hs.y), b: at(hs.x, hs.y), r: hs.r * k }
-    return { a: at(hs.ax, hs.ay), b: at(hs.bx, hs.by), r: hs.r * k }
+    if (hs.type === 'circle') return { a: at(hs.x, hs.y), b: at(hs.x, hs.y), r: hs.r * s.scale }
+    return { a: at(hs.ax, hs.ay), b: at(hs.bx, hs.by), r: hs.r * s.scale }
   }
-}
-
-function quick(travel: number, hops: number, restitution: number): ItemMotion {
-  return { dist: [0, 1], travel, hops, restitution, curve: 0, settleAmp: 3, settleFreq: 2.4, settleDecay: 6 }
 }

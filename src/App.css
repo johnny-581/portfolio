@@ -53,7 +53,7 @@
   left: 53%;
   top: 22%;
   height: clamp(220px, 34%, 440px);
-  aspect-ratio: 590 / 676;
+  aspect-ratio: 514 / 692;
   pointer-events: none;
 }
 

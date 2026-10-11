@@ -6,7 +6,7 @@ import { config } from './config.ts'
 import type { ItemId } from './types.ts'
 import { ITEM_IDS } from './types.ts'
 
-export type StateName = 'idle' | 'wobble' | 'falling' | 'messy' | 'righting' | 'upright' | 'tidy'
+export type StateName = 'idle' | 'falling' | 'messy' | 'righting' | 'upright' | 'tidy'
 
 export type Drag = null | { kind: 'item'; id: ItemId } | { kind: 'bag' }
 
@@ -28,8 +28,6 @@ export type DropTarget = 'mouth' | 'bag' | 'floor'
 export type MachineEvent =
   | { type: 'arm' }
   | { type: 'disarm' }
-  | { type: 'near' }
-  | { type: 'far' }
   | { type: 'bump' }
   | { type: 'pressBag' }
   | { type: 'itemSpawned'; id: ItemId }
@@ -42,7 +40,6 @@ export type MachineEvent =
   | { type: 'cooldownDone' }
 
 export type Effect =
-  | { type: 'startWobble' }
   | { type: 'startFall' }
   | { type: 'cancelRoll'; id: ItemId }
   | { type: 'beginItemDrag'; id: ItemId }
@@ -80,7 +77,7 @@ export function canGrabBag(s: MachineState): boolean {
 
 /** Can the bag be bumped or tapped over right now? */
 export function canTip(s: MachineState): boolean {
-  return s.armed && (s.name === 'idle' || s.name === 'wobble')
+  return s.armed && s.name === 'idle'
 }
 
 export function reduce(s: MachineState, e: MachineEvent): Step {
@@ -91,12 +88,7 @@ export function reduce(s: MachineState, e: MachineEvent): Step {
     case 'arm':
       return to({ armed: true })
     case 'disarm':
-      return s.name === 'idle' || s.name === 'wobble' ? to({ armed: false, name: 'idle' }) : to({ armed: false })
-
-    case 'near':
-      return s.armed && s.name === 'idle' ? to({ name: 'wobble' }, [{ type: 'startWobble' }]) : none
-    case 'far':
-      return s.name === 'wobble' ? to({ name: 'idle' }) : none
+      return to({ armed: false })
 
     case 'bump':
     case 'pressBag':

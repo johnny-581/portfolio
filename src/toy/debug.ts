@@ -4,6 +4,7 @@
 import { config } from './config.ts'
 import { rotRectCorners } from './hit.ts'
 import type { Engine } from './index.ts'
+import { project } from './layout.ts'
 import type { ItemId, RotRect, Vec } from './types.ts'
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -31,26 +32,46 @@ export function attachDebug(stage: HTMLElement, engine: Engine): () => void {
     // Zone and exclusions
     parts.push(
       `<rect x="${z.left}" y="${z.back}" width="${z.right - z.left}" height="${z.front - z.back}" fill="rgba(40,160,80,0.07)" stroke="#28a050" stroke-dasharray="6 5"/>`,
-      `<rect x="${z.footprint.x}" y="${z.footprint.y}" width="${z.footprint.w}" height="${z.footprint.h}" fill="rgba(220,50,50,0.08)" stroke="#dc3232" stroke-dasharray="4 4"/>`,
+      `<polygon points="${z.footprint.map((q) => `${q.x},${q.y}`).join(' ')}" fill="rgba(220,50,50,0.08)" stroke="#dc3232" stroke-dasharray="4 4"/>`,
     )
     if (z.headline) {
       const h = z.headline
       parts.push(`<rect x="${h.x}" y="${h.y}" width="${h.w}" height="${h.h}" fill="rgba(240,140,0,0.08)" stroke="#f08c00" stroke-dasharray="4 4"/>`)
     }
 
+    // Floor grid (world, every 150 units) seen through the camera
+    for (let z = -300; z <= 1500; z += 150) {
+      const a = project(l, { x: -1500, y: 0, z })
+      const b = project(l, { x: 900, y: 0, z })
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#2f6fde" stroke-opacity="${z === 0 ? 0.6 : 0.12}"/>`)
+    }
+    for (let x = -1500; x <= 900; x += 150) {
+      const a = project(l, { x, y: 0, z: -300 })
+      const b = project(l, { x, y: 0, z: 1500 })
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#2f6fde" stroke-opacity="0.12"/>`)
+    }
+
     // Bag
     parts.push(`<polygon points="${poly(bag.hitbox())}" fill="none" stroke="#2f6fde" stroke-width="1.5"/>`)
     parts.push(cross(bag.pivotStage(), '#2f6fde'))
-    const m = bag.mouthStage()
-    if (bag.isLayered) parts.push(`<circle cx="${m.x}" cy="${m.y}" r="${m.r}" fill="none" stroke="#2f6fde" stroke-dasharray="3 4"/>`)
-    const fm = c.mouth.fallen
-    parts.push(dot({ x: l.origin.x + fm.x * l.scale, y: l.origin.y + fm.y * l.scale }, '#2f6fde', 5))
+    if (bag.isLayered) {
+      // The mouth's drop target at rim height.
+      const m = c.mouth
+      const t = config.mouthTolerance
+      const corners = [
+        { x: m.x - m.halfX * t, z: m.z - m.halfZ * t },
+        { x: m.x + m.halfX * t, z: m.z - m.halfZ * t },
+        { x: m.x + m.halfX * t, z: m.z + m.halfZ * t + 60 },
+        { x: m.x - m.halfX * t, z: m.z + m.halfZ * t + 60 },
+      ].map((q) => project(l, { x: q.x, y: m.rimY, z: q.z }))
+      parts.push(`<polygon points="${corners.map((q) => `${q.x},${q.y}`).join(' ')}" fill="none" stroke="#2f6fde" stroke-dasharray="3 4"/>`)
+    }
 
     for (const id of Object.keys(c.exits) as ItemId[]) {
       const e = c.exits[id]
-      const p = bag.toStage(e)
+      const p = project(l, e)
       parts.push(dot(p, '#e0218a'), `<text x="${p.x + 6}" y="${p.y - 6}" font-size="10" fill="#e0218a">${id} exit · f${e.frame}</text>`)
-      parts.push(dot(bag.toStage(c.homes[id]), '#7a3fd0', 3))
+      parts.push(dot(project(l, c.homes[id]), '#7a3fd0', 3))
     }
 
     // Items
@@ -63,7 +84,7 @@ export function attachDebug(stage: HTMLElement, engine: Engine): () => void {
           `<line x1="${h.a.x}" y1="${h.a.y}" x2="${h.b.x}" y2="${h.b.y}" stroke="rgba(47,111,222,0.35)" stroke-width="${h.r * 2}" stroke-linecap="round"/>`,
         )
       }
-      if (it.landing) parts.push(cross(it.landing, '#28a050'))
+      if (it.landing) parts.push(cross(project(l, { x: it.landing.x, y: 0, z: it.landing.z }), '#28a050'))
     }
 
     for (const p of stress) {
@@ -117,13 +138,12 @@ export function attachDebug(stage: HTMLElement, engine: Engine): () => void {
       p.addBinding(result, 'underHeadline', { readonly: true })
 
       const groups: Record<string, string[]> = {
-        trigger: ['wobbleRadius', 'bumpSpeed', 'wobbleKick', 'wobbleMax', 'wobbleK', 'wobbleC'],
+        trigger: ['bumpSpeed', 'rearmDelay'],
         righting: ['scrubThreshold', 'uprightK', 'uprightC', 'lowerK', 'lowerC'],
-        messy: ['getUpInterval', 'getUpAngle', 'getUpDuration', 'rearmDelay'],
-        snap: ['snapDuration', 'snapArc', 'mouthTolerance'],
-        drag: ['dragLift', 'liftHeight', 'tiltMax', 'tiltFactor', 'springK', 'springC', 'rotK', 'rotC'],
-        fall: ['gravity', 'depthFar', 'depthNear', 'bumpOffMin', 'bumpOffMax', 'fanMin', 'fanMax'],
-        zone: ['zoneFrontMargin', 'footprintPad', 'itemGap', 'shortenStep', 'maxTries'],
+        holding: ['heldLift', 'liftK', 'liftC', 'rampCurve', 'releaseCap', 'mouthTolerance'],
+        world: ['gravity', 'bumpOffSpeed', 'bumpOffUp'],
+        shadows: ['contactShadow', 'softShadow'],
+        zone: ['zoneFrontMargin', 'footprintPad', 'itemGap', 'shortenStep', 'maxTries', 'fanSpread'],
         time: ['timeScale'],
       }
       const cfg = config as unknown as Record<string, number>
@@ -133,10 +153,7 @@ export function attachDebug(stage: HTMLElement, engine: Engine): () => void {
       }
       for (const [id, m] of Object.entries(config.items)) {
         const f = p.addFolder({ title: `item · ${id}`, expanded: false })
-        const band = { near: m.dist[0], far: m.dist[1] }
-        f.addBinding(band, 'near', { min: 0, max: 3, step: 0.05 }).on('change', (ev) => (m.dist[0] = ev.value))
-        f.addBinding(band, 'far', { min: 0, max: 3, step: 0.05 }).on('change', (ev) => (m.dist[1] = ev.value))
-        for (const key of ['travel', 'hops', 'restitution', 'curve', 'settleAmp', 'settleFreq', 'settleDecay'] as const) {
+        for (const key of ['mu', 'restitution', 'bounces', 'curve', 'rock', 'speedJitter', 'angleJitter'] as const) {
           f.addBinding(m, key)
         }
       }
