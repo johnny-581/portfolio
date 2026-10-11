@@ -1,5 +1,7 @@
 # Grocery Bag Toy: Placeholder Prototype Plan
 
+> Record of the prototype as built. The redesign is planned in [implementation-plan.md](implementation-plan.md).
+
 ## Context
 
 This is the centerpiece of Johnny's portfolio hero. A hand-drawn grocery bag sits in the top-right of a minimal page (name and nav at the top, "A curious design engineer" at the bottom-left). When the cursor bumps the bag, it tips forward-left. A tomato, a banana bunch and a Chinese radish roll out to random spots. The visitor drags the bag upright and puts the items back. It's a playful nod to Johnny being very organized.
