@@ -2,7 +2,10 @@ export const site = {
   name: "Johnny Dong",
   title: "Johnny Dong",
   tagline: "I’m an engineer and designer making fun and purposeful products",
-  roles: ["Interning @Scalepad", "Leading engineering @UBC UX Hub"],
+  roles: [
+    { role: "Interning", at: "@Scalepad" },
+    { role: "Leading engineering", at: "@UBC UX Hub" },
+  ],
 
   // Words floating around the avatar. x is the offset of the word's center from
   // the avatar's center, y is the offset from the top of the hero (both in px).

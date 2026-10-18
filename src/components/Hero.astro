@@ -10,7 +10,7 @@ import { site } from "../site";
     {
       site.interests.map(({ label, x, y, rotate }) => (
         <span
-          class="absolute text-h2 whitespace-nowrap"
+          class="absolute whitespace-nowrap"
           style={`left: calc(50% + ${x}px); top: ${y}px; transform: translateX(-50%) rotate(${rotate}deg)`}
         >
           {label}
@@ -22,7 +22,13 @@ import { site } from "../site";
 
   <h1 class="mt-[67px] font-serif text-h1 font-bold text-heading max-sm:text-[2.25rem]">{site.name}</h1>
   <p class="mt-[30px] text-h2 max-sm:px-6">{site.tagline}</p>
-  <div class="mt-14 flex flex-col gap-3 text-h2">
-    {site.roles.map((role) => <p>{role}</p>)}
+  <div class="mt-14 flex flex-col gap-[7px]">
+    {
+      site.roles.map(({ role, at }) => (
+        <p>
+          {role} <strong>{at}</strong>
+        </p>
+      ))
+    }
   </div>
 </header>
