@@ -44,7 +44,8 @@ const { projects } = Astro.props;
     const grid = document.querySelector<HTMLElement>("[data-project-grid]");
     if (!grid) return;
 
-    let active: HTMLElement | null = null;
+    // A preview may already be showing when returning from a project page
+    let active = grid.querySelector<HTMLElement>("[data-preview]:not(.opacity-0)");
     let scrolling = false;
     let scrollTimer: number | undefined;
 
@@ -67,8 +68,12 @@ const { projects } = Astro.props;
     });
 
     // Hide on the first scroll tick, and ignore the hover events the browser
-    // fires while content moves under a still cursor.
+    // fires while content moves under a still cursor. Events that don't move the
+    // page (like the one from restoring the scroll position) are skipped.
+    let lastY = window.scrollY;
     const onScroll = () => {
+      if (window.scrollY === lastY) return;
+      lastY = window.scrollY;
       show(null);
       scrolling = true;
       clearTimeout(scrollTimer);
