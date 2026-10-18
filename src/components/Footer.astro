@@ -1,0 +1,18 @@
+---
+import { site } from "../site";
+---
+
+<footer class="container-wide mt-[295px] mb-[52px] flex flex-wrap items-center justify-between gap-6 text-h2">
+  <nav class="flex gap-12">
+    {site.nav.map((link) => <a href={link.href} class="hover:text-muted">{link.label}</a>)}
+  </nav>
+  <ul class="flex flex-wrap gap-x-12 gap-y-2">
+    {
+      site.social.map((link) => (
+        <li>
+          <a href={link.href} class="hover:text-muted">{link.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</footer>

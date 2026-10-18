@@ -1,0 +1,23 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import SideNav from "../components/SideNav.astro";
+import FeaturedProject from "../components/FeaturedProject.astro";
+import ProjectGrid from "../components/ProjectGrid.astro";
+import { getProjects } from "../lib/projects";
+
+const projects = await getProjects();
+const featured = projects.find((p) => p.data.featured) ?? projects[0];
+const others = projects.filter((p) => p !== featured);
+---
+
+<Base>
+  <SideNav />
+  <main class="@container">
+    <Hero />
+    <div class="mt-[99px]">
+      <FeaturedProject project={featured} />
+    </div>
+    <ProjectGrid projects={others} />
+  </main>
+</Base>

@@ -1,0 +1,47 @@
+---
+import { Image } from "astro:assets";
+import me from "../assets/me.png";
+import { site } from "../site";
+---
+
+<header class="text-center">
+  <!-- Fixed 620px stage so the words keep their Figma positions; scaled down on phones -->
+  <div class="relative left-1/2 h-[416px] w-[620px] -translate-x-1/2 max-sm:-mb-[166px] max-sm:origin-top max-sm:scale-60">
+    {
+      site.interests.map(({ label, x, y, rotate }, i) => (
+        <span
+          class="interest absolute text-h2 whitespace-nowrap"
+          style={`left: calc(50% + ${x}px); top: ${y}px; --r: ${rotate}deg; --delay: ${i * -1.3}s`}
+        >
+          {label}
+        </span>
+      ))
+    }
+    <Image src={me} alt="Drawing of Johnny" width={154} height={164} loading="eager" class="absolute top-[252px] left-1/2 -translate-x-1/2" />
+  </div>
+
+  <h1 class="mt-[67px] font-serif text-h1 font-bold text-heading max-sm:text-[2.25rem]">{site.name}</h1>
+  <p class="mt-[30px] text-h2 max-sm:px-6">{site.tagline}</p>
+  <div class="mt-14 flex flex-col gap-3 text-h2">
+    {site.roles.map((role) => <p>{role}</p>)}
+  </div>
+</header>
+
+<style>
+  .interest {
+    transform: translateX(-50%) rotate(var(--r));
+    animation: float 6s ease-in-out var(--delay) infinite;
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateX(-50%) translateY(-6px) rotate(var(--r));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interest {
+      animation: none;
+    }
+  }
+</style>

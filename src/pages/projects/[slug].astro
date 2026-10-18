@@ -1,0 +1,61 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Carousel from "../../components/Carousel.astro";
+import { getProjects } from "../../lib/projects";
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project, prev, next } = Astro.props;
+const { title, blurb, link } = project.data;
+const { Content } = await render(project);
+---
+
+<Base title={title} description={blurb}>
+  <a href="/" class="absolute top-[94px] left-[62px] hover:text-muted max-sm:left-6 max-sm:top-8">back to home</a>
+
+  <main class="pt-[263px] max-sm:pt-32">
+    <div class="container-content">
+      <div class="max-w-[612px]">
+        <h1 class="font-serif text-h1 font-bold text-heading max-sm:text-[2.25rem]">{title}</h1>
+        {
+          link && (
+            <a href={link.href} target="_blank" rel="noopener" class="mt-[21px] inline-block underline hover:text-muted">
+              {link.label} ↗
+            </a>
+          )
+        }
+        <p class="mt-[29px]">{blurb}</p>
+        <div class="mt-[29px] space-y-4">
+          <Content />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-[79px]">
+      <Carousel project={project} />
+    </div>
+
+    <nav class="container-content mt-[79px] flex items-center justify-between">
+      <a href={`/projects/${prev.id}`} class="-ml-2.5 flex items-center gap-2.5 hover:text-muted" aria-label={`Previous project: ${prev.data.title}`}>
+        <span class="rounded-full bg-neutral-100 p-[3px]"><img src="/icons/chevron-left.svg" alt="" width="24" height="24" /></span>
+        previous project
+      </a>
+      <a href={`/projects/${next.id}`} class="flex items-center gap-[9px] hover:text-muted" aria-label={`Next project: ${next.data.title}`}>
+        next project
+        <span class="rounded-full bg-neutral-100 p-[3px]"><img src="/icons/chevron-right.svg" alt="" width="24" height="24" /></span>
+      </a>
+    </nav>
+  </main>
+</Base>

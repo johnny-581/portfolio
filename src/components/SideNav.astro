@@ -1,0 +1,21 @@
+---
+const links = [
+  { label: "home", href: "/" },
+  { label: "about me", href: "/about" },
+];
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+---
+
+<nav class="fixed top-1/2 left-[38px] hidden -translate-y-1/2 flex-col gap-5 lg:flex">
+  {
+    links.map(({ label, href }) => {
+      const active = path === href;
+      return (
+        <a href={href} class:list={["flex items-center gap-2.5", active ? "font-bold" : "hover:text-muted"]} aria-current={active ? "page" : undefined}>
+          <img src="/icons/dot.svg" alt="" width="8" height="8" class:list={[!active && "invisible"]} />
+          {label}
+        </a>
+      );
+    })
+  }
+</nav>

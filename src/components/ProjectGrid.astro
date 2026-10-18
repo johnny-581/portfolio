@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import ProjectTitle from "./ProjectTitle.astro";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+const { projects } = Astro.props;
+---
+
+<section class="container-content mt-[99px] grid gap-x-7 gap-y-10 md:grid-cols-2" data-project-grid>
+  {
+    projects.map((project) => (
+      <a href={`/projects/${project.id}`} class="flex flex-col gap-4" data-slug={project.id}>
+        <ProjectTitle title={project.data.title} status={project.data.status} />
+        <p>{project.data.blurb}</p>
+      </a>
+    ))
+  }
+
+  <!-- Hover preview: every thumbnail is stacked here and only the active one is shown -->
+  <div class="relative col-start-2 aspect-[613/383] w-[calc(100%+var(--bleed))] max-md:hidden pointer-coarse:hidden" aria-hidden="true">
+    {
+      projects.map((project) => (
+        <Image
+          src={project.data.images[0].src}
+          alt=""
+          widths={[613, 1226]}
+          sizes="613px"
+          loading="eager"
+          class="absolute inset-0 size-full rounded-2xl border border-neutral-500 object-cover opacity-0"
+          data-preview={project.id}
+        />
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { shotName } from "../lib/shot";
+
+  document.addEventListener("astro:page-load", () => {
+    const grid = document.querySelector<HTMLElement>("[data-project-grid]");
+    if (!grid) return;
+
+    let active: HTMLElement | null = null;
+    let scrolling = false;
+    let scrollTimer: number | undefined;
+
+    const show = (slug: string | null) => {
+      if (active) {
+        active.classList.add("opacity-0");
+        active.style.viewTransitionName = "";
+      }
+      active = slug ? grid.querySelector<HTMLElement>(`[data-preview="${slug}"]`) : null;
+      if (active) {
+        active.classList.remove("opacity-0");
+        active.style.viewTransitionName = shotName(slug!);
+      }
+    };
+
+    grid.querySelectorAll<HTMLElement>("[data-slug]").forEach((card) => {
+      const onEnter = () => !scrolling && show(card.dataset.slug!);
+      card.addEventListener("pointerenter", onEnter);
+      card.addEventListener("focus", onEnter);
+    });
+
+    // Hide on the first scroll tick, and ignore the hover events the browser
+    // fires while content moves under a still cursor.
+    const onScroll = () => {
+      show(null);
+      scrolling = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => (scrolling = false), 150);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("astro:before-swap", () => window.removeEventListener("scroll", onScroll), { once: true });
+  });
+</script>

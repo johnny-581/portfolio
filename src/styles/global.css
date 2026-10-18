@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "@fontsource/libre-baskerville/700.css";
+
+@theme {
+  --color-neutral-100: #f9f8f6;
+  --color-neutral-200: #e0e0dc;
+  --color-neutral-400: #c4c2b9;
+  --color-neutral-500: #838077;
+  --color-neutral-600: #46443d;
+  --color-neutral-800: #2d2d2a;
+  --color-neutral-900: #1b1b19;
+
+  --font-serif: "Libre Baskerville", Georgia, serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Text styles: sans 16/24, h1 48/54 (serif bold), h2 20/auto */
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-h1: 3rem;
+  --text-h1--line-height: 3.375rem;
+  --text-h2: 1.25rem;
+  --text-h2--line-height: normal;
+}
+
+/* Semantic tokens. Add a dark-mode block here later. */
+:root {
+  --ink: var(--color-neutral-900);
+  --heading: var(--color-neutral-800);
+  --line: var(--color-neutral-800);
+  --muted: var(--color-neutral-500);
+  --surface: #fff;
+
+  /* Layout: 998px content column inside a 1255px wide column.
+     These resolve where they're used, against the parent's width (100%). */
+  --gutter: 1.5rem;
+  --content: min(998px, 100% - 2 * var(--gutter));
+  --wide: min(1255px, 100% - 2 * var(--gutter));
+  /* How far the wide column sticks out past the content column (needs an @container ancestor) */
+  --bleed: calc((min(1255px, 100cqw - 2 * var(--gutter)) - min(998px, 100cqw - 2 * var(--gutter))) / 2);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-heading: var(--heading);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+}
+
+@utility container-content {
+  width: var(--content);
+  margin-inline: auto;
+}
+
+@utility container-wide {
+  width: var(--wide);
+  margin-inline: auto;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+  }
+  body {
+    @apply bg-surface font-sans text-body text-ink antialiased;
+  }
+}

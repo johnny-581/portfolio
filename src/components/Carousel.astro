@@ -1,0 +1,50 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import { shotName } from "../lib/shot";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+const { project } = Astro.props;
+const { title, images } = project.data;
+---
+
+<!-- Starts on the content column and bleeds off the right edge of the viewport -->
+<div class="carousel no-scrollbar flex snap-x snap-mandatory gap-7 overflow-x-auto" data-carousel>
+  {
+    images.map((image, i) => (
+      <figure class="w-full shrink-0 snap-start">
+        <Image
+          src={image.src}
+          alt={image.caption ?? `${title} screenshot ${i + 1}`}
+          widths={[800, 998, 1996]}
+          sizes="(min-width: 1046px) 998px, calc(100vw - 48px)"
+          loading={i === 0 ? "eager" : "lazy"}
+          class="aspect-[998/624] w-full rounded-2xl border border-neutral-500 object-cover"
+          transition:name={i === 0 ? shotName(project.id) : undefined}
+        />
+        {image.caption && <figcaption class="mt-[29px]">{image.caption}</figcaption>}
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  /* Padding = the content column's inset, so each slide (100% of the padded box)
+     is exactly as wide as the content column. */
+  .carousel {
+    --inset: calc((100% - min(998px, 100% - 2 * var(--gutter))) / 2);
+    padding-inline: var(--inset);
+    scroll-padding-inline: var(--inset);
+  }
+</style>
+
+<script>
+  // Clicking a peeking slide scrolls it into view (helps mouse users without horizontal scroll).
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>("[data-carousel] figure").forEach((slide) => {
+      slide.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" }));
+    });
+  });
+</script>
