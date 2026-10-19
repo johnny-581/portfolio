@@ -7,35 +7,55 @@ interface Props {
   projects: CollectionEntry<"projects">[];
 }
 const { projects } = Astro.props;
+
+// Three staggered columns, filled left to right; the preview ends the last column
+const columns: (typeof projects)[] = [[], [], []];
+projects.forEach((project, i) => columns[i % 3].push(project));
 ---
 
-<section class="container-content mt-[99px] grid gap-x-7 gap-y-10 md:grid-cols-2" data-project-grid>
+<section class="container-projects mt-[98px] grid gap-y-10 md:grid-cols-3 md:gap-x-7" data-project-grid>
   {
-    projects.map((project) => (
-      <a href={`/projects/${project.id}`} class="flex flex-col gap-4" data-slug={project.id}>
-        <ProjectTitle title={project.data.title} status={project.data.status} />
-        <p>{project.data.blurb}</p>
-      </a>
+    columns.map((column, i) => (
+      <div class="flex flex-col gap-12 max-md:contents">
+        {column.map((project) => (
+          <a
+            href={`/projects/${project.id}`}
+            class="flex flex-col gap-4 max-md:order-(--order)"
+            style={`--order: ${projects.indexOf(project)}`}
+            data-slug={project.id}
+          >
+            <ProjectTitle title={project.data.title} status={project.data.status} />
+            <p>{project.data.blurb}</p>
+          </a>
+        ))}
+
+        {i === 2 && (
+          <div class="preview relative aspect-[434/271] max-md:hidden pointer-coarse:hidden" aria-hidden="true">
+            {projects.map((project) => (
+              <Image
+                src={project.data.images[0].src}
+                alt=""
+                widths={[434, 868]}
+                sizes="434px"
+                loading="eager"
+                class="absolute inset-0 size-full rounded-[4px] object-cover opacity-0"
+                data-preview={project.id}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     ))
   }
-
-  <!-- Hover preview: every thumbnail is stacked here and only the active one is shown -->
-  <div class="relative col-start-2 aspect-[613/383] w-[calc(100%+var(--bleed))] max-md:hidden pointer-coarse:hidden" aria-hidden="true">
-    {
-      projects.map((project) => (
-        <Image
-          src={project.data.images[0].src}
-          alt=""
-          widths={[613, 1226]}
-          sizes="613px"
-          loading="eager"
-          class="absolute inset-0 size-full rounded-2xl border border-neutral-500 object-cover opacity-0"
-          data-preview={project.id}
-        />
-      ))
-    }
-  </div>
 </section>
+
+<style>
+  /* 434px wide, sticking out past the grid's right edge, but never past the page gutter.
+     Here 100% is the column width and 100cqw is <main>'s width. */
+  .preview {
+    width: min(434px, 100% + (100cqw - 3 * 100% - 56px) / 2 - var(--gutter));
+  }
+</style>
 
 <script>
   import { shotName } from "../lib/shot";

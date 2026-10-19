@@ -21,7 +21,7 @@ const { title, images } = project.data;
           widths={[800, 998, 1996]}
           sizes="(min-width: 1046px) 998px, calc(100vw - 48px)"
           loading={i === 0 ? "eager" : "lazy"}
-          class="aspect-[998/624] w-full rounded-2xl border border-neutral-500 object-cover"
+          class="aspect-[998/624] w-full rounded-[4px] object-cover"
           transition:name={i === 0 ? shotName(project.id) : undefined}
         />
         {image.caption && <figcaption class="mt-[29px]">{image.caption}</figcaption>}

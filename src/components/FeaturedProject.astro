@@ -11,19 +11,17 @@ const { project } = Astro.props;
 const { title, status, blurb, images } = project.data;
 ---
 
-<a href={`/projects/${project.id}`} class="block">
-  <div class="container-wide">
-    <Image
-      src={images[0].src}
-      alt={`${title} screenshot`}
-      widths={[800, 1255, 2510]}
-      sizes="(min-width: 1303px) 1255px, calc(100vw - 48px)"
-      loading="eager"
-      class="aspect-[1255/785] w-full rounded-3xl border border-neutral-500 object-cover"
-      transition:name={shotName(project.id)}
-    />
-  </div>
-  <div class="container-content mt-10 flex justify-between gap-x-[30px] gap-y-4 max-md:flex-col">
+<a href={`/projects/${project.id}`} class="container-projects block">
+  <Image
+    src={images[0].src}
+    alt={`${title} screenshot`}
+    widths={[800, 896, 1792]}
+    sizes="(min-width: 944px) 896px, calc(100vw - 48px)"
+    loading="eager"
+    class="aspect-[998/624] w-full rounded-[4px] object-cover"
+    transition:name={shotName(project.id)}
+  />
+  <div class="mt-[30px] flex justify-between gap-x-[30px] gap-y-4 max-md:flex-col">
     <ProjectTitle title={title} status={status} class="shrink-0 md:w-[356px]" />
     <p class="max-w-[612px] text-right max-md:text-left">{blurb}</p>
   </div>

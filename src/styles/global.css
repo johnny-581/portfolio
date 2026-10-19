@@ -30,13 +30,10 @@
   --muted: var(--color-neutral-500);
   --surface: #fff;
 
-  /* Layout: 998px content column inside a 1255px wide column.
+  /* Layout: 998px content column (project pages), 896px projects column (home, footer).
      These resolve where they're used, against the parent's width (100%). */
   --gutter: 1.5rem;
   --content: min(998px, 100% - 2 * var(--gutter));
-  --wide: min(1255px, 100% - 2 * var(--gutter));
-  /* How far the wide column sticks out past the content column (needs an @container ancestor) */
-  --bleed: calc((min(1255px, 100cqw - 2 * var(--gutter)) - min(998px, 100cqw - 2 * var(--gutter))) / 2);
 }
 
 @theme inline {
@@ -52,8 +49,9 @@
   margin-inline: auto;
 }
 
-@utility container-wide {
-  width: var(--wide);
+/* Featured project, project grid and footer */
+@utility container-projects {
+  width: min(896px, 100% - 2 * var(--gutter));
   margin-inline: auto;
 }
 
