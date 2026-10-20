@@ -1,9 +1,9 @@
 ---
 import Base from "../layouts/Base.astro";
-import Hero from "../components/Hero.astro";
-import SideNav from "../components/SideNav.astro";
+import Sidebar from "../components/Sidebar.astro";
 import FeaturedProject from "../components/FeaturedProject.astro";
 import ProjectGrid from "../components/ProjectGrid.astro";
+import Footer from "../components/Footer.astro";
 import { getProjects } from "../lib/projects";
 
 const projects = await getProjects();
@@ -11,13 +11,12 @@ const featured = projects.find((p) => p.data.featured) ?? projects[0];
 const others = projects.filter((p) => p !== featured);
 ---
 
-<Base>
-  <SideNav />
-  <main class="@container">
-    <Hero />
-    <div class="mt-[90px]">
-      <FeaturedProject project={featured} />
-    </div>
+<!-- The footer goes in the canvas, beside the sidebar -->
+<Base footer={false}>
+  <Sidebar />
+  <main class="pt-16 lg:ml-(--sidebar) lg:pt-[131px]">
+    <FeaturedProject project={featured} />
     <ProjectGrid projects={others} />
+    <Footer />
   </main>
 </Base>

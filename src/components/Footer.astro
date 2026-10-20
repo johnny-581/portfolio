@@ -2,17 +2,17 @@
 import { site } from "../site";
 ---
 
-<footer class="container-projects mt-[295px] mb-[52px] flex flex-wrap items-center justify-between gap-6">
-  <nav class="flex gap-12">
-    {site.nav.map((link) => <a href={link.href} class="hover:text-muted">{link.label}</a>)}
-  </nav>
-  <ul class="flex flex-wrap gap-x-12 gap-y-2">
-    {
-      site.social.map((link) => (
-        <li>
-          <a href={link.href} class="hover:text-muted">{link.label}</a>
-        </li>
-      ))
-    }
-  </ul>
+<footer class="mt-[195px] bg-neutral-100">
+  <div class="flex flex-col gap-10 px-6 py-[55px] md:grid md:grid-cols-[minmax(0,698px)_auto] lg:px-[63px]">
+    <ul class="flex flex-col gap-[11px]">
+      {
+        site.social.map((link) => (
+          <li>
+            <a href={link.href} class="hover:text-muted">{link.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <p>{site.footerNote}</p>
+  </div>
 </footer>

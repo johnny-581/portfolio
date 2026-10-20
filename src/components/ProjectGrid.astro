@@ -8,83 +8,69 @@ interface Props {
 }
 const { projects } = Astro.props;
 
-// Three staggered columns, filled left to right; the preview ends the last column
+// Each project names its column; any without one fill the columns in turn
 const columns: (typeof projects)[] = [[], [], []];
-projects.forEach((project, i) => columns[i % 3].push(project));
+projects.forEach((project, i) => columns[(project.data.column ?? (i % 3) + 1) - 1].push(project));
 ---
 
-<section class="container-projects mt-[98px] grid gap-y-10 md:grid-cols-3 md:gap-x-7" data-project-grid>
-  {
-    columns.map((column, i) => (
-      <div class="flex flex-col gap-12 max-md:contents">
-        {column.map((project) => (
-          <a
-            href={`/projects/${project.id}`}
-            class="flex flex-col gap-4 max-md:order-(--order)"
-            style={`--order: ${projects.indexOf(project)}`}
-            data-slug={project.id}
-          >
-            <ProjectTitle title={project.data.title} status={project.data.status} />
-            <p>{project.data.blurb}</p>
-          </a>
-        ))}
-
-        {i === 2 && (
-          <div class="preview relative aspect-[434/271] max-md:hidden pointer-coarse:hidden" aria-hidden="true">
-            {projects.map((project) => (
-              <Image
-                src={project.data.images[0].src}
-                alt=""
-                widths={[434, 868]}
-                sizes="434px"
-                loading="eager"
-                class="absolute inset-0 size-full rounded-[4px] object-cover opacity-0"
-                data-preview={project.id}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    ))
-  }
+<section class="container-canvas mt-16 lg:mt-[88px]">
+  <div class="grid gap-x-7 gap-y-10 md:grid-cols-2 lg:ml-[clamp(0px,4vw,61px)] lg:max-w-[904px] lg:grid-cols-[280fr_284fr_284fr]" data-project-grid>
+    {
+      columns.map((column, i) => (
+        <div class="flex flex-col gap-9 max-lg:contents">
+          {column.map((project) => (
+            <a
+              href={`/projects/${project.id}`}
+              class="flex flex-col gap-4 max-lg:order-(--order)"
+              style={`--order: ${project.data.order}`}
+              data-card
+              data-slug={project.id}
+              data-column={i + 1}
+            >
+              <ProjectTitle title={project.data.title} status={project.data.status} />
+              <p>{project.data.blurb}</p>
+            </a>
+          ))}
+        </div>
+      ))
+    }
+  </div>
 </section>
 
-<style>
-  /* 434px wide, sticking out past the grid's right edge, but never past the page gutter.
-     Here 100% is the column width and 100cqw is <main>'s width. */
-  .preview {
-    width: min(434px, 100% + (100cqw - 3 * 100% - 56px) / 2 - var(--gutter));
+<!-- Hover thumbnails, positioned by lib/preview.ts. Desktop with a mouse only. -->
+<div class="pointer-events-none fixed inset-0 z-10 max-lg:hidden pointer-coarse:hidden" aria-hidden="true" data-thumbs>
+  {
+    projects.map((project) => (
+      <Image
+        src={project.data.images[0].src}
+        alt=""
+        widths={[392, 784]}
+        sizes="392px"
+        loading="eager"
+        class="absolute top-0 left-0 rounded-[4px] object-cover opacity-0"
+        data-preview={project.id}
+      />
+    ))
   }
-</style>
+</div>
 
 <script>
-  import { shotName } from "../lib/shot";
+  import { showPreview } from "../lib/preview";
 
   document.addEventListener("astro:page-load", () => {
     const grid = document.querySelector<HTMLElement>("[data-project-grid]");
     if (!grid) return;
 
-    // A preview may already be showing when returning from a project page
-    let active = grid.querySelector<HTMLElement>("[data-preview]:not(.opacity-0)");
     let scrolling = false;
     let scrollTimer: number | undefined;
 
-    const show = (slug: string | null) => {
-      if (active) {
-        active.classList.add("opacity-0");
-        active.style.viewTransitionName = "";
-      }
-      active = slug ? grid.querySelector<HTMLElement>(`[data-preview="${slug}"]`) : null;
-      if (active) {
-        active.classList.remove("opacity-0");
-        active.style.viewTransitionName = shotName(slug!);
-      }
-    };
-
-    grid.querySelectorAll<HTMLElement>("[data-slug]").forEach((card) => {
-      const onEnter = () => !scrolling && show(card.dataset.slug!);
+    grid.querySelectorAll<HTMLElement>("[data-card]").forEach((card) => {
+      const onEnter = () => !scrolling && showPreview(card.dataset.slug!);
+      const onLeave = () => showPreview(null);
       card.addEventListener("pointerenter", onEnter);
       card.addEventListener("focus", onEnter);
+      card.addEventListener("pointerleave", onLeave);
+      card.addEventListener("blur", onLeave);
     });
 
     // Hide on the first scroll tick, and ignore the hover events the browser
@@ -94,12 +80,21 @@ projects.forEach((project, i) => columns[i % 3].push(project));
     const onScroll = () => {
       if (window.scrollY === lastY) return;
       lastY = window.scrollY;
-      show(null);
+      showPreview(null);
       scrolling = true;
       clearTimeout(scrollTimer);
       scrollTimer = window.setTimeout(() => (scrolling = false), 150);
     };
+    const onResize = () => showPreview(null);
     window.addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("astro:before-swap", () => window.removeEventListener("scroll", onScroll), { once: true });
+    window.addEventListener("resize", onResize);
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onResize);
+      },
+      { once: true },
+    );
   });
 </script>

@@ -7,9 +7,11 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Pages that place the footer themselves pass false */
+  footer?: boolean;
 }
 
-const { title, description = site.tagline } = Astro.props;
+const { title, description = site.tagline, footer = true } = Astro.props;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 ---
 
@@ -26,12 +28,12 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
   </head>
   <body>
     <slot />
-    <Footer />
+    {footer && <Footer />}
   </body>
 </html>
 
 <script>
-  import { shotName } from "../lib/shot";
+  import { showPreview } from "../lib/preview";
 
   // Going home from a project page lands where you left the home page, with that
   // project's preview showing so its image morphs back into place.
@@ -51,10 +53,6 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
   document.addEventListener("astro:after-swap", () => {
     if (!returningFrom) return;
     if (restoreScroll) window.scrollTo({ top: homeScroll, behavior: "instant" });
-    const preview = document.querySelector<HTMLElement>(`[data-preview="${returningFrom}"]`);
-    if (preview) {
-      preview.classList.remove("opacity-0");
-      preview.style.viewTransitionName = shotName(returningFrom);
-    }
+    showPreview(returningFrom);
   });
 </script>

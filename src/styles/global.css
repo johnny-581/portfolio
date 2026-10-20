@@ -13,13 +13,15 @@
   --font-serif: "Libre Baskerville", Georgia, serif;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* Text styles: sans 16/24, h1 48/54 (serif bold), h2 20/auto */
+  /* Text styles: sans 16/24, h1 48/54 (serif bold), name 32/44 (serif bold), h2 20/28 */
   --text-body: 1rem;
   --text-body--line-height: 1.5rem;
   --text-h1: 3rem;
   --text-h1--line-height: 3.375rem;
+  --text-name: 2rem;
+  --text-name--line-height: 2.75rem;
   --text-h2: 1.25rem;
-  --text-h2--line-height: normal;
+  --text-h2--line-height: 1.75rem;
 }
 
 /* Semantic tokens. Add a dark-mode block here later. */
@@ -30,10 +32,13 @@
   --muted: var(--color-neutral-500);
   --surface: #fff;
 
-  /* Layout: 998px content column (project pages), 896px projects column (home, footer).
-     These resolve where they're used, against the parent's width (100%). */
+  /* Layout: 998px content column (project pages). Resolves where it's used,
+     against the parent's width (100%). */
   --gutter: 1.5rem;
   --content: min(998px, 100% - 2 * var(--gutter));
+
+  /* Home page (lg and up): fixed sidebar on the left, everything else in the canvas */
+  --sidebar: clamp(300px, 26vw, 391px);
 }
 
 @theme inline {
@@ -49,10 +54,15 @@
   margin-inline: auto;
 }
 
-/* Featured project, project grid and footer */
-@utility container-projects {
-  width: min(896px, 100% - 2 * var(--gutter));
+/* Home page canvas: featured project and project grid. Centered on small screens,
+   flush against the sidebar from lg up. */
+@utility container-canvas {
+  width: min(965px, 100% - 2 * var(--gutter));
   margin-inline: auto;
+  @variant lg {
+    width: min(965px, 100% - 48px);
+    margin-inline: 0;
+  }
 }
 
 @utility no-scrollbar {

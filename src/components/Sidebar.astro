@@ -1,0 +1,46 @@
+---
+import { Image } from "astro:assets";
+import me from "../assets/me.png";
+import { site } from "../site";
+---
+
+<!-- Fixed to the left edge from lg up. Hover thumbnails can show over it, lined up
+     with the sidebar text (see lib/preview.ts). -->
+<aside class="px-6 pt-16 lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-(--sidebar) lg:flex-col lg:pt-[91px] lg:pb-12" data-sidebar>
+  <!-- Centered in the sidebar; at full width that's Figma's 56px inset -->
+  <div class="max-w-[280px] lg:mx-auto lg:w-full">
+    <Image src={me} alt="Drawing of Johnny" width={116} height={123} densities={[1, 2, 3]} loading="eager" />
+    <h1 class="mt-[7px] font-serif text-name font-bold whitespace-nowrap text-heading">{site.name}</h1>
+    <p class="mt-10 text-h2">{site.tagline}</p>
+    <ul class="mt-[25px] flex flex-col gap-1.5">
+      {
+        site.roles.map(({ role, at }) => (
+          <li>
+            {role} <strong>{at}</strong>
+          </li>
+        ))
+      }
+    </ul>
+    <a href="/about" class="mt-[25px] inline-block underline hover:text-muted">About me</a>
+  </div>
+
+  <p class="mt-10 min-h-6 max-w-[280px] lg:mx-auto lg:mt-auto lg:w-full" data-clock></p>
+</aside>
+
+<script>
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: "America/Vancouver", hour: "numeric", minute: "2-digit" });
+
+  document.addEventListener("astro:page-load", () => {
+    const clock = document.querySelector<HTMLElement>("[data-clock]");
+    if (!clock) return;
+
+    // Tick on each minute boundary
+    let timer: number | undefined;
+    const tick = () => {
+      clock.textContent = `Vancouver · ${time.format(new Date())}`;
+      timer = window.setTimeout(tick, 60_000 - (Date.now() % 60_000));
+    };
+    tick();
+    document.addEventListener("astro:before-swap", () => clearTimeout(timer), { once: true });
+  });
+</script>
