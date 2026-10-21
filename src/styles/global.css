@@ -38,7 +38,7 @@
   --content: min(998px, 100% - 2 * var(--gutter));
 
   /* Home page (lg and up): fixed sidebar on the left, everything else in the canvas */
-  --sidebar: clamp(300px, 26vw, 391px);
+  --sidebar: clamp(300px, 26vw, 390px);
 }
 
 @theme inline {
@@ -57,10 +57,10 @@
 /* Home page canvas: featured project and project grid. Centered on small screens,
    flush against the sidebar from lg up. */
 @utility container-canvas {
-  width: min(965px, 100% - 2 * var(--gutter));
+  width: min(960px, 100% - 2 * var(--gutter));
   margin-inline: auto;
   @variant lg {
-    width: min(965px, 100% - 48px);
+    width: min(960px, 100% - 48px);
     margin-inline: 0;
   }
 }

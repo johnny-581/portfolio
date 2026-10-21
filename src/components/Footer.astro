@@ -2,8 +2,9 @@
 import { site } from "../site";
 ---
 
-<footer class="mt-[195px] bg-neutral-100">
-  <div class="flex flex-col gap-10 px-6 py-[55px] md:grid md:grid-cols-[minmax(0,698px)_auto] lg:px-[63px]">
+<footer class="mt-[195px] bg-neutral-100 px-6 py-[55px] lg:px-[60px]">
+  <!-- 900px wide from lg up, so the note lines up with the right edge of the home page content -->
+  <div class="flex flex-col gap-10 md:flex-row md:justify-between lg:max-w-[900px]">
     <ul class="flex flex-col gap-[11px]">
       {
         site.social.map((link) => (

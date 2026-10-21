@@ -14,7 +14,7 @@ const others = projects.filter((p) => p !== featured);
 <!-- The footer goes in the canvas, beside the sidebar -->
 <Base footer={false}>
   <Sidebar />
-  <main class="pt-16 lg:ml-(--sidebar) lg:pt-[131px]">
+  <main class="pt-16 lg:ml-(--sidebar) lg:pt-32">
     <FeaturedProject project={featured} />
     <ProjectGrid projects={others} />
     <Footer />
