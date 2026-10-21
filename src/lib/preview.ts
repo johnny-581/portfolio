@@ -44,10 +44,11 @@ export function showPreview(slug: string | null) {
   const w = Math.min(MAX_W, Math.round(cardRect.w * SCALE));
   // The gutter thumbnail fills the sidebar from its right edge to the screen edge
   const gutterW = Math.min(MAX_W, canvasLeft);
+  const column = cards.filter((c) => c.dataset.column === card.dataset.column);
 
   const place = placeThumb({
     card: cardRect,
-    column: Number(card.dataset.column),
+    columnTop: Math.min(...column.map((c) => rect(c).y)),
     others: cards.filter((c) => c !== card).map(rect),
     viewport: { w: document.documentElement.clientWidth, h: window.innerHeight },
     canvasLeft,
@@ -66,4 +67,10 @@ export function showPreview(slug: string | null) {
   });
   thumb.dataset.where = place.where;
   thumb.classList.remove("opacity-0");
+}
+
+/** Moves the showing thumbnail with the page as it scrolls by `dy`, so it stays by its card */
+export function movePreview(dy: number) {
+  const active = document.querySelector<HTMLElement>("[data-thumbs] [data-preview]:not(.opacity-0)");
+  if (active) active.style.top = `${parseFloat(active.style.top) - dy}px`;
 }
