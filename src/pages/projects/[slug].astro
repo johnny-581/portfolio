@@ -20,7 +20,8 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { project, prev, next } = Astro.props;
-const { title, blurb, link, links } = project.data;
+// `links` can be missing in content cached before the field existed
+const { title, blurb, link, links = [] } = project.data;
 const { Content } = await render(project);
 ---
 
