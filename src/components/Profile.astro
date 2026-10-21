@@ -1,11 +1,10 @@
 ---
-import { Image } from "astro:assets";
-import me from "../assets/me.png";
+import Avatar from "./Avatar.astro";
 import { site } from "../site";
 ---
 
 <!-- Home page sidebar content -->
-<Image src={me} alt="Drawing of Johnny" width={116} height={123} densities={[1, 2, 3]} loading="eager" />
+<Avatar />
 <h1 class="mt-[7px] font-serif text-name font-bold whitespace-nowrap text-heading">{site.name}</h1>
 <p class="mt-10 text-h2">{site.tagline}</p>
 <ul class="mt-[25px] flex flex-col gap-1.5 text-h2">

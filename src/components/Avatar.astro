@@ -1,0 +1,103 @@
+---
+import { Image } from "astro:assets";
+import opened from "../assets/opened.png";
+import half from "../assets/half.png";
+import closed from "../assets/closed.png";
+
+// Blink frames, stacked; the wrapper's data-frame says which one shows
+const frames = [
+  { name: "open", src: opened },
+  { name: "half", src: half },
+  { name: "closed", src: closed },
+];
+---
+
+<!-- Blinks when the cursor enters it, or a finger taps or swipes across it -->
+<div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
+  {
+    frames.map(({ name, src }) => (
+      <Image
+        src={src}
+        alt={name === "open" ? "Drawing of Johnny" : ""}
+        aria-hidden={name === "open" ? undefined : "true"}
+        width={116}
+        height={123}
+        densities={[1, 2, 3]}
+        loading="eager"
+        class="absolute inset-0"
+        data-name={name}
+      />
+    ))
+  }
+</div>
+
+<style>
+  /* Frames swap instantly; a cross-fade would read as ghosting, not blinking */
+  .avatar :global(img) {
+    visibility: hidden;
+  }
+  .avatar[data-frame="open"] :global([data-name="open"]),
+  .avatar[data-frame="half"] :global([data-name="half"]),
+  .avatar[data-frame="closed"] :global([data-name="closed"]) {
+    visibility: visible;
+  }
+</style>
+
+<script>
+  // Real eyelids snap shut and open more slowly, so the half frame only shows on the way up
+  const CLOSED_MS = 80;
+  const HALF_MS = 70;
+  // Rest after a blink, so wiggling over it doesn't flicker
+  const REST_MS = 400;
+
+  document.addEventListener("astro:page-load", () => {
+    const avatar = document.querySelector<HTMLElement>("[data-avatar]");
+    if (!avatar) return;
+
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const timers: number[] = [];
+    let busy = false;
+
+    const later = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
+    const blink = () => {
+      if (busy || reducedMotion.matches) return;
+      busy = true;
+      avatar.dataset.frame = "closed";
+      later(CLOSED_MS, () => (avatar.dataset.frame = "half"));
+      later(CLOSED_MS + HALF_MS, () => (avatar.dataset.frame = "open"));
+      later(CLOSED_MS + HALF_MS + REST_MS, () => (busy = false));
+    };
+
+    // Mouse and pen; touch is handled below
+    avatar.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && blink());
+
+    // A touch only reports to the element it started on, so follow the finger across the
+    // page and blink when it moves onto the avatar (or starts there)
+    let fingerOver = false;
+    const onTouch = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const r = avatar.getBoundingClientRect();
+      const over = touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom;
+      if (over && !fingerOver) blink();
+      fingerOver = over;
+    };
+    const onTouchEnd = () => (fingerOver = false);
+
+    document.addEventListener("touchstart", onTouch, { passive: true });
+    document.addEventListener("touchmove", onTouch, { passive: true });
+    document.addEventListener("touchend", onTouchEnd);
+    document.addEventListener("touchcancel", onTouchEnd);
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        timers.forEach(clearTimeout);
+        document.removeEventListener("touchstart", onTouch);
+        document.removeEventListener("touchmove", onTouch);
+        document.removeEventListener("touchend", onTouchEnd);
+        document.removeEventListener("touchcancel", onTouchEnd);
+      },
+      { once: true },
+    );
+  });
+</script>
