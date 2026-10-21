@@ -10,41 +10,112 @@ const { project } = Astro.props;
 const { title, images } = project.data;
 ---
 
-<!-- Starts on the content column and bleeds off the right edge of the viewport -->
-<div class="carousel no-scrollbar flex snap-x snap-mandatory gap-7 overflow-x-auto" data-carousel>
+<!-- Starts at the content's left edge and bleeds off the right edge of the screen.
+     Slides share one height and keep their own widths; captions wrap to the image. -->
+<div class="carousel-root relative" data-carousel-root>
+  <div class="carousel no-scrollbar relative flex snap-x snap-proximity gap-[27px] overflow-x-auto" data-carousel>
+    {
+      images.map((image, i) => (
+        <figure class="flex w-min shrink-0 snap-start flex-col gap-5">
+          <Image
+            src={image.src}
+            alt={image.caption ?? `${title} screenshot ${i + 1}`}
+            widths={[640, 960, 1400]}
+            sizes="(min-width: 1024px) 700px, 80vw"
+            loading={i === 0 ? "eager" : "lazy"}
+            class="h-(--slide-h) w-auto max-w-none rounded-[4px] object-cover"
+            transition:name={i === 0 ? shotName(project.id) : undefined}
+          />
+          {image.caption && <figcaption>{image.caption}</figcaption>}
+        </figure>
+      ))
+    }
+  </div>
+
   {
-    images.map((image, i) => (
-      <figure class="w-full shrink-0 snap-start">
-        <Image
-          src={image.src}
-          alt={image.caption ?? `${title} screenshot ${i + 1}`}
-          widths={[800, 998, 1996]}
-          sizes="(min-width: 1046px) 998px, calc(100vw - 48px)"
-          loading={i === 0 ? "eager" : "lazy"}
-          class="aspect-[998/624] w-full rounded-[4px] object-cover"
-          transition:name={i === 0 ? shotName(project.id) : undefined}
-        />
-        {image.caption && <figcaption class="mt-[29px]">{image.caption}</figcaption>}
-      </figure>
-    ))
+    images.length > 1 && (
+      <>
+        <button type="button" class="arrow left-1 lg:left-0" aria-label="Previous image" data-step="-1">
+          <img src="/icons/chevron-left.svg" alt="" width="24" height="24" />
+        </button>
+        <button type="button" class="arrow right-1 lg:right-auto lg:left-[min(987px,100%_-_54px)]" aria-label="Next image" data-step="1">
+          <img src="/icons/chevron-right.svg" alt="" width="24" height="24" />
+        </button>
+      </>
+    )
   }
 </div>
 
 <style>
-  /* Padding = the content column's inset, so each slide (100% of the padded box)
-     is exactly as wide as the content column. */
+  .carousel-root {
+    --slide-h: clamp(200px, 40vw, 394px);
+  }
+  /* Inset to the content column's left edge: page gutter on small screens, 60px into the canvas from lg */
   .carousel {
-    --inset: calc((100% - min(998px, 100% - 2 * var(--gutter))) / 2);
-    padding-inline: var(--inset);
-    scroll-padding-inline: var(--inset);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+  @media (width >= 64rem) {
+    .carousel {
+      padding-left: 60px;
+      scroll-padding-left: 60px;
+    }
+  }
+  /* Centered on the images; hidden when there's nothing further that way */
+  .arrow {
+    position: absolute;
+    top: calc(var(--slide-h) / 2 - 15px);
+    border-radius: 9999px;
+    background: var(--color-neutral-100);
+    padding: 3px;
+    filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.25));
+    transition: opacity 150ms;
+  }
+  .arrow.off {
+    opacity: 0;
+    pointer-events: none;
   }
 </style>
 
 <script>
-  // Clicking a peeking slide scrolls it into view (helps mouse users without horizontal scroll).
   document.addEventListener("astro:page-load", () => {
-    document.querySelectorAll<HTMLElement>("[data-carousel] figure").forEach((slide) => {
-      slide.addEventListener("click", () => slide.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" }));
+    document.querySelectorAll<HTMLElement>("[data-carousel-root]").forEach((root) => {
+      const track = root.querySelector<HTMLElement>("[data-carousel]")!;
+      const slides = [...track.querySelectorAll<HTMLElement>("figure")];
+      const arrows = [...root.querySelectorAll<HTMLButtonElement>("[data-step]")];
+      const inset = () => parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0;
+
+      const scrollToSlide = (slide: HTMLElement) =>
+        track.scrollTo({ left: slide.offsetLeft - inset(), behavior: "smooth" });
+
+      // The slide at the start of the view
+      const currentIndex = () => {
+        const x = track.scrollLeft + inset();
+        return slides.reduce((best, s, i) => (Math.abs(s.offsetLeft - x) < Math.abs(slides[best].offsetLeft - x) ? i : best), 0);
+      };
+
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        for (const arrow of arrows) {
+          const off = arrow.dataset.step === "-1" ? track.scrollLeft <= 1 : track.scrollLeft >= max - 1;
+          arrow.classList.toggle("off", off);
+          arrow.tabIndex = off ? -1 : 0;
+        }
+      };
+
+      arrows.forEach((arrow) =>
+        arrow.addEventListener("click", () => {
+          const i = Math.min(slides.length - 1, Math.max(0, currentIndex() + Number(arrow.dataset.step)));
+          scrollToSlide(slides[i]);
+        }),
+      );
+      // Clicking a peeking slide scrolls it into view
+      slides.forEach((slide) => slide.addEventListener("click", () => scrollToSlide(slide)));
+
+      track.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      document.addEventListener("astro:before-swap", () => window.removeEventListener("resize", update), { once: true });
+      update();
     });
   });
 </script>

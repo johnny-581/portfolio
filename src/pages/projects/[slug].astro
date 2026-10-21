@@ -2,7 +2,9 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import Sidebar from "../../components/Sidebar.astro";
 import Carousel from "../../components/Carousel.astro";
+import Footer from "../../components/Footer.astro";
 import { getProjects } from "../../lib/projects";
 
 export const getStaticPaths = (async () => {
@@ -18,44 +20,58 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { project, prev, next } = Astro.props;
-const { title, blurb, link } = project.data;
+const { title, blurb, link, links } = project.data;
 const { Content } = await render(project);
 ---
 
-<Base title={title} description={blurb}>
-  <a href="/" class="absolute top-[94px] left-[62px] hover:text-muted max-sm:left-6 max-sm:top-8">back to home</a>
+<!-- The footer goes in the canvas, beside the sidebar -->
+<Base title={title} description={blurb} footer={false}>
+  <Sidebar>
+    <a href="/" class="underline hover:text-muted">back to home</a>
+    {
+      links.length > 0 && (
+        <ul class="mt-10 flex flex-col gap-4 lg:mt-[111px]">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} target="_blank" rel="noopener" class="underline hover:text-muted">
+                {l.label} ↗
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </Sidebar>
 
-  <main class="pt-[263px] max-sm:pt-32">
-    <div class="container-content">
-      <div class="max-w-[612px]">
-        <h1 class="font-serif text-h1 font-bold text-heading max-sm:text-[2.25rem]">{title}</h1>
-        {
-          link && (
-            <a href={link.href} target="_blank" rel="noopener" class="mt-[21px] inline-block underline hover:text-muted">
-              {link.label} ↗
-            </a>
-          )
-        }
-        <p class="mt-[29px]">{blurb}</p>
-        <div class="mt-[29px] space-y-4">
-          <Content />
-        </div>
+  <main class="pt-16 lg:ml-(--sidebar) lg:pt-32">
+    <div class="container-canvas lg:pl-[60px]">
+      <h1 class="font-serif text-h1 font-bold text-heading max-sm:text-[2.25rem]">{title}</h1>
+      {
+        link && (
+          <a href={link.href} target="_blank" rel="noopener" class="mt-12 inline-block underline hover:text-muted">
+            {link.label} ↗
+          </a>
+        )
+      }
+      <div class="mt-12 max-w-[612px] space-y-[29px]">
+        <p>{blurb}</p>
+        <Content />
       </div>
     </div>
 
-    <div class="mt-[79px]">
+    <div class="mt-12">
       <Carousel project={project} />
     </div>
 
-    <nav class="container-content mt-[79px] flex items-center justify-between">
-      <a href={`/projects/${prev.id}`} class="-ml-2.5 flex items-center gap-2.5 hover:text-muted" aria-label={`Previous project: ${prev.data.title}`}>
-        <span class="rounded-full bg-neutral-100 p-[3px]"><img src="/icons/chevron-left.svg" alt="" width="24" height="24" /></span>
+    <nav class="container-canvas mt-12 flex justify-between lg:pl-[60px]">
+      <a href={`/projects/${prev.id}`} class="underline hover:text-muted" aria-label={`Previous project: ${prev.data.title}`}>
         previous project
       </a>
-      <a href={`/projects/${next.id}`} class="flex items-center gap-[9px] hover:text-muted" aria-label={`Next project: ${next.data.title}`}>
+      <a href={`/projects/${next.id}`} class="underline hover:text-muted" aria-label={`Next project: ${next.data.title}`}>
         next project
-        <span class="rounded-full bg-neutral-100 p-[3px]"><img src="/icons/chevron-right.svg" alt="" width="24" height="24" /></span>
       </a>
     </nav>
+
+    <Footer />
   </main>
 </Base>

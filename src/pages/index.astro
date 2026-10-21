@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Sidebar from "../components/Sidebar.astro";
+import Profile from "../components/Profile.astro";
 import FeaturedProject from "../components/FeaturedProject.astro";
 import ProjectGrid from "../components/ProjectGrid.astro";
 import Footer from "../components/Footer.astro";
@@ -13,7 +14,9 @@ const others = projects.filter((p) => p !== featured);
 
 <!-- The footer goes in the canvas, beside the sidebar -->
 <Base footer={false}>
-  <Sidebar />
+  <Sidebar>
+    <Profile />
+  </Sidebar>
   <main class="pt-16 lg:ml-(--sidebar) lg:pt-32">
     <FeaturedProject project={featured} />
     <ProjectGrid projects={others} />

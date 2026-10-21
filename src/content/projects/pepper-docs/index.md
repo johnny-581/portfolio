@@ -5,6 +5,12 @@ blurb: A notion-like editor for PDF documents. I found the process of writing co
 link:
   label: pepperdocs.app
   href: https://pepperdocs.app
+# Sidebar links on the project page, e.g.
+# links:
+#   - label: Github
+#     href: https://github.com/...
+#   - label: Figma
+#     href: https://www.figma.com/...
 order: 0
 featured: true
 images:
