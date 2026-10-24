@@ -10,7 +10,8 @@ const { project } = Astro.props;
 const { title, images } = project.data;
 ---
 
-<!-- Starts at the content's left edge and bleeds off the right edge of the screen.
+<!-- Starts at the content's left edge and bleeds off both edges of the screen: from lg up
+     it reaches under the sidebar too, so slides scroll all the way to the left edge.
      Slides share one height and keep their own widths; captions wrap to the image. -->
 <div class="carousel-root relative" data-carousel-root>
   <div class="carousel no-scrollbar relative flex snap-x snap-proximity gap-[27px] overflow-x-auto" data-carousel>
@@ -35,10 +36,10 @@ const { title, images } = project.data;
   {
     images.length > 1 && (
       <>
-        <button type="button" class="arrow left-1 lg:left-0" aria-label="Previous image" data-step="-1">
+        <button type="button" class="arrow left-1 lg:left-(--sidebar)" aria-label="Previous image" data-step="-1">
           <img src="/icons/chevron-left.svg" alt="" width="24" height="24" />
         </button>
-        <button type="button" class="arrow right-1 lg:right-auto lg:left-[min(987px,100%_-_54px)]" aria-label="Next image" data-step="1">
+        <button type="button" class="arrow right-1 lg:right-auto lg:left-[calc(var(--sidebar)_+_min(987px,100%_-_var(--sidebar)_-_54px))]" aria-label="Next image" data-step="1">
           <img src="/icons/chevron-right.svg" alt="" width="24" height="24" />
         </button>
       </>
@@ -50,15 +51,21 @@ const { title, images } = project.data;
   .carousel-root {
     --slide-h: clamp(200px, 40vw, 394px);
   }
-  /* Inset to the content column's left edge: page gutter on small screens, 60px into the canvas from lg */
+  @media (width >= 64rem) {
+    .carousel-root {
+      margin-left: calc(-1 * var(--sidebar));
+    }
+  }
+  /* Inset to the content column's left edge: page gutter on small screens; from lg, the
+     root extends left under the sidebar and the inset is the sidebar plus 60px */
   .carousel {
     padding-inline: var(--gutter);
     scroll-padding-inline: var(--gutter);
   }
   @media (width >= 64rem) {
     .carousel {
-      padding-left: 60px;
-      scroll-padding-left: 60px;
+      padding-left: calc(var(--sidebar) + 60px);
+      scroll-padding-left: calc(var(--sidebar) + 60px);
     }
   }
   /* Centered on the images; hidden when there's nothing further that way */
