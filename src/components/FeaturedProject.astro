@@ -12,12 +12,13 @@ const { title, status, blurb, images } = project.data;
 ---
 
 <!-- Image on top; title and blurb share the row beneath it, the blurb set against the right edge -->
-<a href={`/projects/${project.id}`} class="container-canvas flex flex-col gap-6 lg:max-w-[670px]">
+<!-- As wide as the project grid below -->
+<a href={`/projects/${project.id}`} class="container-canvas flex flex-col gap-6 lg:max-w-[750px]">
   <Image
     src={images[0].src}
     alt={`${title} screenshot`}
-    widths={[670, 1000, 1340]}
-    sizes="(min-width: 1024px) 670px, calc(100vw - 48px)"
+    widths={[750, 1100, 1500]}
+    sizes="(min-width: 1024px) 750px, calc(100vw - 48px)"
     loading="eager"
     class="aspect-[1257/786] w-full rounded-[4px] object-cover"
     transition:name={shotName(project.id)}

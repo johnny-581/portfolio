@@ -13,7 +13,7 @@ const columns: (typeof projects)[] = [[], [], []];
 projects.forEach((project, i) => columns[(project.data.column ?? (i % 3) + 1) - 1].push(project));
 ---
 
-<!-- Lines up with the featured project's left edge and runs a little past its right -->
+<!-- Lines up with the featured project's edges -->
 <section class="container-canvas mt-16 lg:mt-[100px]">
   <div class="grid gap-x-7 gap-y-10 md:grid-cols-2 lg:max-w-[750px] lg:grid-cols-3" data-project-grid>
     {
