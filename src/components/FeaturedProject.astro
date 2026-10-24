@@ -11,18 +11,19 @@ const { project } = Astro.props;
 const { title, status, blurb, images } = project.data;
 ---
 
-<a href={`/projects/${project.id}`} class="container-canvas flex flex-col gap-7 lg:flex-row lg:items-end">
+<!-- Image on top; title and blurb share the row beneath it, the blurb set against the right edge -->
+<a href={`/projects/${project.id}`} class="container-canvas flex flex-col gap-6 lg:max-w-[670px]">
   <Image
     src={images[0].src}
     alt={`${title} screenshot`}
-    widths={[652, 800, 1304]}
-    sizes="(min-width: 1024px) 652px, calc(100vw - 48px)"
+    widths={[670, 1000, 1340]}
+    sizes="(min-width: 1024px) 670px, calc(100vw - 48px)"
     loading="eager"
-    class="aspect-[1257/786] w-full rounded-[4px] object-cover lg:min-w-0 lg:flex-1"
+    class="aspect-[1257/786] w-full rounded-[4px] object-cover"
     transition:name={shotName(project.id)}
   />
-  <div class="flex shrink-0 flex-col gap-4 lg:w-[280px]">
-    <ProjectTitle title={title} status={status} />
-    <p>{blurb}</p>
+  <div class="flex flex-col gap-4 md:flex-row md:justify-between md:gap-10">
+    <ProjectTitle title={title} status={status} class="shrink-0" />
+    <p class="md:max-w-[370px] md:text-right">{blurb}</p>
   </div>
 </a>
