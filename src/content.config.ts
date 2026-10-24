@@ -19,8 +19,6 @@ const projects = defineCollection({
       // More links (Github, Figma...), shown in the sidebar on the project page
       links: z.array(z.object({ label: z.string(), href: z.url() })).default([]),
       order: z.number(),
-      // Home page grid column (lg and up). Projects without one fill the columns in turn.
-      column: z.number().int().min(1).max(3).optional(),
       featured: z.boolean().default(false),
       // The first image is the thumbnail on the home page
       images: z

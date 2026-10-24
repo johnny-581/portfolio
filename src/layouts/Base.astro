@@ -33,26 +33,20 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
 </html>
 
 <script>
-  import { showPreview } from "../lib/preview";
-
-  // Going home from a project page lands where you left the home page, with that
-  // project's preview showing so its image morphs back into place.
+  // Going home from a project page lands where you left the home page, so the project's
+  // image morphs back into its card.
   let homeScroll = 0;
-  let returningFrom: string | null = null;
   let restoreScroll = false;
 
   document.addEventListener("astro:before-preparation", (e) => {
     if (e.from.pathname === "/") homeScroll = window.scrollY;
-    const slug = e.from.pathname.match(/^\/projects\/([^/]+)/)?.[1];
-    returningFrom = slug && e.to.pathname === "/" ? slug : null;
+    const fromProject = e.from.pathname.startsWith("/projects/");
     // Browser back/forward already restores scroll
-    restoreScroll = !!returningFrom && e.navigationType !== "traverse";
+    restoreScroll = fromProject && e.to.pathname === "/" && e.navigationType !== "traverse";
   });
 
   // Runs after the new page is in the DOM but before the transition captures it
   document.addEventListener("astro:after-swap", () => {
-    if (!returningFrom) return;
     if (restoreScroll) window.scrollTo({ top: homeScroll, behavior: "instant" });
-    showPreview(returningFrom);
   });
 </script>

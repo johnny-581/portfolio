@@ -2,34 +2,40 @@
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import ProjectTitle from "./ProjectTitle.astro";
+import { shotName } from "../lib/shot";
 
 interface Props {
   projects: CollectionEntry<"projects">[];
 }
 const { projects } = Astro.props;
 
-// Each project names its column; any without one fill the columns in turn
-const columns: (typeof projects)[] = [[], [], []];
-projects.forEach((project, i) => columns[(project.data.column ?? (i % 3) + 1) - 1].push(project));
+// Projects alternate between the two columns, so they read left to right, row by row
+const columns: (typeof projects)[] = [[], []];
+projects.forEach((project, i) => columns[i % 2].push(project));
 ---
 
-<!-- Lines up with the featured project's edges -->
+<!-- Two staggered columns of image cards, lining up with the featured project's edges.
+     A single column on small screens, in the projects' order. -->
 <section class="container-canvas mt-16 lg:mt-[100px]">
-  <div class="grid gap-x-7 gap-y-10 md:grid-cols-2 lg:max-w-[750px] lg:grid-cols-3" data-project-grid>
+  <div class="grid gap-x-7 gap-y-12 md:grid-cols-2 lg:max-w-[750px]">
     {
-      columns.map((column, i) => (
-        <div class="flex flex-col gap-9 max-lg:contents">
+      columns.map((column) => (
+        <div class="flex flex-col gap-12 max-md:contents">
           {column.map((project) => (
             <a
               href={`/projects/${project.id}`}
-              class="flex flex-col gap-4 max-lg:order-(--order)"
+              class="group flex flex-col gap-4 max-md:order-(--order)"
               style={`--order: ${project.data.order}`}
-              data-card
-              data-slug={project.id}
-              data-column={i + 1}
             >
+              <Image
+                src={project.data.images[0].src}
+                alt={`${project.data.title} screenshot`}
+                widths={[400, 720, 1080]}
+                sizes="(min-width: 1024px) 361px, (min-width: 768px) calc(50vw - 38px), calc(100vw - 48px)"
+                class="h-auto w-full rounded-[4px] bg-neutral-100 transition-opacity group-hover:opacity-85"
+                transition:name={shotName(project.id)}
+              />
               <ProjectTitle title={project.data.title} status={project.data.status} />
-              <p>{project.data.blurb}</p>
             </a>
           ))}
         </div>
@@ -37,141 +43,3 @@ projects.forEach((project, i) => columns[(project.data.column ?? (i % 3) + 1) - 
     }
   </div>
 </section>
-
-<!-- Hover thumbnails, positioned by lib/preview.ts. Desktop with a mouse only. The
-     showing one takes the mouse, so you can move onto it and click through. -->
-<div class="pointer-events-none fixed inset-0 z-10 max-lg:hidden pointer-coarse:hidden" aria-hidden="true" data-thumbs>
-  {
-    projects.map((project) => (
-      <a
-        href={`/projects/${project.id}`}
-        tabindex="-1"
-        class="absolute top-0 left-0 overflow-hidden rounded-[4px] opacity-0 [&:not(.opacity-0)]:pointer-events-auto"
-        data-preview={project.id}
-      >
-        <Image
-          src={project.data.images[0].src}
-          alt=""
-          widths={[392, 784]}
-          sizes="392px"
-          loading="eager"
-          class="size-full object-cover"
-        />
-      </a>
-    ))
-  }
-</div>
-
-<script>
-  import { movePreview, showPreview } from "../lib/preview";
-  import { onTheWay } from "../lib/safeZone";
-
-  document.addEventListener("astro:page-load", () => {
-    const grid = document.querySelector<HTMLElement>("[data-project-grid]");
-    const layer = document.querySelector<HTMLElement>("[data-thumbs]");
-    if (!grid || !layer) return;
-
-    const cards = [...grid.querySelectorAll<HTMLElement>("[data-card]")];
-    const showing = () => layer.querySelector<HTMLElement>("[data-preview]:not(.opacity-0)");
-    const cardAt = ({ x, y }: { x: number; y: number }) =>
-      document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-card]") ?? null;
-
-    let scrolling = false;
-    let scrollTimer: number | undefined;
-    let pointer: { x: number; y: number } | null = null;
-    // The card whose preview is showing (it may already be up when returning from a project page)
-    let current = cards.find((c) => c.dataset.slug === showing()?.dataset.preview) ?? null;
-    // Set while the cursor crosses the gap between a card and its preview
-    let crossing: { from: { x: number; y: number }; target: DOMRect } | null = null;
-    let idleTimer: number | undefined;
-
-    const stopCrossing = () => {
-      crossing = null;
-      clearTimeout(idleTimer);
-    };
-    const open = (card: HTMLElement) => {
-      stopCrossing();
-      current = card;
-      showPreview(card.dataset.slug!);
-    };
-    const hide = () => {
-      stopCrossing();
-      current = null;
-      showPreview(null);
-    };
-    // Hide, then show whichever card the cursor ended up on (one passed over on the way, say)
-    const close = () => {
-      hide();
-      const card = pointer && !scrolling ? cardAt(pointer) : null;
-      if (card) open(card);
-    };
-    // The preview stays while the cursor keeps heading for `target`, and goes if it
-    // strays or rests on the way
-    const restartIdle = () => {
-      clearTimeout(idleTimer);
-      idleTimer = window.setTimeout(close, 300);
-    };
-    const startCrossing = (e: PointerEvent, target: HTMLElement | null) => {
-      if (!target) return close();
-      crossing = { from: { x: e.clientX, y: e.clientY }, target: target.getBoundingClientRect() };
-      restartIdle();
-    };
-
-    cards.forEach((card) => {
-      card.addEventListener("pointerenter", () => {
-        if (card === current) return stopCrossing();
-        if (!scrolling && !crossing) open(card);
-      });
-      card.addEventListener("pointerleave", (e) => card === current && startCrossing(e, showing()));
-      card.addEventListener("focus", () => !scrolling && open(card));
-      card.addEventListener("blur", (e) => {
-        if (card === current && !(e.relatedTarget as Element | null)?.closest("[data-preview]")) hide();
-      });
-    });
-
-    layer.querySelectorAll<HTMLElement>("[data-preview]").forEach((preview) => {
-      const isCurrent = () => preview.dataset.preview === current?.dataset.slug;
-      preview.addEventListener("pointerenter", () => isCurrent() && stopCrossing());
-      preview.addEventListener("pointerleave", (e) => isCurrent() && startCrossing(e, current));
-    });
-
-    const onPointerMove = (e: PointerEvent) => {
-      pointer = { x: e.clientX, y: e.clientY };
-      if (!crossing) return;
-      if (onTheWay(pointer, crossing.from, crossing.target)) restartIdle();
-      else close();
-    };
-
-    // While the cursor stays on the card or its preview, the preview scrolls along with
-    // the page. Otherwise it hides on the first scroll tick, and the hover events the
-    // browser fires while content moves under a still cursor are ignored. Events that
-    // don't move the page (like the one from restoring the scroll position) are skipped.
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      if (window.scrollY === lastY) return;
-      const dy = window.scrollY - lastY;
-      lastY = window.scrollY;
-      const under = pointer && document.elementFromPoint(pointer.x, pointer.y);
-      const onCurrent =
-        current && !crossing && (under?.closest("[data-card]") === current || under?.closest("[data-preview]") === showing());
-      if (onCurrent) movePreview(dy);
-      else hide();
-      scrolling = true;
-      clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(() => (scrolling = false), 150);
-    };
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", hide);
-    document.addEventListener(
-      "astro:before-swap",
-      () => {
-        stopCrossing();
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("scroll", onScroll);
-        window.removeEventListener("resize", hide);
-      },
-      { once: true },
-    );
-  });
-</script>
