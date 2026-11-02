@@ -2,29 +2,30 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-const projects = defineCollection({
-  // One folder per project: src/content/projects/<slug>/index.md + its images
+const entries = defineCollection({
+  // One folder per entry: src/content/entries/<slug>/index.md + its images
   loader: glob({
     pattern: "*/index.md",
-    base: "./src/content/projects",
+    base: "./src/content/entries",
     generateId: ({ entry }) => entry.split("/")[0],
   }),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      status: z.string(),
-      blurb: z.string(),
-      // The project's site, shown under its title
-      link: z.object({ label: z.string(), href: z.url() }).optional(),
-      // More links (Github, Figma...), shown in the sidebar on the project page
-      links: z.array(z.object({ label: z.string(), href: z.url() })).default([]),
-      order: z.number(),
-      featured: z.boolean().default(false),
-      // The first image is the thumbnail on the home page
-      images: z
-        .array(z.object({ src: image(), caption: z.string().optional() }))
-        .min(1),
-    }),
+  schema: z.object({
+    // Lowercase by convention
+    title: z.string(),
+    tag: z.enum(["journal", "project", "place", "list"]),
+    // Index label: "2026", "2024-25", "2025-". YAML reads a bare 2026 as a number, so coerce
+    when: z.coerce.string().regex(/^\d{4}(-(\d{2})?)?$/),
+    // Sort key and RSS date
+    published: z.coerce.date(),
+    // Meta description, RSS and og:description
+    summary: z.string(),
+    // Shown in the meta line under the title; href is a plain string so "/resume.pdf" is allowed
+    links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+    // Hidden from the index, feed and RSS, but still has its own page (about)
+    unlisted: z.boolean().default(false),
+    // Not built at all
+    draft: z.boolean().default(false),
+  }),
 });
 
-export const collections = { projects };
+export const collections = { entries };
