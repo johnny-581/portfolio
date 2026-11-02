@@ -1,17 +1,17 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import Footer from "../components/Footer.astro";
+import Aside from "../components/Aside.astro";
 import { site } from "../site";
 import "../styles/global.css";
 
 interface Props {
   title?: string;
   description?: string;
-  /** Pages that place the footer themselves pass false */
-  footer?: boolean;
+  /** Slug of the open entry, so the index and links row can mark it */
+  current?: string;
 }
 
-const { title, description = site.tagline, footer = true } = Astro.props;
+const { title, description = site.tagline, current } = Astro.props;
 const fullTitle = title ? `${title} — ${site.title}` : site.title;
 ---
 
@@ -20,6 +20,7 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={fullTitle} />
@@ -27,26 +28,13 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
     <ClientRouter />
   </head>
   <body>
-    <slot />
-    {footer && <Footer />}
+    <!-- Two panes from lg up (index left, page scrolls on the right); one column below,
+         where the aside's header, main and index are ordered around each other -->
+    <div class="flex min-h-dvh flex-col lg:grid lg:grid-cols-[var(--aside)_minmax(0,1fr)] lg:items-start">
+      <Aside current={current} />
+      <main class="column order-2 min-w-0 pt-10 pb-16 lg:order-none lg:max-w-none lg:px-14 lg:pb-40">
+        <slot />
+      </main>
+    </div>
   </body>
 </html>
-
-<script>
-  // Going home from a project page lands where you left the home page, so the project's
-  // image morphs back into its card.
-  let homeScroll = 0;
-  let restoreScroll = false;
-
-  document.addEventListener("astro:before-preparation", (e) => {
-    if (e.from.pathname === "/") homeScroll = window.scrollY;
-    const fromProject = e.from.pathname.startsWith("/projects/");
-    // Browser back/forward already restores scroll
-    restoreScroll = fromProject && e.to.pathname === "/" && e.navigationType !== "traverse";
-  });
-
-  // Runs after the new page is in the DOM but before the transition captures it
-  document.addEventListener("astro:after-swap", () => {
-    if (restoreScroll) window.scrollTo({ top: homeScroll, behavior: "instant" });
-  });
-</script>

@@ -41,6 +41,13 @@ const frames = [
   .avatar[data-frame="closed"] :global([data-name="closed"]) {
     visibility: visible;
   }
+
+  /* The frames are dark strokes on a transparent background, so flip them in dark mode */
+  @media (prefers-color-scheme: dark) {
+    .avatar :global(img) {
+      filter: invert(1) hue-rotate(180deg);
+    }
+  }
 </style>
 
 <script>
@@ -52,13 +59,14 @@ const frames = [
 
   document.addEventListener("astro:page-load", () => {
     const avatar = document.querySelector<HTMLElement>("[data-avatar]");
-    if (!avatar) return;
+    // The avatar persists across pages, so bind it once for the whole session
+    if (!avatar || avatar.dataset.bound) return;
+    avatar.dataset.bound = "1";
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    const timers: number[] = [];
     let busy = false;
 
-    const later = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
+    const later = (ms: number, fn: () => void) => window.setTimeout(fn, ms);
     const blink = () => {
       if (busy || reducedMotion.matches) return;
       busy = true;
@@ -84,20 +92,10 @@ const frames = [
     };
     const onTouchEnd = () => (fingerOver = false);
 
+    // Never removed: the avatar lives for the whole session
     document.addEventListener("touchstart", onTouch, { passive: true });
     document.addEventListener("touchmove", onTouch, { passive: true });
     document.addEventListener("touchend", onTouchEnd);
     document.addEventListener("touchcancel", onTouchEnd);
-    document.addEventListener(
-      "astro:before-swap",
-      () => {
-        timers.forEach(clearTimeout);
-        document.removeEventListener("touchstart", onTouch);
-        document.removeEventListener("touchmove", onTouch);
-        document.removeEventListener("touchend", onTouchEnd);
-        document.removeEventListener("touchcancel", onTouchEnd);
-      },
-      { once: true },
-    );
   });
 </script>

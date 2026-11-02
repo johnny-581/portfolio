@@ -1,25 +1,25 @@
 ---
+import { render } from "astro:content";
 import Base from "../layouts/Base.astro";
-import Sidebar from "../components/Sidebar.astro";
-import Profile from "../components/Profile.astro";
-import FeaturedProject from "../components/FeaturedProject.astro";
-import ProjectGrid from "../components/ProjectGrid.astro";
-import Footer from "../components/Footer.astro";
-import { getProjects } from "../lib/projects";
+import Entry from "../components/Entry.astro";
+import { getEntries, getEntry } from "../lib/entries";
 
-const projects = await getProjects();
-const featured = projects.find((p) => p.data.featured) ?? projects[0];
-const others = projects.filter((p) => p !== featured);
+const entries = await getEntries();
+// The about entry's body is the intro above the feed
+const about = await getEntry("about");
+const Intro = about && (await render(about)).Content;
 ---
 
-<!-- The footer goes in the canvas, beside the sidebar -->
-<Base footer={false}>
-  <Sidebar>
-    <Profile />
-  </Sidebar>
-  <main class="pt-16 lg:ml-(--sidebar) lg:pt-24">
-    <FeaturedProject project={featured} />
-    <ProjectGrid projects={others} />
-    <Footer />
-  </main>
+<Base>
+  <h1 class="sr-only">Johnny Dong</h1>
+  <div class="prose max-w-[620px]">{Intro && <Intro />}</div>
+  <div>
+    {
+      entries.map((entry) => (
+        <div class="mt-12 border-t border-line pt-12">
+          <Entry entry={entry} linkTitle />
+        </div>
+      ))
+    }
+  </div>
 </Base>

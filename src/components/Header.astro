@@ -1,0 +1,66 @@
+---
+import Avatar from "./Avatar.astro";
+import { site } from "../site";
+
+interface Props {
+  /** Slug of the open page, so its link in the row is marked */
+  current?: string;
+}
+
+const { current } = Astro.props;
+const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links, { label: "rss", href: "/rss.xml" }];
+---
+
+<!-- The avatar sits in the top-left corner with the name beside it, bottom-aligned to its chin -->
+<header class="grid grid-cols-[116px_1fr] items-end gap-x-4 sm:gap-x-5">
+  <Avatar />
+  <div class="min-w-0 pb-2.5">
+    <a
+      href="/"
+      class="mb-1.5 inline-block font-serif text-name font-bold text-ink hover:underline hover:decoration-1 hover:underline-offset-4"
+    >
+      {site.name.toLowerCase()}
+    </a>
+    <p class="text-ui text-ink-soft">{site.lines[0]}</p>
+    <p class="text-[0.875rem] leading-6 whitespace-nowrap text-muted">{site.lines[1]}</p>
+    <p class="mt-0.5 font-mono text-meta tabular-nums text-muted" data-clock>vancouver</p>
+  </div>
+
+  <nav aria-label="elsewhere" class="col-span-full mt-[18px] text-ui text-ink">
+    {
+      links.map((link, i) => (
+        <>
+          {i > 0 && <span class="mx-[0.35em] text-faint">·</span>}
+          <a
+            href={link.href}
+            aria-current={"slug" in link && link.slug === current ? "page" : undefined}
+            data-slug={"slug" in link ? link.slug : undefined}
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noopener" : undefined}
+            class="hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]"
+          >
+            {link.label}
+          </a>
+        </>
+      ))
+    }
+  </nav>
+</header>
+
+<script>
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: "America/Vancouver", hour: "numeric", minute: "2-digit" });
+
+  document.addEventListener("astro:page-load", () => {
+    const clock = document.querySelector<HTMLElement>("[data-clock]");
+    // The header persists across pages, so start the clock once
+    if (!clock || clock.dataset.bound) return;
+    clock.dataset.bound = "1";
+
+    // Tick on each minute boundary
+    const tick = () => {
+      clock.textContent = `vancouver · ${time.format(new Date()).toLowerCase()}`;
+      setTimeout(tick, 60_000 - (Date.now() % 60_000));
+    };
+    tick();
+  });
+</script>

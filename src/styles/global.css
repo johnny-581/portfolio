@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/inter/wght-italic.css";
+@import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/libre-baskerville/700.css";
 
 @theme {
@@ -11,58 +14,74 @@
   --color-neutral-900: #1b1b19;
 
   --font-serif: "Libre Baskerville", Georgia, serif;
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Text styles: sans 16/24, h1 48/54 (serif bold), name 32/44 (serif bold), h2 20/28 */
+  /* Text styles: body sans 16/1.65, ui sans 15/24, meta mono 12.5/20,
+     title 26/34 and name 22/28 (serif bold), h2 16/24 */
   --text-body: 1rem;
-  --text-body--line-height: 1.5rem;
-  --text-h1: 3rem;
-  --text-h1--line-height: 3.375rem;
-  --text-name: 2rem;
-  --text-name--line-height: 2.75rem;
-  --text-h2: 1.25rem;
-  --text-h2--line-height: 1.75rem;
+  --text-body--line-height: 1.65;
+  --text-ui: 0.9375rem;
+  --text-ui--line-height: 1.5rem;
+  --text-meta: 0.78125rem;
+  --text-meta--line-height: 1.25rem;
+  --text-title: 1.625rem;
+  --text-title--line-height: 2.125rem;
+  --text-title--letter-spacing: -0.01em;
+  --text-name: 1.375rem;
+  --text-name--line-height: 1.75rem;
+  --text-h2: 1rem;
+  --text-h2--line-height: 1.5rem;
 }
 
-/* Semantic tokens. Add a dark-mode block here later. */
+/* Semantic tokens. Dark mode follows the system, with no toggle. */
 :root {
+  --bg: #faf9f6;
   --ink: var(--color-neutral-900);
-  --heading: var(--color-neutral-800);
-  --line: var(--color-neutral-800);
-  --muted: var(--color-neutral-500);
-  --surface: #fff;
+  --ink-soft: var(--color-neutral-800);
+  --muted: #6f6c64;
+  /* Decorative only: separators, list markers */
+  --faint: #b3b0a6;
+  --line: #e7e5df;
+  --chip: #efede7;
+  --mark: #f6e7a3;
 
-  /* Layout: 998px content column (project pages). Resolves where it's used,
-     against the parent's width (100%). */
-  --gutter: 1.5rem;
-  --content: min(998px, 100% - 2 * var(--gutter));
+  /* Side padding of the one-column layout */
+  --gutter: 1rem;
+  /* Width of the index pane from lg up */
+  --aside: clamp(392px, 32vw, 440px);
 
-  /* Home page (lg and up): fixed sidebar on the left, everything else in the canvas */
-  --sidebar: clamp(300px, 26vw, 390px);
+  color-scheme: light dark;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151514;
+    --ink: #ecebe6;
+    --ink-soft: #d4d2cb;
+    --muted: #9a978e;
+    --faint: #55534d;
+    --line: #2a2a27;
+    --chip: #242422;
+    --mark: #4f4318;
+  }
 }
 
 @theme inline {
+  --color-bg: var(--bg);
   --color-ink: var(--ink);
-  --color-heading: var(--heading);
-  --color-line: var(--line);
+  --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
-  --color-surface: var(--surface);
-}
-
-@utility container-content {
-  width: var(--content);
-  margin-inline: auto;
-}
-
-/* Home page canvas: featured project and project grid. Centered on small screens,
-   flush against the sidebar from lg up. */
-@utility container-canvas {
-  width: min(960px, 100% - 2 * var(--gutter));
-  margin-inline: auto;
-  @variant lg {
-    width: min(960px, 100% - 48px);
-    margin-inline: 0;
-  }
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-mark: var(--mark);
 }
 
 @utility no-scrollbar {
@@ -72,11 +91,197 @@
   }
 }
 
+/* The one-column layout: a left-aligned column that stops at 640px of text. From lg up the
+   panes take over, so callers undo it with lg:max-w-none and lg:px-*. */
+@utility column {
+  width: 100%;
+  max-width: calc(640px + 2 * var(--gutter));
+  padding-inline: var(--gutter);
+}
+
 @layer base {
   html {
     overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-surface font-sans text-body text-ink antialiased;
+    @apply bg-bg font-sans text-body text-ink-soft antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection {
+    background: var(--mark);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* Entry text. Hand-written rather than a typography plugin: the Markdown only needs
+   a few elements, each styled for the diary look. */
+@layer components {
+  .prose {
+    p {
+      margin: 0 0 1.1em;
+      /* Single line breaks in the Markdown stay as line breaks */
+      white-space: pre-line;
+    }
+    a {
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: var(--faint);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      &:hover {
+        text-decoration-color: var(--ink);
+      }
+    }
+    strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* Chip: only for dates (jan 31) and people (@mina) */
+    code {
+      font-family: var(--font-mono);
+      font-size: var(--text-meta);
+      line-height: 1;
+      background: var(--chip);
+      color: var(--ink-soft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      position: relative;
+      top: -1px;
+    }
+    pre {
+      margin: 0 0 1.1em;
+      padding: 14px;
+      overflow-x: auto;
+      background: var(--chip);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--text-meta);
+      line-height: 1.5;
+      white-space: pre;
+      code {
+        background: none;
+        padding: 0;
+        top: 0;
+        line-height: inherit;
+      }
+    }
+
+    /* One highlight per entry, by convention */
+    mark {
+      color: inherit;
+      background: linear-gradient(transparent 12%, var(--mark) 12%, var(--mark) 92%, transparent 92%);
+      padding: 0 2px;
+      box-decoration-break: clone;
+    }
+
+    h2 {
+      margin: 2em 0 0.5em;
+      font-size: var(--text-h2);
+      line-height: var(--text-h2--line-height);
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    ul,
+    ol {
+      list-style: none;
+      margin: 0 0 1.1em;
+      padding: 0 0 0 1.1em;
+    }
+    li {
+      position: relative;
+      margin: 0 0 0.35em;
+    }
+    ul > li::before {
+      content: "–";
+      position: absolute;
+      left: -1.1em;
+      color: var(--faint);
+    }
+    ol {
+      counter-reset: item;
+      padding-left: 1.6em;
+      > li {
+        counter-increment: item;
+        &::before {
+          content: counter(item) ".";
+          position: absolute;
+          left: -1.6em;
+          font-family: var(--font-mono);
+          font-size: var(--text-meta);
+          color: var(--muted);
+        }
+      }
+    }
+
+    blockquote {
+      margin: 0 0 1.1em;
+      padding-left: 16px;
+      border-left: 2px solid var(--line);
+      color: var(--muted);
+    }
+    hr {
+      margin: 2em 0;
+      border: 0;
+      text-align: center;
+      &::before {
+        content: "· · ·";
+        color: var(--faint);
+      }
+    }
+
+    /* A paragraph holding an image is a figure */
+    p:has(> img) {
+      margin: 1.6em 0;
+      white-space: normal;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+    }
+    /* Several images in one paragraph sit side by side, the caption on its own row */
+    p:has(> img + img) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      > img {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      > small {
+        flex: 0 0 100%;
+        margin-top: -4px;
+      }
+    }
+    /* A <small> right under an image is its caption */
+    p:has(> img) small {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: var(--text-meta);
+      line-height: var(--text-meta--line-height);
+      color: var(--muted);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    /* The avatar drawing frames (drawing-my-face) are dark strokes on transparent, so flip them */
+    .prose img {
+      opacity: 0.92;
+    }
+    .prose img:is([src*="opened."], [src*="half."], [src*="closed."]) {
+      filter: invert(1) hue-rotate(180deg);
+    }
   }
 }

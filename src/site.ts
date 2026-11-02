@@ -2,20 +2,14 @@ export const site = {
   name: "Johnny Dong",
   title: "Johnny Dong",
   tagline: "I’m an engineer and designer making fun and purposeful products",
-  roles: [
-    { role: "CS", at: "@UBC" },
-    { role: "Interning", at: "@Scalepad" },
-    { role: "Leading engineering", at: "@UBC UX Hub" },
-  ],
+  // Under the name in the header
+  lines: ["engineer & designer", "cs @ubc · scalepad · ux hub"],
 
-  footerNote: "For the love of building ✦",
-
-  // TODO: fill in real links
-  social: [
-    { label: "Email", href: "mailto:TODO" },
-    { label: "Github", href: "https://github.com/TODO" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/TODO" },
-    { label: "X", href: "https://x.com/TODO" },
-    { label: "Resume", href: "/resume.pdf" },
+  // TODO: fill in real links (Header adds about and rss)
+  links: [
+    { label: "github", href: "https://github.com/TODO" },
+    { label: "linkedin", href: "https://www.linkedin.com/in/TODO" },
+    { label: "email", href: "mailto:TODO" },
+    { label: "resume", href: "/resume.pdf" },
   ],
 };

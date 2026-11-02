@@ -1,0 +1,51 @@
+---
+import Header from "./Header.astro";
+import EntryIndex from "./EntryIndex.astro";
+import { getEntries } from "../lib/entries";
+
+interface Props {
+  /** Slug of the open page; none on the home page */
+  current?: string;
+}
+
+const { current } = Astro.props;
+const entries = await getEntries();
+---
+
+<!-- From lg up this is the left pane: sticky, scrolling on its own if the index is taller than the
+     window. Below lg it has no box of its own, so the header and index become siblings of <main>
+     and can be ordered around it (header, article, index). It persists across pages, so the
+     avatar and the index don't re-render when you move between entries. -->
+<aside
+  class="contents lg:block lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:pt-10 lg:pr-8 lg:pb-12 lg:pl-10 no-scrollbar"
+  transition:persist="aside"
+  data-aside
+>
+  <div class="column order-1 pt-6 lg:order-none lg:max-w-none lg:px-0 lg:pt-0">
+    <Header current={current} />
+  </div>
+  <div class="column order-3 pb-16 before:mb-6 before:block before:border-t before:border-line lg:order-none lg:mt-12 lg:max-w-none lg:px-0 lg:pb-0 lg:before:hidden">
+    <EntryIndex entries={entries} current={current} />
+  </div>
+</aside>
+
+<script>
+  // The aside is kept between pages, so point its "current" marks at the new page, and keep
+  // its scroll position (moving a node can reset it)
+  let scroll = 0;
+
+  document.addEventListener("astro:before-swap", () => {
+    scroll = document.querySelector<HTMLElement>("[data-aside]")?.scrollTop ?? 0;
+  });
+  document.addEventListener("astro:after-swap", () => {
+    const aside = document.querySelector<HTMLElement>("[data-aside]");
+    if (aside) aside.scrollTop = scroll;
+  });
+  document.addEventListener("astro:page-load", () => {
+    const slug = location.pathname.replace(/^\/|\/$/g, "");
+    document.querySelectorAll<HTMLElement>("[data-aside] a[data-slug]").forEach((a) => {
+      if (a.dataset.slug === slug) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  });
+</script>
