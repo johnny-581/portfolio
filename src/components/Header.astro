@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { current } = Astro.props;
-const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links, { label: "rss", href: "/rss.xml" }];
+const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links];
 ---
 
 <!-- The avatar sits in the top-left corner with the name beside it, bottom-aligned to its chin -->
@@ -21,13 +21,15 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links,
     >
       {site.name.toLowerCase()}
     </a>
-    <p class="text-ui text-ink-soft">{site.role}</p>
-    <p class="flex gap-x-[0.6em] text-[0.875rem] leading-6 whitespace-nowrap text-muted">
-      {site.places.map((place) => <span>{place}</span>)}
-    </p>
-    <p class="mt-0.5 flex gap-x-[0.75em] font-mono text-meta tabular-nums text-muted">
-      <span>vancouver</span><span data-clock></span>
-    </p>
+    <ul class="text-ui text-ink-soft">
+      {
+        site.roles.map(({ role, at }) => (
+          <li>
+            {role} <strong class="font-semibold text-ink">{at}</strong>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 
   <nav aria-label="elsewhere" class="col-span-full mt-[18px] flex flex-wrap gap-x-[0.75em] text-ui text-ink">
@@ -47,23 +49,42 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links,
         </>
       ))
     }
+    <!-- Names the theme it switches to; the script fills it in once the current theme is known -->
+    <button
+      type="button"
+      data-theme-toggle
+      class="min-w-[2.5em] cursor-pointer text-left hover:underline hover:decoration-1 hover:underline-offset-[3px]"
+    ></button>
   </nav>
 </header>
 
 <script>
-  const time = new Intl.DateTimeFormat("en-US", { timeZone: "America/Vancouver", hour: "numeric", minute: "2-digit" });
+  // Follows the system until clicked, then the choice is saved (Base applies it on load)
+  const systemDark = matchMedia("(prefers-color-scheme: dark)");
 
   document.addEventListener("astro:page-load", () => {
-    const clock = document.querySelector<HTMLElement>("[data-clock]");
-    // The header persists across pages, so start the clock once
-    if (!clock || clock.dataset.bound) return;
-    clock.dataset.bound = "1";
+    const toggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    // The header persists across pages, so bind once
+    if (!toggle || toggle.dataset.bound) return;
+    toggle.dataset.bound = "1";
 
-    // Tick on each minute boundary
-    const tick = () => {
-      clock.textContent = time.format(new Date()).toLowerCase();
-      setTimeout(tick, 60_000 - (Date.now() % 60_000));
+    const root = document.documentElement;
+    const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : systemDark.matches);
+    const label = () => {
+      const next = isDark() ? "light" : "dark";
+      toggle.textContent = next;
+      toggle.setAttribute("aria-label", `Switch to ${next} theme`);
     };
-    tick();
+
+    toggle.addEventListener("click", () => {
+      const theme = isDark() ? "light" : "dark";
+      root.dataset.theme = theme;
+      try {
+        localStorage.setItem("theme", theme);
+      } catch {}
+      label();
+    });
+    systemDark.addEventListener("change", label);
+    label();
   });
 </script>

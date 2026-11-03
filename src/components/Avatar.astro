@@ -43,10 +43,8 @@ const frames = [
   }
 
   /* The frames are dark strokes on a transparent background, so flip them in dark mode */
-  @media (prefers-color-scheme: dark) {
-    .avatar :global(img) {
-      filter: invert(1) hue-rotate(180deg);
-    }
+  .avatar :global(img) {
+    filter: invert(var(--dark)) hue-rotate(calc(180deg * var(--dark)));
   }
 </style>
 

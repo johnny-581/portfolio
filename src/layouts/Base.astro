@@ -20,12 +20,23 @@ const fullTitle = title ? `${title} — ${site.title}` : site.title;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <ClientRouter />
+    <!-- Before first paint, so a theme picked with the header toggle doesn't flash the system one -->
+    <script is:inline>
+      const applyTheme = () => {
+        try {
+          const theme = localStorage.getItem("theme");
+          if (theme) document.documentElement.dataset.theme = theme;
+        } catch {}
+      };
+      applyTheme();
+      // Page swaps replace <html>'s attributes with the new page's
+      document.addEventListener("astro:after-swap", applyTheme);
+    </script>
   </head>
   <body>
     <!-- Two panes from lg up (index left, page scrolls on the right); one column below,

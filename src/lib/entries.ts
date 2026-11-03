@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from "astro:content";
 export type Entry = CollectionEntry<"entries">;
 
 // Slugs that belong to routes, so an entry can't take them
-const RESERVED = ["rss", "404", "projects"];
+const RESERVED = ["404", "projects"];
 
 /** Listed entries (not draft, not unlisted), newest first */
 export async function getEntries() {

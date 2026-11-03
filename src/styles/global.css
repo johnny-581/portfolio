@@ -34,42 +34,46 @@
   --text-h2--line-height: 1.5rem;
 }
 
-/* Semantic tokens. Dark mode follows the system, with no toggle. */
+/* Semantic tokens, as light-dark() pairs. The theme follows the system unless the toggle in
+   the header has set data-theme on <html>, which pins color-scheme. */
 :root {
-  --bg: #faf9f6;
-  --ink: var(--color-neutral-900);
-  --ink-soft: var(--color-neutral-800);
-  --muted: #6f6c64;
+  --bg: light-dark(#faf9f6, #151514);
+  --ink: light-dark(var(--color-neutral-900), #ecebe6);
+  --ink-soft: light-dark(var(--color-neutral-800), #d4d2cb);
+  --muted: light-dark(#6f6c64, #9a978e);
   /* Decorative only: separators, list markers */
-  --faint: #b3b0a6;
-  --line: #e7e5df;
-  --chip: #efede7;
-  --mark: #f6e7a3;
+  --faint: light-dark(#b3b0a6, #55534d);
+  --line: light-dark(#e7e5df, #2a2a27);
+  --chip: light-dark(#efede7, #242422);
+  --mark: light-dark(#f6e7a3, #4f4318);
 
   /* Side padding of the one-column layout */
   --gutter: 1rem;
   /* Width of the index pane from lg up */
   --aside: clamp(392px, 32vw, 440px);
 
+  /* 1 in dark mode, for what light-dark() can't do (flipping the avatar drawings) */
+  --dark: 0;
+
   color-scheme: light dark;
+  &[data-theme="light"] {
+    color-scheme: light;
+  }
+  &[data-theme="dark"] {
+    color-scheme: dark;
+    --dark: 1;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --dark: 1;
+  }
 }
 
 @media (min-width: 640px) {
   :root {
     --gutter: 2rem;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #151514;
-    --ink: #ecebe6;
-    --ink-soft: #d4d2cb;
-    --muted: #9a978e;
-    --faint: #55534d;
-    --line: #2a2a27;
-    --chip: #242422;
-    --mark: #4f4318;
   }
 }
 
@@ -275,13 +279,12 @@
     }
   }
 
-  @media (prefers-color-scheme: dark) {
-    /* The avatar drawing frames (drawing-my-face) are dark strokes on transparent, so flip them */
-    .prose img {
-      opacity: 0.92;
-    }
-    .prose img:is([src*="opened."], [src*="half."], [src*="closed."]) {
-      filter: invert(1) hue-rotate(180deg);
-    }
+  /* Dim images a little in dark mode. The avatar drawing frames (drawing-my-face) are dark
+     strokes on transparent, so flip them. */
+  .prose img {
+    opacity: calc(1 - 0.08 * var(--dark));
+  }
+  .prose img:is([src*="opened."], [src*="half."], [src*="closed."]) {
+    filter: invert(var(--dark)) hue-rotate(calc(180deg * var(--dark)));
   }
 }
