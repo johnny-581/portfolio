@@ -3,7 +3,8 @@ export const site = {
   title: "Johnny Dong",
   tagline: "I’m an engineer and designer making fun and purposeful products",
   // Under the name in the header
-  lines: ["engineer & designer", "cs @ubc · scalepad · ux hub"],
+  role: "engineer & designer",
+  places: ["cs @ubc", "scalepad", "ux hub"],
 
   // TODO: fill in real links (Header adds about and rss)
   links: [

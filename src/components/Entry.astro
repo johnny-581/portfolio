@@ -17,7 +17,7 @@ const Heading = linkTitle ? "h2" : "h1";
 ---
 
 <article class="max-w-[620px]">
-  <Heading class="font-serif text-[1.375rem]/[1.875rem] font-bold tracking-[-0.01em] text-ink sm:text-title">
+  <Heading class="font-serif text-[1.875rem]/[2.25rem] font-bold tracking-[-0.01em] text-ink sm:text-title">
     {
       linkTitle ? (
         <a href={`/${entry.id}`} class="hover:underline hover:decoration-1 hover:underline-offset-[5px]">
@@ -28,12 +28,11 @@ const Heading = linkTitle ? "h2" : "h1";
       )
     }
   </Heading>
-  <p class="mt-1.5 font-mono text-meta text-muted">
-    {tag}<span class="mx-[0.3em] text-faint">·</span>{when}
+  <p class="mt-1.5 flex flex-wrap gap-x-[1em] font-mono text-meta text-muted">
+    <span>{tag}</span><span>{when}</span>
     {
       links.map((link) => (
         <>
-          <span class="mx-[0.3em] text-faint">·</span>
           <a
             href={link.href}
             target={link.href.startsWith("http") ? "_blank" : undefined}

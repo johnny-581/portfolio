@@ -21,16 +21,19 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links,
     >
       {site.name.toLowerCase()}
     </a>
-    <p class="text-ui text-ink-soft">{site.lines[0]}</p>
-    <p class="text-[0.875rem] leading-6 whitespace-nowrap text-muted">{site.lines[1]}</p>
-    <p class="mt-0.5 font-mono text-meta tabular-nums text-muted" data-clock>vancouver</p>
+    <p class="text-ui text-ink-soft">{site.role}</p>
+    <p class="flex gap-x-[0.6em] text-[0.875rem] leading-6 whitespace-nowrap text-muted">
+      {site.places.map((place) => <span>{place}</span>)}
+    </p>
+    <p class="mt-0.5 flex gap-x-[0.75em] font-mono text-meta tabular-nums text-muted">
+      <span>vancouver</span><span data-clock></span>
+    </p>
   </div>
 
-  <nav aria-label="elsewhere" class="col-span-full mt-[18px] text-ui text-ink">
+  <nav aria-label="elsewhere" class="col-span-full mt-[18px] flex flex-wrap gap-x-[0.75em] text-ui text-ink">
     {
-      links.map((link, i) => (
+      links.map((link) => (
         <>
-          {i > 0 && <span class="mx-[0.35em] text-faint">·</span>}
           <a
             href={link.href}
             aria-current={"slug" in link && link.slug === current ? "page" : undefined}
@@ -58,7 +61,7 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links,
 
     // Tick on each minute boundary
     const tick = () => {
-      clock.textContent = `vancouver · ${time.format(new Date()).toLowerCase()}`;
+      clock.textContent = time.format(new Date()).toLowerCase();
       setTimeout(tick, 60_000 - (Date.now() % 60_000));
     };
     tick();
