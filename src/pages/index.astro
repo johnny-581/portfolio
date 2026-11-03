@@ -4,7 +4,8 @@ import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
 import { getEntries, getEntry } from "../lib/entries";
 
-const entries = await getEntries();
+// Journal entries live in the index only; the feed is projects
+const entries = await getEntries("projects");
 // The about entry's body is the intro above the feed
 const about = await getEntry("about");
 const Intro = about && (await render(about)).Content;
