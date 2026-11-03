@@ -7,9 +7,10 @@ import { getAllEntries, neighbours } from "../lib/entries";
 export const getStaticPaths = (async () => {
   const entries = await getAllEntries();
   return Promise.all(
+    // An entry's id is its path: projects/whisk, journal/tokyo, about
     entries.map(async (entry) => ({
-      params: { slug: entry.id },
-      props: { entry, ...(await neighbours(entry.id)) },
+      params: { path: entry.id },
+      props: { entry, ...(await neighbours(entry)) },
     })),
   );
 }) satisfies GetStaticPaths;

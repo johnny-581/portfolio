@@ -1,6 +1,5 @@
 ---
 title: access buddy
-tag: project
 when: "2025"
 published: 2025-01-26
 summary: A Chrome extension for browsing with only your voice. Won nwHacks 2025.

@@ -2,23 +2,26 @@
 import type { Entry } from "../lib/entries";
 
 interface Props {
+  /** The section's name, shown above its rows */
+  label: string;
   entries: Entry[];
-  /** Slug of the open entry; none on the home page */
+  /** Path of the open entry; none on the home page */
   current?: string;
 }
 
-const { entries, current } = Astro.props;
+const { label, entries, current } = Astro.props;
 ---
 
-<nav aria-label="index">
+<nav aria-label={label}>
   <div class="mb-2 flex justify-between font-mono text-meta text-muted">
-    <span>index</span>
+    <span>{label}</span>
     <span>{entries.length}</span>
   </div>
   <ol>
     {
       entries.map((entry) => (
         <li>
+          {/* The tag column stays even when empty (projects), so dates line up across sections */}
           <a
             href={`/${entry.id}`}
             data-slug={entry.id}

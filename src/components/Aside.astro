@@ -1,15 +1,15 @@
 ---
 import Header from "./Header.astro";
 import EntryIndex from "./EntryIndex.astro";
-import { getEntries } from "../lib/entries";
+import { getEntries, SECTIONS } from "../lib/entries";
 
 interface Props {
-  /** Slug of the open page; none on the home page */
+  /** Path of the open page ("projects/whisk"); none on the home page */
   current?: string;
 }
 
 const { current } = Astro.props;
-const entries = await getEntries();
+const sections = await Promise.all(SECTIONS.map(async (section) => ({ section, entries: await getEntries(section) })));
 ---
 
 <!-- From lg up this is the left pane: sticky, scrolling on its own if the index is taller than the
@@ -27,7 +27,9 @@ const entries = await getEntries();
     <Header current={current} />
   </div>
   <div class="column order-3 pb-16 before:mb-6 before:block before:border-t before:border-line lg:order-none lg:mt-12 lg:max-w-none lg:px-0 lg:pb-0 lg:before:hidden">
-    <EntryIndex entries={entries} current={current} />
+    <div class="flex flex-col gap-10">
+      {sections.map(({ section, entries }) => <EntryIndex label={section} entries={entries} current={current} />)}
+    </div>
   </div>
 </aside>
 

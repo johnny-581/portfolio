@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { render } from "astro:content";
-import { firstImage, type Entry } from "../lib/entries";
+import { firstImage, sectionOf, type Entry } from "../lib/entries";
 
 interface Props {
   entry: Entry;
@@ -13,6 +13,8 @@ const { entry, preview = false } = Astro.props;
 const { title, tag, when, links, summary } = entry.data;
 const { Content } = await render(entry);
 const image = preview ? firstImage(entry) : undefined;
+// Projects have no tag of their own; the meta line still says what they are
+const kind = sectionOf(entry) === "projects" ? "project" : tag;
 
 // The feed has many entries, so only a lone entry gets the page's h1
 const Heading = preview ? "h2" : "h1";
@@ -31,7 +33,7 @@ const Heading = preview ? "h2" : "h1";
     }
   </Heading>
   <p class="mt-1.5 flex flex-wrap gap-x-[1em] font-mono text-meta text-muted">
-    <span>{tag}</span><span>{when}</span>
+    {kind && <span>{kind}</span>}<span>{when}</span>
     {
       links.map((link) => (
         <>

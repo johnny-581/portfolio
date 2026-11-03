@@ -1,6 +1,5 @@
 ---
 title: pepper docs
-tag: project
 when: 2026-
 published: 2026-09-30
 summary: A Notion-like editor for PDF documents, made because writing cover letters in Google Docs made me sad.

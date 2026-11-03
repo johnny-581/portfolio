@@ -29,4 +29,4 @@ The best part was the quiet. <mark>Tokyo is huge and loud, and then you turn one
 ![a notebook page of handwritten vocab next to a can of coffee](./2.jpg)
 <small>vocab from one afternoon. half of these went straight into whisk.</small>
 
-I came home with a notebook of words I'd actually needed, and an idea for practising them without waiting a year to go back. That became [whisk](/whisk).
+I came home with a notebook of words I'd actually needed, and an idea for practising them without waiting a year to go back. That became [whisk](/projects/whisk).
