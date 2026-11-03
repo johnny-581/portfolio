@@ -14,13 +14,28 @@ const Intro = about && (await render(about)).Content;
 <Base>
   <h1 class="sr-only">Johnny Dong</h1>
   <div class="prose max-w-[620px]">{Intro && <Intro />}</div>
-  <div>
+  <!-- Each block's spacing is padding, not margin, so hovering never falls into a gap between them -->
+  <div class="mt-12">
     {
       entries.map((entry) => (
-        <div class="mt-12 border-t border-line pt-12">
+        <div class="border-t border-line pt-12 pb-12 last:pb-0" data-feed={entry.id}>
           <Entry entry={entry} preview />
         </div>
       ))
     }
   </div>
 </Base>
+
+<script>
+  // Hovering a project in the feed lights up its row in the index, so it reads as the same list
+  document.addEventListener("astro:page-load", () => {
+    // The index persists across pages, so clear a mark left by clicking through from the feed
+    document.querySelectorAll("[data-aside] a[data-linked]").forEach((a) => a.removeAttribute("data-linked"));
+
+    document.querySelectorAll<HTMLElement>("[data-feed]").forEach((block) => {
+      const row = () => document.querySelector(`[data-aside] a[data-slug="${block.dataset.feed}"]`);
+      block.addEventListener("mouseenter", () => row()?.setAttribute("data-linked", ""));
+      block.addEventListener("mouseleave", () => row()?.removeAttribute("data-linked"));
+    });
+  });
+</script>
