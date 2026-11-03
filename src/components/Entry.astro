@@ -1,25 +1,27 @@
 ---
+import { Image } from "astro:assets";
 import { render } from "astro:content";
-import type { Entry } from "../lib/entries";
+import { firstImage, type Entry } from "../lib/entries";
 
 interface Props {
   entry: Entry;
-  /** On the home feed the title links to the entry's own page */
-  linkTitle?: boolean;
+  /** On the home feed: the summary and first image instead of the body, linking to the entry's page */
+  preview?: boolean;
 }
 
-const { entry, linkTitle = false } = Astro.props;
-const { title, tag, when, links } = entry.data;
+const { entry, preview = false } = Astro.props;
+const { title, tag, when, links, summary } = entry.data;
 const { Content } = await render(entry);
+const image = preview ? firstImage(entry) : undefined;
 
 // The feed has many entries, so only a lone entry gets the page's h1
-const Heading = linkTitle ? "h2" : "h1";
+const Heading = preview ? "h2" : "h1";
 ---
 
 <article class="max-w-[620px]">
   <Heading class="font-serif text-[1.875rem]/[2.25rem] font-bold tracking-[-0.01em] text-ink sm:text-title">
     {
-      linkTitle ? (
+      preview ? (
         <a href={`/${entry.id}`} class="hover:underline hover:decoration-1 hover:underline-offset-[5px]">
           {title}
         </a>
@@ -46,6 +48,19 @@ const Heading = linkTitle ? "h2" : "h1";
     }
   </p>
   <div class="prose mt-7">
-    <Content />
+    {
+      preview ? (
+        <>
+          <p>{summary}</p>
+          {image && (
+            <a href={`/${entry.id}`} class="mt-6 block" tabindex="-1" aria-hidden="true">
+              <Image src={image.src} alt={image.alt} widths={[620, 1240]} sizes="(min-width: 1024px) 620px, 100vw" />
+            </a>
+          )}
+        </>
+      ) : (
+        <Content />
+      )
+    }
   </div>
 </article>

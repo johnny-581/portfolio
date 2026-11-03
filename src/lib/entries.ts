@@ -1,6 +1,21 @@
+import type { ImageMetadata } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 export type Entry = CollectionEntry<"entries">;
+
+// Every image sitting next to an entry, keyed by path, so a Markdown image can be found as an asset
+const images = import.meta.glob<{ default: ImageMetadata }>("/src/content/entries/*/*.{png,jpg,jpeg,webp,gif}", {
+  eager: true,
+});
+
+/** The first image in an entry's body, for its preview on the home feed */
+export function firstImage(entry: Entry) {
+  const match = entry.body?.match(/!\[([^\]]*)\]\(\.\/([^)\s]+)\)/);
+  if (!match) return undefined;
+  const [, alt, file] = match;
+  const src = images[`/src/content/entries/${entry.id}/${file}`]?.default;
+  return src && { src, alt };
+}
 
 // Slugs that belong to routes, so an entry can't take them
 const RESERVED = ["404", "projects"];

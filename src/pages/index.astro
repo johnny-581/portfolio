@@ -17,7 +17,7 @@ const Intro = about && (await render(about)).Content;
     {
       entries.map((entry) => (
         <div class="mt-12 border-t border-line pt-12">
-          <Entry entry={entry} linkTitle />
+          <Entry entry={entry} preview />
         </div>
       ))
     }

@@ -15,13 +15,13 @@ const entries = defineCollection({
     tag: z.enum(["journal", "project", "place", "list"]),
     // Index label: "2026", "2024-25", "2025-". YAML reads a bare 2026 as a number, so coerce
     when: z.coerce.string().regex(/^\d{4}(-(\d{2})?)?$/),
-    // Sort key and RSS date
+    // Sort key
     published: z.coerce.date(),
-    // Meta description, RSS and og:description
+    // Meta description and og:description, and the preview text on the home feed
     summary: z.string(),
     // Shown in the meta line under the title; href is a plain string so "/resume.pdf" is allowed
     links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
-    // Hidden from the index, feed and RSS, but still has its own page (about)
+    // Hidden from the index and feed, but still has its own page (about)
     unlisted: z.boolean().default(false),
     // Not built at all
     draft: z.boolean().default(false),
