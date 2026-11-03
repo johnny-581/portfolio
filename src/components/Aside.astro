@@ -15,9 +15,11 @@ const entries = await getEntries();
 <!-- From lg up this is the left pane: sticky, scrolling on its own if the index is taller than the
      window. Below lg it has no box of its own, so the header and index become siblings of <main>
      and can be ordered around it (header, article, index). It persists across pages, so the
-     avatar and the index don't re-render when you move between entries. -->
+     avatar and the index don't re-render when you move between entries.
+     Its top padding is main's 40px less the 12px of empty space above the avatar's head, so the
+     head lines up with the first line of the page. -->
 <aside
-  class="contents lg:block lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:pt-10 lg:pr-8 lg:pb-12 lg:pl-10 no-scrollbar"
+  class="contents lg:block lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:pt-7 lg:pr-8 lg:pb-12 lg:pl-10 no-scrollbar"
   transition:persist="aside"
   data-aside
 >

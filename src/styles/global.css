@@ -121,6 +121,15 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  /* Two panes: trim the page's first line down to its capitals, so its top sits exactly on
+     main's top padding, level with the top of the avatar's head (see Aside). Browsers without
+     text-box sit a few pixels lower. */
+  @media (min-width: 1024px) {
+    main > :nth-child(1 of :not(.sr-only)) > :first-child {
+      text-box: trim-start cap alphabetic;
+    }
+  }
 }
 
 /* Entry text. Hand-written rather than a typography plugin: the Markdown only needs
