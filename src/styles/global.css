@@ -134,6 +134,14 @@
       text-box: trim-start cap alphabetic;
     }
   }
+
+  /* One column: the home page shows the index above its feed, so the aside's copy at the bottom
+     would repeat it. Checked from main because the aside persists across pages. */
+  @media (max-width: 1023.98px) {
+    :root:has([data-home-index]) [data-aside-index] {
+      display: none;
+    }
+  }
 }
 
 /* Entry text. Hand-written rather than a typography plugin: the Markdown only needs

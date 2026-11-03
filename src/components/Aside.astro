@@ -1,7 +1,6 @@
 ---
 import Header from "./Header.astro";
-import EntryIndex from "./EntryIndex.astro";
-import { getEntries, SECTIONS } from "../lib/entries";
+import Index from "./Index.astro";
 
 interface Props {
   /** Path of the open page ("projects/whisk"); none on the home page */
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const { current } = Astro.props;
-const sections = await Promise.all(SECTIONS.map(async (section) => ({ section, entries: await getEntries(section) })));
 ---
 
 <!-- From lg up this is the left pane: sticky, scrolling on its own if the index is taller than the
@@ -26,10 +24,12 @@ const sections = await Promise.all(SECTIONS.map(async (section) => ({ section, e
   <div class="column order-1 pt-6 lg:order-none lg:max-w-none lg:px-0 lg:pt-0">
     <Header current={current} />
   </div>
-  <div class="column order-3 pb-16 before:mb-6 before:block before:border-t before:border-line lg:order-none lg:mt-12 lg:max-w-none lg:px-0 lg:pb-0 lg:before:hidden">
-    <div class="flex flex-col gap-10">
-      {sections.map(({ section, entries }) => <EntryIndex label={section} entries={entries} current={current} />)}
-    </div>
+  <!-- Hidden below lg on the home page, which shows its own copy above the feed (global.css) -->
+  <div
+    class="column order-3 pb-16 before:mb-6 before:block before:border-t before:border-line lg:order-none lg:mt-12 lg:max-w-none lg:px-0 lg:pb-0 lg:before:hidden"
+    data-aside-index
+  >
+    <Index current={current} />
   </div>
 </aside>
 
