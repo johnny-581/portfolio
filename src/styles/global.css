@@ -17,14 +17,14 @@
   --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Text styles: all sans is 16px, all mono 12.5px. Body 16/1.65 for reading, ui 16/24 for
-     the header, links and index, meta mono 12.5/20, title 36/44, name 22/28 and h2 24/32
+  /* Text styles: all sans is 16px, all mono 13.5px. Body 16/1.65 for reading, ui 16/24 for
+     the header, links and index, meta mono 13.5/20, title 36/44, name 22/28 and h2 24/32
      (serif bold), h3 sans 16/24 */
   --text-body: 1rem;
   --text-body--line-height: 1.65;
   --text-ui: 1rem;
   --text-ui--line-height: 1.5rem;
-  --text-meta: 0.78125rem;
+  --text-meta: 0.84375rem;
   --text-meta--line-height: 1.25rem;
   --text-title: 2.25rem;
   --text-title--line-height: 2.75rem;
