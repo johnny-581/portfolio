@@ -23,7 +23,22 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links]
     </a>
     <p class="text-ui text-ink-soft">{site.role}</p>
     <p class="flex gap-x-[0.6em] text-ui whitespace-nowrap text-muted">
-      {site.places.map((place) => <span>{place}</span>)}
+      {
+        site.places.map(({ label, href }) =>
+          href ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener"
+              class="hover:text-ink hover:underline hover:decoration-1 hover:underline-offset-[3px]"
+            >
+              {label}
+            </a>
+          ) : (
+            <span>{label}</span>
+          ),
+        )
+      }
     </p>
   </div>
 

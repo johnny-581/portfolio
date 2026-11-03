@@ -4,13 +4,20 @@ export const site = {
   tagline: "I’m an engineer and designer making fun and purposeful products",
   // Under the name in the header
   role: "engineer & designer",
-  places: ["cs @ubc", "scalepad", "ux hub"],
+  places: [
+    { label: "cs@ubc" },
+    { label: "scalepad", href: "https://www.scalepad.com/" },
+    { label: "ux hub", href: "https://www.ubcuxhub.ca/" },
+  ],
 
-  // TODO: fill in real links (Header adds about)
+  // Header adds about
   links: [
-    { label: "github", href: "https://github.com/TODO" },
-    { label: "linkedin", href: "https://www.linkedin.com/in/TODO" },
-    { label: "email", href: "mailto:TODO" },
+    { label: "github", href: "https://github.com/johnny-581" },
+    {
+      label: "linkedin",
+      href: "https://www.linkedin.com/in/johnny-dong-6ab2b027a/",
+    },
+    { label: "email", href: "mailto:dongjiayang123@gmail.com" },
     { label: "resume", href: "/resume.pdf" },
   ],
 };
