@@ -10,10 +10,10 @@ links:
     href: /resume.pdf
 ---
 
-Hi, I'm Johnny. I'm an engineer and designer making **fun and purposeful products**.
+Hi, I'm Johnny. I'm an engineer and designer making <mark>fun and purposeful products</mark>.
 
-Right now I'm studying **computer science at UBC**, interning at **Scalepad**, and leading engineering at **UBC UX Hub**. Most nights I'm working on [pepper docs](/pepper-docs).
+Right now I'm studying <mark>computer science at UBC</mark>, interning at <mark>Scalepad</mark>, and leading engineering at <mark>UBC UX Hub</mark>. Most nights I'm working on [pepper docs](/pepper-docs).
 
-This site is **part portfolio, part journal**. The index on the left has everything: projects, terms, trips, lists. Start anywhere.
+This site is <mark>part portfolio, part journal</mark>. The index on the left has everything: projects, terms, trips, lists. Start anywhere.
 
-Easiest way to reach me is **email**. I'm always happy to talk about tools for students, Japanese, or a good noodle place in Vancouver.
+Easiest way to reach me is <mark>email</mark>. I'm always happy to talk about tools for students, Japanese, or a good noodle place in Vancouver.
