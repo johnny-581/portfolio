@@ -83,24 +83,32 @@ const frames = [
     avatar.addEventListener("pointerdown", (e) => e.pointerType !== "touch" && blink(false));
 
     // Coming back to the top of a page, so people who never hover it still see it blink. Once
-    // per trip: it arms after scrolling well down and fires as the top comes back into view
-    // (on phones that's when the header, avatar and all, reappears)
+    // per trip: it arms after scrolling well down and fires once the page has settled near the
+    // top, after any momentum or bounce (on phones that's with the header back in view)
     const ARM_Y = 400;
     const FIRE_Y = 100;
+    const SETTLE_MS = 250;
     let armed = false;
+    let settle = 0;
     window.addEventListener(
       "scroll",
       () => {
+        window.clearTimeout(settle);
         if (scrollY > ARM_Y) armed = true;
         else if (armed && scrollY <= FIRE_Y) {
-          armed = false;
-          blink();
+          settle = later(SETTLE_MS, () => {
+            armed = false;
+            blink();
+          });
         }
       },
       { passive: true },
     );
     // A new page starts at the top without the trip back
-    document.addEventListener("astro:after-swap", () => (armed = false));
+    document.addEventListener("astro:after-swap", () => {
+      window.clearTimeout(settle);
+      armed = false;
+    });
 
     // A touch only reports to the element it started on, so follow the finger across the
     // page and blink when it moves onto the avatar (or starts there)
