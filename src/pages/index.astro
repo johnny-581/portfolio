@@ -1,20 +1,18 @@
 ---
-import { render } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
 import Index from "../components/Index.astro";
-import { getEntries, getEntry } from "../lib/entries";
+import { getEntries } from "../lib/entries";
+// The intro above the feed has its own file, so the about page can say something else
+import { Content as Intro } from "../content/intro.md";
 
 // Journal entries live in the index only; the feed is projects
 const entries = await getEntries("projects");
-// The about entry's body is the intro above the feed
-const about = await getEntry("about");
-const Intro = about && (await render(about)).Content;
 ---
 
 <Base>
   <h1 class="sr-only">Johnny Dong</h1>
-  <div class="prose max-w-[620px]">{Intro && <Intro />}</div>
+  <div class="prose max-w-[620px]"><Intro /></div>
   <!-- In one column the index comes before the feed, so a phone sees the whole list first; the
        aside's copy at the bottom is hidden here (global.css). From lg the aside shows it beside. -->
   <div class="mt-12 border-t border-line pt-6 lg:hidden" data-home-index>
