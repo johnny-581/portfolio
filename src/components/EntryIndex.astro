@@ -25,7 +25,7 @@ const { entries, current } = Astro.props;
             aria-current={entry.id === current ? "page" : undefined}
             class="group grid grid-cols-[minmax(0,1fr)_56px_56px] items-baseline gap-x-3 py-0.5 text-muted"
           >
-            <span class="truncate text-ui transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
+            <span class="text-ui transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
               {entry.data.title}
             </span>
             <span class="font-mono text-meta">{entry.data.when}</span>

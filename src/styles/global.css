@@ -17,11 +17,12 @@
   --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Text styles: body sans 16/1.65, ui sans 15/24, meta mono 12.5/20,
-     title 36/44 and name 22/28 (serif bold), h2 16/24 */
+  /* Text styles: all sans is 16px, all mono 12.5px. Body 16/1.65 for reading, ui 16/24 for
+     the header, links and index, meta mono 12.5/20, title 36/44 and name 22/28 (serif bold),
+     h2 16/24 */
   --text-body: 1rem;
   --text-body--line-height: 1.65;
-  --text-ui: 0.9375rem;
+  --text-ui: 1rem;
   --text-ui--line-height: 1.5rem;
   --text-meta: 0.78125rem;
   --text-meta--line-height: 1.25rem;
@@ -49,8 +50,9 @@
 
   /* Side padding of the one-column layout */
   --gutter: 1rem;
-  /* Width of the index pane from lg up */
-  --aside: clamp(392px, 32vw, 440px);
+  /* Width of the index pane from lg up. 440px fits the links row on one line and index titles
+     like "leading engineering at ux hub" beside their date and tag at 16px */
+  --aside: clamp(440px, 34vw, 480px);
 
   /* 1 in dark mode, for what light-dark() can't do (flipping the avatar drawings) */
   --dark: 0;
