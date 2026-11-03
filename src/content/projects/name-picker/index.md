@@ -1,5 +1,6 @@
 ---
 title: hand-drawn name picker
+tag: personal
 when: "2025"
 published: 2025-03-15
 summary: A random name picker that draws each name by hand, stroke by stroke, so picking someone feels less like a lottery.

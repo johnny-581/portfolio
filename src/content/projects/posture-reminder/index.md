@@ -1,5 +1,6 @@
 ---
 title: posture reminder
+tag: personal
 when: "2025"
 published: 2025-06-07
 summary: A small MediaPipe app that taps me on the shoulder when I slouch. Built to learn some ML.

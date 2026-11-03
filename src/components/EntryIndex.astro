@@ -21,12 +21,12 @@ const { label, entries, current } = Astro.props;
     {
       entries.map((entry) => (
         <li>
-          {/* The tag column stays even when empty (projects), so dates line up across sections */}
+          {/* The tag column is fixed, so dates line up across sections; it fits "hackathon" */}
           <a
             href={`/${entry.id}`}
             data-slug={entry.id}
             aria-current={entry.id === current ? "page" : undefined}
-            class="group grid grid-cols-[minmax(0,1fr)_60px_60px] items-baseline gap-x-3 py-0.5 text-muted"
+            class="group grid grid-cols-[minmax(0,1fr)_60px_72px] items-baseline gap-x-3 py-0.5 text-muted"
           >
             <span class="text-ui transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
               {entry.data.title}

@@ -13,8 +13,8 @@ const { entry, preview = false } = Astro.props;
 const { title, tag, when, links, summary } = entry.data;
 const { Content } = await render(entry);
 const image = preview ? firstImage(entry) : undefined;
-// Projects have no tag of their own; the meta line still says what they are
-const kind = sectionOf(entry) === "projects" ? "project" : tag;
+// A project without a tag still says what it is
+const kind = tag ?? (sectionOf(entry) === "projects" ? "project" : undefined);
 
 // The feed has many entries, so only a lone entry gets the page's h1
 const Heading = preview ? "h2" : "h1";

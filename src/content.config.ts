@@ -17,7 +17,8 @@ const entries = defineCollection({
     // Lowercase by convention
     title: z.string(),
     // Journal entries only; the folder already says what projects and pages are
-    tag: z.enum(["journal", "place", "list"]).optional(),
+    // Journal: journal, place, list. Projects: what kind of project it was
+    tag: z.enum(["journal", "place", "list", "work", "shipped", "club", "hackathon", "personal"]).optional(),
     // Index label: "2026", "2024-25", "2025-". YAML reads a bare 2026 as a number, so coerce
     when: z.coerce.string().regex(/^\d{4}(-(\d{2})?)?$/),
     // Sort key

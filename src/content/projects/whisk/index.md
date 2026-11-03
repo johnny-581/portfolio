@@ -1,5 +1,6 @@
 ---
 title: whisk
+tag: personal
 when: "2026"
 published: 2026-03-08
 summary: An AI conversation partner for Japanese learners that changes the screen while you speak.
