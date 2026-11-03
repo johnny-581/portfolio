@@ -21,15 +21,10 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links]
     >
       {site.name.toLowerCase()}
     </a>
-    <ul class="text-ui text-ink-soft">
-      {
-        site.roles.map(({ role, at }) => (
-          <li>
-            {role} <strong class="font-semibold text-ink">{at}</strong>
-          </li>
-        ))
-      }
-    </ul>
+    <p class="text-ui text-ink-soft">{site.role}</p>
+    <p class="flex gap-x-[0.6em] text-[0.875rem] leading-6 whitespace-nowrap text-muted">
+      {site.places.map((place) => <span>{place}</span>)}
+    </p>
   </div>
 
   <nav aria-label="elsewhere" class="col-span-full mt-[18px] flex flex-wrap gap-x-[0.75em] text-ui text-ink">
