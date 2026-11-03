@@ -12,7 +12,7 @@ const frames = [
 ];
 ---
 
-<!-- Blinks when the cursor enters it, or a finger taps or swipes across it -->
+<!-- Blinks when the cursor enters it or clicks it, or a finger taps or swipes across it -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
     frames.map(({ name, src }) => (
@@ -62,20 +62,24 @@ const frames = [
     avatar.dataset.bound = "1";
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    let busy = false;
+    let blinkingUntil = 0;
+    let restingUntil = 0;
 
     const later = (ms: number, fn: () => void) => window.setTimeout(fn, ms);
-    const blink = () => {
-      if (busy || reducedMotion.matches) return;
-      busy = true;
+    // A click skips the rest, so clicking right after the hover blink still blinks
+    const blink = (afterRest = true) => {
+      const now = performance.now();
+      if (reducedMotion.matches || now < blinkingUntil || (afterRest && now < restingUntil)) return;
+      blinkingUntil = now + CLOSED_MS + HALF_MS;
+      restingUntil = blinkingUntil + REST_MS;
       avatar.dataset.frame = "closed";
       later(CLOSED_MS, () => (avatar.dataset.frame = "half"));
       later(CLOSED_MS + HALF_MS, () => (avatar.dataset.frame = "open"));
-      later(CLOSED_MS + HALF_MS + REST_MS, () => (busy = false));
     };
 
-    // Mouse and pen; touch is handled below
+    // Mouse and pen, on the way in and on each click; touch is handled below
     avatar.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && blink());
+    avatar.addEventListener("pointerdown", (e) => e.pointerType !== "touch" && blink(false));
 
     // A touch only reports to the element it started on, so follow the finger across the
     // page and blink when it moves onto the avatar (or starts there)
