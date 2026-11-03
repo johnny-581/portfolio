@@ -12,7 +12,8 @@ const frames = [
 ];
 ---
 
-<!-- Blinks when the cursor enters it or clicks it, or a finger taps or swipes across it -->
+<!-- Blinks when the cursor enters it or clicks it, a finger taps or swipes across it, or the
+     page is scrolled back to the top -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
     frames.map(({ name, src }) => (
@@ -80,6 +81,26 @@ const frames = [
     // Mouse and pen, on the way in and on each click; touch is handled below
     avatar.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && blink());
     avatar.addEventListener("pointerdown", (e) => e.pointerType !== "touch" && blink(false));
+
+    // Coming back to the top of a page, so people who never hover it still see it blink. Once
+    // per trip: it arms after scrolling well down and fires as the top comes back into view
+    // (on phones that's when the header, avatar and all, reappears)
+    const ARM_Y = 400;
+    const FIRE_Y = 100;
+    let armed = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (scrollY > ARM_Y) armed = true;
+        else if (armed && scrollY <= FIRE_Y) {
+          armed = false;
+          blink();
+        }
+      },
+      { passive: true },
+    );
+    // A new page starts at the top without the trip back
+    document.addEventListener("astro:after-swap", () => (armed = false));
 
     // A touch only reports to the element it started on, so follow the finger across the
     // page and blink when it moves onto the avatar (or starts there)
