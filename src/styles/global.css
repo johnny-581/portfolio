@@ -18,8 +18,8 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Text styles: all sans is 16px, all mono 12.5px. Body 16/1.65 for reading, ui 16/24 for
-     the header, links and index, meta mono 12.5/20, title 36/44 and name 22/28 (serif bold),
-     h2 16/24 */
+     the header, links and index, meta mono 12.5/20, title 36/44, name 22/28 and h2 24/32
+     (serif bold), h3 sans 16/24 */
   --text-body: 1rem;
   --text-body--line-height: 1.65;
   --text-ui: 1rem;
@@ -31,8 +31,10 @@
   --text-title--letter-spacing: -0.015em;
   --text-name: 1.375rem;
   --text-name--line-height: 1.75rem;
-  --text-h2: 1rem;
-  --text-h2--line-height: 1.5rem;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-h3: 1rem;
+  --text-h3--line-height: 1.5rem;
 }
 
 /* Semantic tokens, as light-dark() pairs. The theme follows the system unless the toggle in
@@ -197,10 +199,20 @@
       box-decoration-break: clone;
     }
 
+    /* Section headings (##) echo the entry title in serif; ### stays a small sans label */
     h2 {
-      margin: 2em 0 0.5em;
+      margin: 2.75rem 0 0.75rem;
+      font-family: var(--font-serif);
       font-size: var(--text-h2);
       line-height: var(--text-h2--line-height);
+      letter-spacing: -0.01em;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    h3 {
+      margin: 2em 0 0.5em;
+      font-size: var(--text-h3);
+      line-height: var(--text-h3--line-height);
       font-weight: 600;
       color: var(--ink);
     }
