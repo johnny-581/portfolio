@@ -1,6 +1,6 @@
 ---
 title: e-commerce data agent
-tag: personal
+tag: shipped
 when: "2026"
 published: 2026-07-18
 summary: "An agent and its MCP servers built from scratch with ADK and Next.js: live SSE streaming, multi-session sidebar, file upload."

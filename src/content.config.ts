@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { markdownLink } from "./lib/markdown-link";
 
 const entries = defineCollection({
   // One file per entry, grouped by section: src/content/<section>/<slug>.md, with every entry's
@@ -29,17 +30,7 @@ const entries = defineCollection({
     summary: z.string(),
     // Shown in the meta line under the title. Written as Markdown links, "[github](https://…)",
     // so Obsidian edits them as a plain list; the href can be a path like "/resume.pdf"
-    links: z
-      .array(
-        z
-          .string()
-          .regex(/^\[[^\]]+\]\([^)]+\)$/, 'Write links as "[label](href)"')
-          .transform((link) => {
-            const [, label, href] = link.match(/^\[([^\]]+)\]\(([^)]+)\)$/)!;
-            return { label, href };
-          }),
-      )
-      .default([]),
+    links: z.array(markdownLink).default([]),
     // Hidden from the index and feed, but still has its own page (about)
     unlisted: z.boolean().default(false),
     // Not built at all

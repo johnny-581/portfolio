@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { title, description = site.tagline, current } = Astro.props;
-const fullTitle = title ? `${title} — ${site.title}` : site.title;
+const fullTitle = title ? `${title} — ${site.name}` : site.name;
 ---
 
 <!-- Pages swap instantly, without the router's default cross-fade -->

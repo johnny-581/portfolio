@@ -1,6 +1,6 @@
 ---
 title: ux hub portal
-tag: club
+tag: shipped
 when: 2025-26
 published: 2026-05-02
 summary: Membership purchases, event applications with shared review, and QR check-in for UBC UX Hub.
