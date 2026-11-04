@@ -10,5 +10,5 @@ How the little guy in the top left got made: 40 sketches, three frames, one blin
 
 The blink is three drawings: eyes open, half shut, and closed. They swap instantly, because a cross-fade looks like a ghost, not an eyelid.
 
-![the open frame](./opened.png)![the half-shut frame](./half.png)![the closed frame](./closed.png)
+![the open frame](../images/drawing-my-face-opened.png)![the half-shut frame](../images/drawing-my-face-half.png)![the closed frame](../images/drawing-my-face-closed.png)
 <small>open, half, closed. hover him in the corner to see it.</small>

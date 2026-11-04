@@ -3,14 +3,16 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 const entries = defineCollection({
-  // One folder per entry, grouped by section: src/content/<section>/<slug>/<slug>.md + its images.
-  // The file is named after its folder so Obsidian doesn't list a dozen notes called "index".
+  // One file per entry, grouped by section: src/content/<section>/<slug>.md, with every entry's
+  // images together in src/content/images, named after the entry ("whisk-1.png"). Flat so it
+  // edits well as an Obsidian vault.
   // The id is the entry's URL path: "projects/whisk", "journal/tokyo", and "about" for pages
   loader: glob({
-    pattern: "{projects,journal,pages}/*/*.md",
+    pattern: "{projects,journal,pages}/*.md",
     base: "./src/content",
     generateId: ({ entry }) => {
-      const [section, slug] = entry.split("/");
+      const [section, file] = entry.split("/");
+      const slug = file.replace(/\.md$/, "");
       return section === "pages" ? slug : `${section}/${slug}`;
     },
   }),

@@ -9,7 +9,7 @@ summary: Four versions of johnnydong.com since 2021, and why this one is a journ
 This is the fourth version of this website. Every version has been a fairly accurate picture of what I cared about that year.
 
 <!-- placeholder: 16:10, v1–v4 screenshots in a 2×2 grid -->
-![four screenshots of past versions of this site](./1.png)
+![four screenshots of past versions of this site](../images/this-site-1.png)
 <small>clockwise from top left: 2021, 2023, early 2026, now.</small>
 
 - **v1, `2021`.** One HTML file, a typing animation, a list of every language I'd touched. I was in high school and very proud of the animation.

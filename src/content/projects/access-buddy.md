@@ -10,8 +10,8 @@ links:
 
 An accessibility-focused Chrome extension that lets people with physical impairments navigate the web using only their voice. It won nwHacks 2025.
 
-![access buddy: the extension listening for a voice command](./1.png)
+![access buddy: the extension listening for a voice command](../images/access-buddy-1.png)
 
 ==The goal was to make every click something you can say.==
 
-![access buddy: voice navigation on a web page](./2.png)
+![access buddy: voice navigation on a web page](../images/access-buddy-2.png)

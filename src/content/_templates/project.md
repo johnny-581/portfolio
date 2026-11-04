@@ -10,6 +10,6 @@ draft: true
 
 What it is and why it exists.
 
-![{{title}}: what this shows](./1.png)
+![{{title}}: what this shows](../images/{{title}}-1.png)
 
 What I worked on, what I'd change.

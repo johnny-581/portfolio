@@ -8,6 +8,6 @@ summary: A small MediaPipe app that taps me on the shoulder when I slouch. Built
 
 A small project to learn ML and help me sit up straight, using Google MediaPipe.
 
-![posture reminder: the app watching a seated person](./1.png)
+![posture reminder: the app watching a seated person](../images/posture-reminder-1.png)
 
 It finds your shoulders and head from a webcam and nudges you when your posture drifts. Small, a bit silly, and built for fun.

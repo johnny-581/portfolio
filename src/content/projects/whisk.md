@@ -12,7 +12,7 @@ I've been learning Japanese since 2024, and speaking is the one skill that hasn'
 
 whisk is what four of us built between `jan 10` and `feb 21`. You paste a YouTube video you actually want to watch. It pulls the transcript, builds a vocabulary list with readings, and then puts you in a café with someone who wants to talk about it. In Japanese, out loud.
 
-![whisk: a café practice scene over a video's vocabulary list](./1.png)
+![whisk: a café practice scene over a video's vocabulary list](../images/whisk-1.png)
 <small>left: the practice scene. right: a video's vocabulary list and past conversations.</small>
 
 The idea we kept coming back to was ==the screen should react to what you say, not what you click.== When you use a word from the list, it gets checked off. When you go quiet for a few seconds, a hint panel slides in with the words you haven't used yet. When you switch to English, the character waits for you to come back. She doesn't correct you.

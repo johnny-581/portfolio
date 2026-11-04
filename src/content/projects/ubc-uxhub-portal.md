@@ -10,7 +10,7 @@ links:
 
 The portal is where UBC UX Hub runs its year: members buy a membership, apply to events, and check in at the door with a QR code.
 
-![ux hub portal: the member dashboard](./1.png)
+![ux hub portal: the member dashboard](../images/ubc-uxhub-portal-1.png)
 
 Applications are reviewed together, so the decision doesn't live in someone's DMs. ==A student club's tools should be good enough that nobody needs a spreadsheet.==
 

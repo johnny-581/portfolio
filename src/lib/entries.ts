@@ -7,24 +7,24 @@ export type Entry = CollectionEntry<"entries">;
 export const SECTIONS = ["projects", "journal"] as const;
 export type Section = (typeof SECTIONS)[number] | "pages";
 
-/** Which folder an entry lives in. Its id is its URL path, "projects/whisk" or "about" */
+/** Which section an entry belongs to. Its id is its URL path, "projects/whisk" or "about" */
 export function sectionOf(entry: Entry): Section {
   const [first] = entry.id.split("/");
   return SECTIONS.find((s) => s === first) ?? "pages";
 }
 
-// Every image sitting next to an entry, keyed by path, so a Markdown image can be found as an asset
-const images = import.meta.glob<{ default: ImageMetadata }>("/src/content/*/*/*.{png,jpg,jpeg,webp,gif}", {
+// Every entry's images, keyed by path, so a Markdown image can be found as an asset
+const images = import.meta.glob<{ default: ImageMetadata }>("/src/content/images/*.{png,jpg,jpeg,webp,gif}", {
   eager: true,
 });
 
 /** The first image in an entry's body, for its preview on the home feed */
 export function firstImage(entry: Entry) {
-  const match = entry.body?.match(/!\[([^\]]*)\]\(\.\/([^)\s]+)\)/);
-  if (!match || !entry.filePath) return undefined;
+  // Entries link their images as "../images/whisk-1.png"
+  const match = entry.body?.match(/!\[([^\]]*)\]\(\.\.\/images\/([^)\s]+)\)/);
+  if (!match) return undefined;
   const [, alt, file] = match;
-  const folder = entry.filePath.replace(/\/[^/]+\.md$/, "");
-  const src = images[`/${folder}/${file}`]?.default;
+  const src = images[`/src/content/images/${decodeURI(file)}`]?.default;
   return src && { src, alt };
 }
 
