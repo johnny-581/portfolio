@@ -8,6 +8,7 @@ links:
   - "[github](https://github.com/TODO/whisk)"
 ---
 hello
+
 I've been learning Japanese since 2024, and speaking is the one skill that hasn't improved. Flashcards taught me to recognize 牛乳 on a carton. They didn't teach me to ask someone where the milk was.
 
 whisk is what four of us built between `jan 10` and `feb 21`. You paste a YouTube video you actually want to watch. It pulls the transcript, builds a vocabulary list with readings, and then puts you in a café with someone who wants to talk about it. In Japanese, out loud.
