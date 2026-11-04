@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
-import { getAllEntries, neighbours } from "../lib/entries";
+import { getAllEntries, neighbours, titleOf } from "../lib/entries";
 
 export const getStaticPaths = (async () => {
   const entries = await getAllEntries();
@@ -18,7 +18,7 @@ export const getStaticPaths = (async () => {
 const { entry, older, newer } = Astro.props;
 ---
 
-<Base title={entry.data.title} description={entry.data.summary} current={entry.id}>
+<Base title={titleOf(entry)} description={entry.data.summary} current={entry.id}>
   <Entry entry={entry} />
   {
     (older || newer) && (
@@ -28,12 +28,12 @@ const { entry, older, newer } = Astro.props;
       >
         {older && (
           <a href={`/${older.id}`} class="hover:text-ink">
-            ← older: {older.data.title}
+            ← older: {titleOf(older)}
           </a>
         )}
         {newer && (
           <a href={`/${newer.id}`} class="hover:text-ink sm:ml-auto sm:text-right">
-            newer: {newer.data.title} →
+            newer: {titleOf(newer)} →
           </a>
         )}
       </nav>

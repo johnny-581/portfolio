@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { render } from "astro:content";
-import { firstImage, sectionOf, type Entry } from "../lib/entries";
+import { firstImage, sectionOf, titleOf, type Entry } from "../lib/entries";
 
 interface Props {
   entry: Entry;
@@ -10,7 +10,8 @@ interface Props {
 }
 
 const { entry, preview = false } = Astro.props;
-const { title, tag, when, links, summary } = entry.data;
+const { tag, when, links, summary } = entry.data;
+const title = titleOf(entry);
 const { Content } = await render(entry);
 const image = preview ? firstImage(entry) : undefined;
 // A project without a tag still says what it is

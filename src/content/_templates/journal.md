@@ -1,5 +1,4 @@
 ---
-title: {{title}}
 tag: journal
 when: "{{date:YYYY}}"
 published: {{date:YYYY-MM-DD}}

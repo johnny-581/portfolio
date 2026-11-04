@@ -13,6 +13,11 @@ export function sectionOf(entry: Entry): Section {
   return SECTIONS.find((s) => s === first) ?? "pages";
 }
 
+/** The entry's title, or its file name with spaces for dashes: posture-reminder.md is "posture reminder" */
+export function titleOf(entry: Entry) {
+  return entry.data.title ?? entry.id.split("/").at(-1)!.replaceAll("-", " ");
+}
+
 // Every entry's images, keyed by path, so a Markdown image can be found as an asset
 const images = import.meta.glob<{ default: ImageMetadata }>("/src/content/images/*.{png,jpg,jpeg,webp,gif}", {
   eager: true,

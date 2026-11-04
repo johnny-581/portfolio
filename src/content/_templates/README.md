@@ -7,6 +7,8 @@ Images all live in `images/`, named after their entry (`my-thing-1.png`) and lin
 `../images/my-thing-1.png`. Pasting an image puts it there; rename it to match the entry.
 The first image in an entry is its preview on the homepage.
 
+- `title`: optional. Without it the title is the file name with spaces for dashes
+  (`podcast-recs.md` is "podcast recs"). Add it for punctuation or extra words: "tokyo, in december".
 - `tag`: projects use work, shipped, club, hackathon or personal; journal uses journal, place or list.
 - `when`: the label in the index, like 2026, 2025-26 or 2026- (ongoing).
 - `published`: sets the order, newest first. Not shown anywhere.

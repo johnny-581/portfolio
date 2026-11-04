@@ -1,5 +1,4 @@
 ---
-title: {{title}}
 tag: personal
 when: "{{date:YYYY}}"
 published: {{date:YYYY-MM-DD}}

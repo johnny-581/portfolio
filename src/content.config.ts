@@ -18,8 +18,9 @@ const entries = defineCollection({
     },
   }),
   schema: z.object({
-    // Lowercase by convention
-    title: z.string(),
+    // Lowercase by convention. Optional: without it the title is the file name with spaces for
+    // dashes (see titleOf), so only titles with punctuation or extra words need writing out
+    title: z.string().optional(),
     // Journal: journal, place, list. Projects: what kind of project it was
     tag: z.enum(["journal", "place", "list", "work", "shipped", "club", "hackathon", "personal"]).optional(),
     // Index label: "2026", "2024-25", "2025-". YAML reads a bare 2026 as a number, so coerce
