@@ -7,7 +7,6 @@ summary: An AI conversation partner for Japanese learners that changes the scree
 links:
   - "[github](https://github.com/TODO/whisk)"
 ---
-hello
 
 I've been learning Japanese since 2024, and speaking is the one skill that hasn't improved. Flashcards taught me to recognize 牛乳 on a carton. They didn't teach me to ask someone where the milk was.
 
