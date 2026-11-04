@@ -27,3 +27,7 @@ pnpm-debug.log*
 # site depends on, not the per-machine workspace
 src/content/.obsidian/*
 !src/content/.obsidian/app.json
+!src/content/.obsidian/templates.json
+
+# Claude Code's local session files
+.claude/
