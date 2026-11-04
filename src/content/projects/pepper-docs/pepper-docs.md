@@ -15,7 +15,7 @@ Resumes and cover letters are documents where the layout *is* part of the conten
 ![pepper docs: dragging a resume entry to a new section](./1.png)
 <small>drag a whole entry, or a whole section, and the PDF reflows.</small>
 
-pepper docs treats a document as blocks, like Notion. Sections, entries, and bullets are things you can grab and move. <mark>The PDF is always the real output, never an export you check at the end.</mark> Every edit re-renders it, and the preview sits right beside you.
+pepper docs treats a document as blocks, like Notion. Sections, entries, and bullets are things you can grab and move. ==The PDF is always the real output, never an export you check at the end.== Every edit re-renders it, and the preview sits right beside you.
 
 ![pepper docs: the editor with a live PDF preview beside it](./2.png)
 <small>side by side: what you type, and what the recruiter gets.</small>

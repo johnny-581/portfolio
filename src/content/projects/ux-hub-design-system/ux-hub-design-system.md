@@ -18,7 +18,7 @@ The design system started as a one-page list of colours and grew into a Figma li
 - components in React with Tailwind: buttons, inputs, cards, tags, dialogs, tables, and the event card that shows up everywhere
 - a poster template set, so event graphics use the same type and grid as the site
 
-<mark>The goal was never consistency for its own sake. It was so a new member could ship a page in their first week.</mark> Every component has a usage note written for someone who joined last month, not for me.
+==The goal was never consistency for its own sake. It was so a new member could ship a page in their first week.== Every component has a usage note written for someone who joined last month, not for me.
 
 ## what I'd do differently
 

@@ -14,7 +14,7 @@ Replies stream in over SSE, so you watch the agent work instead of waiting on a 
 
 ![e-commerce data agent: the multi-session sidebar](./2.png)
 
-<mark>The hard part wasn't the model, it was deciding what the tools should be.</mark> You can also upload a file and ask about that instead.
+==The hard part wasn't the model, it was deciding what the tools should be.== You can also upload a file and ask about that instead.
 
 ![e-commerce data agent: uploading a file](./3.png)
 

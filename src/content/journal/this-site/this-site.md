@@ -17,7 +17,7 @@ This is the fourth version of this website. Every version has been a fairly accu
 - **v3, `2026`.** Astro, Libre Baskerville, a grid of project cards, and a small drawing of me that blinks when your cursor touches it. The first version I wasn't embarrassed to send to recruiters.
 - **v4, now.** This one.
 
-v3 was a portfolio: finished projects with good screenshots. But most of what I do in a year isn't a finished project. It's a term, a trip, a book, an idea that didn't make it. <mark>I wanted a place where those count too.</mark>
+v3 was a portfolio: finished projects with good screenshots. But most of what I do in a year isn't a finished project. It's a term, a trip, a book, an idea that didn't make it. ==I wanted a place where those count too.==
 
 So v4 is an index on the left and writing on the right. Projects are entries like everything else, just with a different tag. The blinking guy stayed. He's earned it.
 

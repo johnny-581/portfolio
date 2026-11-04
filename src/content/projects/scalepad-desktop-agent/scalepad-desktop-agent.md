@@ -19,6 +19,6 @@ It's a small background service for Windows and macOS. It collects hardware deta
 - the installer and auto-update flow, including rolling back cleanly when an update fails halfway
 - a tray app that shows the machine's owner exactly what is collected, in plain language
 
-<mark>An agent on someone's work laptop should be quiet, small, and easy to explain.</mark> It uses under 30MB of memory at idle and does nothing on battery saver. Every field it collects is listed in the tray app, because "what is this thing" is the first question anyone asks.
+==An agent on someone's work laptop should be quiet, small, and easy to explain.== It uses under 30MB of memory at idle and does nothing on battery saver. Every field it collects is listed in the tray app, because "what is this thing" is the first question anyone asks.
 
 More once it ships.

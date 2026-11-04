@@ -12,6 +12,6 @@ The portal is where UBC UX Hub runs its year: members buy a membership, apply to
 
 ![ux hub portal: the member dashboard](./1.png)
 
-Applications are reviewed together, so the decision doesn't live in someone's DMs. <mark>A student club's tools should be good enough that nobody needs a spreadsheet.</mark>
+Applications are reviewed together, so the decision doesn't live in someone's DMs. ==A student club's tools should be good enough that nobody needs a spreadsheet.==
 
 More to come.

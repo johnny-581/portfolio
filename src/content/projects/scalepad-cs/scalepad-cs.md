@@ -19,7 +19,7 @@ I spent my first months at ScalePad on an internal tool that puts those in one p
 - call prep: a short summary generated from the timeline, which the CSM edits before the call. It's a draft, not a verdict.
 - the sync jobs that pull from each source on a schedule, and the boring work of matching account ids across systems that disagree about what an account is
 
-<mark>The best feedback was a CSM saying she'd stopped keeping her own notes doc.</mark>
+==The best feedback was a CSM saying she'd stopped keeping her own notes doc.==
 
 ## what I learned
 

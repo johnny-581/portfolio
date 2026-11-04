@@ -23,7 +23,7 @@ Things that did not:
 - I said すみません about four hundred times
 - I got lost in Shinjuku station twice, the same way both times
 
-The best part was the quiet. <mark>Tokyo is huge and loud, and then you turn one corner and it's a residential street with laundry out and a cat on a step.</mark> I started taking photos of those corners instead of the famous stuff.
+The best part was the quiet. ==Tokyo is huge and loud, and then you turn one corner and it's a residential street with laundry out and a cat on a step.== I started taking photos of those corners instead of the famous stuff.
 
 <!-- placeholder: 3:2 photo, notebook + canned coffee on a café table -->
 ![a notebook page of handwritten vocab next to a can of coffee](./2.jpg)

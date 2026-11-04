@@ -12,6 +12,6 @@ An accessibility-focused Chrome extension that lets people with physical impairm
 
 ![access buddy: the extension listening for a voice command](./1.png)
 
-<mark>The goal was to make every click something you can say.</mark>
+==The goal was to make every click something you can say.==
 
 ![access buddy: voice navigation on a web page](./2.png)
