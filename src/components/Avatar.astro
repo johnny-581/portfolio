@@ -13,7 +13,7 @@ const frames = [
 ---
 
 <!-- Blinks when the cursor enters it or the header around it, or clicks it; when a finger taps
-     or swipes across it; or when the page is scrolled back to the top -->
+     or swipes across it; or when it scrolls back into view -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
     frames.map(({ name, src }) => (
@@ -85,11 +85,9 @@ const frames = [
     avatar.addEventListener("pointerenter", enter);
     avatar.addEventListener("pointerdown", (e) => e.pointerType !== "touch" && blink(false));
 
-    // Coming back to the top of a page, so people who never hover it still see it blink. Once
-    // per trip: it arms after scrolling well down and fires once the page has settled near the
-    // top, after any momentum or bounce (on phones that's with the header back in view)
-    const ARM_Y = 400;
-    const FIRE_Y = 100;
+    // Coming back into view after being scrolled away, so people who never hover it still see
+    // it blink. Only the one-column layout scrolls it away; beside the page it never leaves
+    // the screen, so this never fires there. Once per trip, after any momentum or bounce settles
     const SETTLE_MS = 350;
     let armed = false;
     let settle = 0;
@@ -97,8 +95,9 @@ const frames = [
       "scroll",
       () => {
         window.clearTimeout(settle);
-        if (scrollY > ARM_Y) armed = true;
-        else if (armed && scrollY <= FIRE_Y) {
+        const { top, bottom } = avatar.getBoundingClientRect();
+        if (bottom <= 0) armed = true;
+        else if (armed && top >= 0) {
           settle = later(SETTLE_MS, () => {
             armed = false;
             blink();
