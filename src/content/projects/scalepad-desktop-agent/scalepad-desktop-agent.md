@@ -5,8 +5,7 @@ when: 2026-
 published: 2026-10-18
 summary: A lightweight agent that runs on client machines and reports hardware, warranty and software details back to ScalePad.
 links:
-  - label: scalepad
-    href: https://www.scalepad.com/
+  - "[scalepad](https://www.scalepad.com/)"
 ---
 
 MSPs manage thousands of laptops and desktops they never see in person. To plan replacements and renewals, ScalePad needs to know what each machine is, how old it is, and what's running on it. Most of that comes from other tools. The desktop agent fills in what they miss.

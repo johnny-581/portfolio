@@ -5,8 +5,7 @@ when: 2025-26
 published: 2026-04-11
 summary: Tokens, components and a Figma library shared by UX Hub's site, portal and event graphics.
 links:
-  - label: ubcuxhub.ca
-    href: https://ubcuxhub.ca
+  - "[ubcuxhub.ca](https://ubcuxhub.ca)"
 ---
 
 By the fall of 2025, UX Hub had three blues. The website used one, the portal used another, and the event posters used whatever the designer that week had open. Nobody had decided this. It just happened, one deadline at a time.

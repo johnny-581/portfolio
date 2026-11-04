@@ -1,4 +1,4 @@
-<!-- The homepage intro, above the index and project feed. The about page is separate: src/content/pages/about/index.md -->
+<!-- The homepage intro, above the index and project feed. The about page is separate: src/content/pages/about/about.md -->
 
 Hi, I'm Johnny. I'm an engineer and designer making <mark>fun and purposeful products</mark>.
 

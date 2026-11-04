@@ -23,7 +23,7 @@ export function firstImage(entry: Entry) {
   const match = entry.body?.match(/!\[([^\]]*)\]\(\.\/([^)\s]+)\)/);
   if (!match || !entry.filePath) return undefined;
   const [, alt, file] = match;
-  const folder = entry.filePath.replace(/\/index\.md$/, "");
+  const folder = entry.filePath.replace(/\/[^/]+\.md$/, "");
   const src = images[`/${folder}/${file}`]?.default;
   return src && { src, alt };
 }

@@ -5,8 +5,7 @@ published: 2026-11-01
 unlisted: true
 summary: Johnny Dong is an engineer and designer making fun and purposeful products.
 links:
-  - label: resume
-    href: /resume.pdf
+  - "[resume](/resume.pdf)"
 ---
 
 Hi, I'm Johnny. I'm an engineer and designer making <mark>fun and purposeful products</mark>.

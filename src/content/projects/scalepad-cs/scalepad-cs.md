@@ -5,8 +5,7 @@ when: "2026"
 published: 2026-08-22
 summary: An internal workspace that gives ScalePad's customer success team one view of each account's health, notes and next steps.
 links:
-  - label: scalepad
-    href: https://www.scalepad.com/
+  - "[scalepad](https://www.scalepad.com/)"
 ---
 
 ScalePad's customer success managers look after hundreds of MSP accounts each. Before this project, getting ready for a call meant opening six tabs: the CRM, the billing system, product usage dashboards, support tickets, last quarter's notes, and a spreadsheet someone made in 2023.

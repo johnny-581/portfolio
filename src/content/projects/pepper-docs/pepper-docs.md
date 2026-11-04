@@ -5,8 +5,7 @@ when: 2026-
 published: 2026-11-01
 summary: A Notion-like editor for PDF documents, made because writing cover letters in Google Docs made me sad.
 links:
-  - label: pepperdocs.app
-    href: https://pepperdocs.app
+  - "[pepperdocs.app](https://pepperdocs.app)"
 ---
 
 Every co-op season I'd write about forty cover letters. Each one started as a copy of the last, and each one broke a little more of the formatting. By `aug 2025` I had a folder called `final_final_v3` and I was done.

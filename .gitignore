@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Obsidian, when src/content is opened as a vault: keep the link and attachment settings the
+# site depends on, not the per-machine workspace
+src/content/.obsidian/*
+!src/content/.obsidian/app.json

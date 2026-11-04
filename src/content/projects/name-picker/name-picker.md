@@ -5,8 +5,7 @@ when: "2025"
 published: 2025-03-15
 summary: A random name picker that draws each name by hand, stroke by stroke, so picking someone feels less like a lottery.
 links:
-  - label: github
-    href: https://github.com/johnny-581
+  - "[github](https://github.com/johnny-581)"
 ---
 
 I was a TA for a first-year design course, and every week we picked students to present. The usual wheel-of-names site worked, but it felt like a game show. People flinched when it stopped.
