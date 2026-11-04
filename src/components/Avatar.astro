@@ -12,8 +12,8 @@ const frames = [
 ];
 ---
 
-<!-- Blinks when the cursor enters it or clicks it, a finger taps or swipes across it, or the
-     page is scrolled back to the top -->
+<!-- Blinks when the cursor enters it or the header around it, or clicks it; when a finger taps
+     or swipes across it; or when the page is scrolled back to the top -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
     frames.map(({ name, src }) => (
@@ -78,8 +78,11 @@ const frames = [
       later(CLOSED_MS + HALF_MS, () => (avatar.dataset.frame = "open"));
     };
 
-    // Mouse and pen, on the way in and on each click; touch is handled below
-    avatar.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && blink());
+    // Mouse and pen, on the way in and on each click; touch is handled below. Entering the
+    // header counts too, as if the face noticed you reaching for its links
+    const enter = (e: PointerEvent) => e.pointerType !== "touch" && blink();
+    avatar.closest("header")?.addEventListener("pointerenter", enter);
+    avatar.addEventListener("pointerenter", enter);
     avatar.addEventListener("pointerdown", (e) => e.pointerType !== "touch" && blink(false));
 
     // Coming back to the top of a page, so people who never hover it still see it blink. Once
