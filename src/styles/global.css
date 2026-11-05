@@ -127,13 +127,9 @@
     }
   }
 
-  /* One column: the home page shows the index above its feed, so the aside's copy at the bottom
-     would repeat it. Checked from main because the aside persists across pages. */
+  /* One column: project and journal pages drop the header, leaving the "home" link above the
+     title. Checked from main because the aside persists across pages. */
   @media (max-width: 1023.98px) {
-    :root:has([data-home-index]) [data-aside-index] {
-      display: none;
-    }
-    /* Likewise project and journal pages drop the header, leaving the "home" link above the title */
     :root:has([data-back-home]) [data-aside-header] {
       display: none;
     }
