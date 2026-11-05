@@ -50,3 +50,30 @@ const fullTitle = title ? `${title} — ${site.name}` : site.name;
     </div>
   </body>
 </html>
+
+<script>
+  // Clips (see lib/video.mjs) play like GIFs. Offscreen they pause, so a long page doesn't decode
+  // every clip at once; with reduced motion they show their first frame and wait for a tap.
+  document.addEventListener("astro:page-load", () => {
+    const clips = document.querySelectorAll<HTMLVideoElement>("video[data-clip]");
+    if (!clips.length) return;
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      clips.forEach((clip) => {
+        clip.autoplay = false;
+        clip.pause();
+        clip.controls = true;
+      });
+      return;
+    }
+
+    const onScreen = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        const clip = target as HTMLVideoElement;
+        if (isIntersecting) clip.play().catch(() => {});
+        else clip.pause();
+      });
+    });
+    clips.forEach((clip) => onScreen.observe(clip));
+  });
+</script>

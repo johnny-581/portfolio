@@ -8,6 +8,11 @@ links:
   - "[pepperdocs.app](https://pepperdocs.app)"
 ---
 
+
+
+
+
+
 Every co-op season I'd write about forty cover letters. Each one started as a copy of the last, and each one broke a little more of the formatting. By `aug 2025` I had a folder called `final_final_v3` and I was done.
 
 Resumes and cover letters are documents where the layout _is_ part of the content. Recruiters see the PDF, not your Google Doc. But every tool I tried made me pick one: edit text comfortably and hope the PDF comes out right, or edit the PDF directly and lose your mind.

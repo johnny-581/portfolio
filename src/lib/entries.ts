@@ -1,5 +1,6 @@
 import type { ImageMetadata } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import { VIDEO, mediaUrl } from "./video.mjs";
 
 export type Entry = CollectionEntry<"entries">;
 
@@ -23,14 +24,16 @@ const images = import.meta.glob<{ default: ImageMetadata }>("/src/content/images
   eager: true,
 });
 
-/** The first image in an entry's body, for its preview on the home feed */
-export function firstImage(entry: Entry) {
-  // Entries link their images as "../images/whisk-1.png"
+/** The first image or clip in an entry's body, for its preview on the home feed */
+export function firstMedia(entry: Entry) {
+  // Entries link their images and clips as "../images/whisk-1.png"
   const match = entry.body?.match(/!\[([^\]]*)\]\(\.\.\/images\/([^)\s]+)\)/);
   if (!match) return undefined;
-  const [, alt, file] = match;
-  const src = images[`/src/content/images/${decodeURI(file)}`]?.default;
-  return src && { src, alt };
+  const [, alt, encoded] = match;
+  const file = decodeURI(encoded);
+  if (VIDEO.test(file)) return { kind: "video" as const, src: mediaUrl(file) as string, alt };
+  const src = images[`/src/content/images/${file}`]?.default;
+  return src && { kind: "image" as const, src, alt };
 }
 
 // Paths that belong to routes or sections, so a page can't take them

@@ -273,24 +273,24 @@
       }
     }
 
-    /* A paragraph holding an image is a figure */
-    p:has(> img) {
+    /* A paragraph holding an image or clip is a figure */
+    p:has(> :is(img, video)) {
       margin: 1.6em 0;
       white-space: normal;
     }
-    img {
+    :is(img, video) {
       display: block;
       width: 100%;
       height: auto;
       border-radius: 6px;
       border: 1px solid var(--line);
     }
-    /* Several images in one paragraph sit side by side, the caption on its own row */
-    p:has(> img + img) {
+    /* Several in one paragraph sit side by side, the caption on its own row */
+    p:has(> :is(img, video) + :is(img, video)) {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      > img {
+      > :is(img, video) {
         flex: 1 1 0;
         min-width: 0;
       }
@@ -299,8 +299,8 @@
         margin-top: -4px;
       }
     }
-    /* A <small> right under an image is its caption */
-    p:has(> img) small {
+    /* A <small> right under an image or clip is its caption */
+    p:has(> :is(img, video)) small {
       display: block;
       margin-top: 8px;
       font-family: var(--font-mono);
@@ -312,7 +312,7 @@
 
   /* Dim images a little in dark mode. The avatar drawing frames (drawing-my-face) are dark
      strokes on transparent, so flip them. */
-  .prose img {
+  .prose :is(img, video) {
     opacity: calc(1 - 0.08 * var(--dark));
   }
   .prose img:is([src*="opened."], [src*="half."], [src*="closed."]) {

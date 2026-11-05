@@ -1,11 +1,12 @@
 ---
 import { Image } from "astro:assets";
 import { render } from "astro:content";
-import { firstImage, sectionOf, titleOf, type Entry } from "../lib/entries";
+import { firstMedia, sectionOf, titleOf, type Entry } from "../lib/entries";
+import { videoHtml } from "../lib/video.mjs";
 
 interface Props {
   entry: Entry;
-  /** On the home feed: the summary and first image instead of the body, linking to the entry's page */
+  /** On the home feed: the summary and first image or clip instead of the body, linking to the entry's page */
   preview?: boolean;
 }
 
@@ -13,7 +14,7 @@ const { entry, preview = false } = Astro.props;
 const { tag, when, links, summary } = entry.data;
 const title = titleOf(entry);
 const { Content } = await render(entry);
-const image = preview ? firstImage(entry) : undefined;
+const media = preview ? firstMedia(entry) : undefined;
 // A project without a tag still says what it is
 const kind = tag ?? (sectionOf(entry) === "projects" ? "project" : undefined);
 
@@ -55,9 +56,13 @@ const Heading = preview ? "h2" : "h1";
       preview ? (
         <>
           <p>{summary}</p>
-          {image && (
+          {media && (
             <a href={`/${entry.id}`} class="mt-6 block" tabindex="-1" aria-hidden="true">
-              <Image src={image.src} alt={image.alt} widths={[620, 1240]} sizes="(min-width: 1024px) 620px, 100vw" />
+              {media.kind === "video" ? (
+                <Fragment set:html={videoHtml(media.src, media.alt)} />
+              ) : (
+                <Image src={media.src} alt={media.alt} widths={[620, 1240]} sizes="(min-width: 1024px) 620px, 100vw" />
+              )}
             </a>
           )}
         </>
