@@ -13,7 +13,7 @@ links:
 
 [watch the demo](https://youtu.be/ehOObTde4LM?si=8GoAFnVaubaGwjVb)
 
-## i lead a hackathon team
+## I lead a hackathon team
 
 I joined the Gemini hackathon with some friends from UX Hub and found out I was the only developer on a team of designers. We pulled in more devs from UBC LunchPad, but suddenly everyone looked to me to lead. I took on the challenge.
 
