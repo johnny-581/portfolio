@@ -2,11 +2,11 @@
 // at most 1456px wide (half a retina recording), streamable. Uses macOS's own AVFoundation.
 //
 //   npm run clip -- ~/Downloads/recording.mov pepper-docs-demo
-//   npm run clip -- ~/Downloads/recording.mov name-picker-demo --crop-top 201 --crop-bottom 61
+//   npm run clip -- ~/Downloads/recording.mov name-picker-demo --crop-top 201 --crop-bottom 61 --crop-left 0 --crop-right 1
 //
-// --crop-top / --crop-bottom trim that many source pixels off the top / bottom (a window bar,
-// black strips), before scaling. Also saves three frames next to the output's temp folder, so whoever adds the clip can see
-// what it shows. Prints the Markdown line to paste into a note.
+// --crop-top / --crop-bottom / --crop-left / --crop-right trim that many source pixels off that edge
+// (a window bar, black strips, a dark edge column), before scaling. Also saves three frames of the
+// finished clip to a temp folder, so whoever adds the clip can see what it shows. Prints the Markdown line to paste into a note.
 import AVFoundation
 import CoreImage
 
@@ -20,8 +20,10 @@ func flag(_ name: String) -> Int {
 }
 let cropTop = flag("--crop-top")
 let cropBottom = flag("--crop-bottom")
+let cropLeft = flag("--crop-left")
+let cropRight = flag("--crop-right")
 guard args.count == 3 else {
-  print("usage: npm run clip -- <video> <name> [--crop-top <px>] [--crop-bottom <px>]   (writes src/content/images/<name>.mp4)")
+  print("usage: npm run clip -- <video> <name> [--crop-top <px>] [--crop-bottom <px>] [--crop-left <px>] [--crop-right <px>]   (writes src/content/images/<name>.mp4)")
   exit(1)
 }
 let input = URL(fileURLWithPath: (args[1] as NSString).expandingTildeInPath)
@@ -39,13 +41,15 @@ guard !FileManager.default.fileExists(atPath: output.path) else {
 let asset = AVURLAsset(url: input)
 guard let track = asset.tracks(withMediaType: .video).first else { print("no video in \(input.path)"); exit(1) }
 let source = track.naturalSize.applying(track.preferredTransform)
-let cropped = cropTop + cropBottom > 0
+let cropped = cropTop + cropBottom + cropLeft + cropRight > 0
 // Cropping works on the stored pixels, so it only makes sense for an upright recording
-guard !cropped || track.preferredTransform.isIdentity else { print("--crop-top/--crop-bottom need an unrotated video"); exit(1) }
+guard !cropped || track.preferredTransform.isIdentity else { print("--crop-top/--crop-bottom/--crop-left/--crop-right need an unrotated video"); exit(1) }
 let visibleHeight = abs(source.height) - CGFloat(cropTop + cropBottom)
 guard visibleHeight > 0 else { print("the crop leaves nothing: the video is \(Int(abs(source.height))) px tall"); exit(1) }
-let width = min(Int(abs(source.width)), 1456) / 2 * 2
-let height = Int((visibleHeight * CGFloat(width) / abs(source.width)).rounded()) / 2 * 2
+let visibleWidth = abs(source.width) - CGFloat(cropLeft + cropRight)
+guard visibleWidth > 0 else { print("the crop leaves nothing: the video is \(Int(abs(source.width))) px wide"); exit(1) }
+let width = min(Int(visibleWidth), 1456) / 2 * 2
+let height = Int((visibleHeight * CGFloat(width) / visibleWidth).rounded()) / 2 * 2
 // About 1.8 bits per pixel per second: 2.4 Mbps at 1456x902, sharp enough for UI text
 let bitrate = min(max(width * height * 9 / 5, 800_000), 4_000_000)
 
@@ -70,18 +74,19 @@ let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: video, sour
 writer.add(video)
 
 // Crops and scales a frame in one pass; the writer would only scale, so cropping needs this.
-// Core Image's origin is the bottom-left, so the bottom crop is the y offset.
+// Core Image's origin is the bottom-left, so the bottom crop is the y offset (the left crop is the x offset).
 let context = CIContext()
 func trimmed(_ pixels: CVPixelBuffer) -> CVPixelBuffer {
   guard cropped, let pool = adaptor.pixelBufferPool else { return pixels }
   var out: CVPixelBuffer?
   CVPixelBufferPoolCreatePixelBuffer(nil, pool, &out)
   guard let out else { return pixels }
-  let sourceHeight = CGFloat(CVPixelBufferGetHeight(pixels))
+  let keptWidth = CGFloat(CVPixelBufferGetWidth(pixels) - cropLeft - cropRight)
+  let keptHeight = CGFloat(CVPixelBufferGetHeight(pixels) - cropTop - cropBottom)
   let image = CIImage(cvPixelBuffer: pixels)
-    .cropped(to: CGRect(x: 0, y: CGFloat(cropBottom), width: CGFloat(CVPixelBufferGetWidth(pixels)), height: sourceHeight - CGFloat(cropTop + cropBottom)))
-    .transformed(by: CGAffineTransform(translationX: 0, y: -CGFloat(cropBottom)))
-    .transformed(by: CGAffineTransform(scaleX: CGFloat(width) / CGFloat(CVPixelBufferGetWidth(pixels)), y: CGFloat(height) / (sourceHeight - CGFloat(cropTop + cropBottom))))
+    .cropped(to: CGRect(x: CGFloat(cropLeft), y: CGFloat(cropBottom), width: keptWidth, height: keptHeight))
+    .transformed(by: CGAffineTransform(translationX: -CGFloat(cropLeft), y: -CGFloat(cropBottom)))
+    .transformed(by: CGAffineTransform(scaleX: CGFloat(width) / keptWidth, y: CGFloat(height) / keptHeight))
   context.render(image, to: out)
   return out
 }
