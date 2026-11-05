@@ -173,21 +173,26 @@
       position: relative;
       top: -1px;
     }
+    /* Code blocks: monochrome (no syntax highlighting, see astro.config.mjs), framed like an
+       image, and scrolling sideways rather than wrapping */
     pre {
       margin: 0 0 1.1em;
-      padding: 14px;
+      padding: 14px 16px;
       overflow-x: auto;
-      background: var(--chip);
+      background: color-mix(in srgb, var(--chip) 60%, transparent);
+      border: 1px solid var(--line);
       border-radius: 6px;
+      color: var(--ink-soft);
       font-family: var(--font-mono);
       font-size: var(--text-meta);
-      line-height: 1.5;
+      line-height: 1.6;
       white-space: pre;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+      /* Not a chip: the chip's nowrap would put every line on one */
       code {
-        background: none;
-        padding: 0;
-        top: 0;
-        line-height: inherit;
+        all: unset;
+        white-space: pre;
       }
     }
 
@@ -277,22 +282,8 @@
       border-radius: 6px;
       border: 1px solid var(--line);
     }
-    /* Several in one paragraph sit side by side, the caption on its own row */
-    p:has(> :is(img, video, .yt) + :is(img, video, .yt)) {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      > :is(img, video, .yt) {
-        flex: 1 1 0;
-        min-width: 0;
-      }
-      > small {
-        flex: 0 0 100%;
-        margin-top: -4px;
-      }
-    }
     /* A <small> right under an image or clip is its caption */
-    p:has(> :is(img, video, .yt)) small {
+    p:is(:has(> :is(img, video, .yt)), .gallery) small {
       display: block;
       margin-top: 8px;
       font-family: var(--font-mono);
@@ -300,49 +291,50 @@
       line-height: var(--text-meta--line-height);
       color: var(--muted);
     }
+    /* Several in one paragraph sit side by side, the caption on its own row (see lib/gallery.mjs,
+       which sets the class, each item's aspect and the gap it assumes). Equal heights: widths
+       grow by aspect ratio, from a 2px basis that covers each item's border. */
+    p.gallery {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 1.6em 0;
+      white-space: normal;
+      .gallery-item {
+        flex: var(--aspect, 1) 1 2px;
+        min-width: 0;
+      }
+      > small {
+        flex: 0 0 100%;
+        margin-top: -4px;
+      }
+    }
+    /* A portrait then landscapes: the portrait on the left, the rest stacked at the width that
+       makes both columns end level */
+    p.gallery.split {
+      > .gallery-item {
+        flex: 1 1 0;
+      }
+      > .gallery-column {
+        flex: 0 0 var(--width);
+        /* Grid, not a flex column, which shrinks the images' height and so their width */
+        display: grid;
+        gap: 12px;
+        min-width: 0;
+      }
+    }
+    /* Phones: rows whose items would come out too small stack full width */
+    @media (max-width: 639.98px) {
+      p.gallery.stack > :is(.gallery-item, .gallery-column) {
+        flex: 0 0 100%;
+      }
+    }
 
-    /* A YouTube video (see lib/youtube.mjs): a 16:9 thumbnail button that becomes the player */
+    /* A YouTube video (see lib/youtube.mjs): a 16:9 player, tinted while it loads */
     .yt {
-      position: relative;
       aspect-ratio: 16 / 9;
-      padding: 0;
-      overflow: hidden;
       background: var(--chip);
-      cursor: pointer;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border: 0;
-        border-radius: 0;
-        opacity: 1;
-      }
-      /* A quiet play mark: a ring with a triangle, in the page's colors */
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-      }
-      &::before {
-        width: 56px;
-        height: 56px;
-        translate: -50% -50%;
-        border-radius: 50%;
-        border: 1px solid var(--line);
-        background: var(--bg);
-        opacity: 0.92;
-      }
-      &::after {
-        translate: -35% -50%;
-        border: 9px solid transparent;
-        border-left: 14px solid var(--ink);
-        border-right: 0;
-      }
-      &:hover::before {
-        opacity: 1;
-      }
     }
   }
 
