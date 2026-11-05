@@ -26,7 +26,7 @@ const fullTitle = title ? `${title} — ${site.name}` : site.name;
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <ClientRouter />
-    <!-- Before first paint, so a theme picked with the header toggle doesn't flash the system one -->
+    <!-- Before first paint, so dark picked with the header toggle doesn't flash light first -->
     <script is:inline>
       const applyTheme = () => {
         try {

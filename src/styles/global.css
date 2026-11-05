@@ -37,8 +37,8 @@
   --text-h3--line-height: 1.5rem;
 }
 
-/* Semantic tokens, as light-dark() pairs. The theme follows the system unless the toggle in
-   the header has set data-theme on <html>, which pins color-scheme. */
+/* Semantic tokens, as light-dark() pairs. Light unless the toggle in the header has set
+   data-theme="dark" on <html>; the system setting is ignored. */
 :root {
   --bg: light-dark(#faf9f6, #151514);
   --ink: light-dark(var(--color-neutral-900), #ecebe6);
@@ -59,18 +59,9 @@
   /* 1 in dark mode, for what light-dark() can't do (flipping the avatar drawings) */
   --dark: 0;
 
-  color-scheme: light dark;
-  &[data-theme="light"] {
-    color-scheme: light;
-  }
+  color-scheme: light;
   &[data-theme="dark"] {
     color-scheme: dark;
-    --dark: 1;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
     --dark: 1;
   }
 }
