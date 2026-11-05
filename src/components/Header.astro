@@ -8,7 +8,13 @@ interface Props {
 }
 
 const { current } = Astro.props;
-const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links];
+// "home" is only for lg and up; below that the name above already links home. Its slug is empty,
+// matching the home page, where there is no current slug
+const links = [
+  { label: "home", href: "/", slug: "", wideOnly: true },
+  { label: "about", href: "/about", slug: "about" },
+  ...site.links,
+];
 ---
 
 <!-- The avatar sits in the top-left corner with the name beside it, bottom-aligned to its chin -->
@@ -48,11 +54,14 @@ const links = [{ label: "about", href: "/about", slug: "about" }, ...site.links]
         <>
           <a
             href={link.href}
-            aria-current={"slug" in link && link.slug === current ? "page" : undefined}
+            aria-current={"slug" in link && link.slug === (current ?? "") ? "page" : undefined}
             data-slug={"slug" in link ? link.slug : undefined}
             target={link.href.startsWith("http") ? "_blank" : undefined}
             rel={link.href.startsWith("http") ? "noopener" : undefined}
-            class="hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]"
+            class:list={[
+              "hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]",
+              "wideOnly" in link && "hidden lg:inline",
+            ]}
           >
             {link.label}
           </a>
