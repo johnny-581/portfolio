@@ -5,13 +5,16 @@ when: "2025"
 published: 2025-03-15
 summary: A random name picker that draws each name by hand, stroke by stroke, so picking someone feels less like a lottery.
 links:
-  - "[github](https://github.com/johnny-581)"
+  - "[github](https://github.com/johnny-581/ux-hub-dice)"
 ---
 
 ![the name picker writing out a name by hand, then the list of names to pick from](../images/name-picker-demo.mp4)
 <small>each name is written out by hand; only checked names get picked.</small>
 
-I manage the dev team at UX Hub. One problem I has was picking the right person
+I manage the dev team at UX Hub and hosts weekly standups. Sometime no one wants to go first, and picking a speaking order becomes a problem.
+
+I built this fun little project in a few hours using claude code and Procreate. It exists to make the process more fun
+
 
 
 So I made one that writes the name instead. The pen wanders across the page for a moment, then commits to a first letter, and the name appears stroke by stroke in handwriting. It takes about two seconds. ==Slow enough to feel considered, fast enough that nobody waits.==
