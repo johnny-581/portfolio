@@ -2,7 +2,7 @@
 // at most 1456px wide (half a retina recording), streamable. Uses macOS's own AVFoundation.
 //
 //   npm run clip -- ~/Downloads/recording.mov pepper-docs-demo
-//   npm run clip -- ~/Downloads/recording.mov name-picker-demo --crop-top 201 --crop-bottom 61 --crop-left 0 --crop-right 1
+//   npm run clip -- ~/Downloads/recording.mov name-picker-demo --crop-top 201 --crop-bottom 61 --crop-right 2
 //
 // --crop-top / --crop-bottom / --crop-left / --crop-right trim that many source pixels off that edge
 // (a window bar, black strips, a dark edge column), before scaling. Also saves three frames of the
