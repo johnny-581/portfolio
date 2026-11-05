@@ -14,7 +14,7 @@ links:
 
 ## I lead a hackathon team
 
-I joined the Gemini hackathon with some friends from UX Hub and found out I was the only developer on a team of designers. We pulled in more devs from UBC LunchPad, but suddenly everyone looked to me to lead. I took on the challenge.
+I joined the Gemini hackathon with some friends from UX Hub and found out I was ==the only developer on a team of designers==. We pulled in more devs from UBC LunchPad, but suddenly everyone looked to me to lead. I took on the challenge.
 
 ## brainstorming
 
@@ -26,7 +26,7 @@ Designing an app like this feels magical, like abstract shapes sharpening into s
 ![a flow diagram from onboarding quiz to vocab extraction to a SQLite database, then to live chat and an optional quiz, with a difficulty level loop and a name on each box](../images/whisk-figjam-first-flow.png)
 ![a user flow diagram from clicking into a YouTube video, to subtitles and a vocabulary summary, to a stored vocabulary database, to reviewing it as flashcards or a podcast, with a Minecraft video screenshot as an example](../images/whisk-figjam-user-flow.png)
 
-Prototyping early paid off. We swapped Notion/Anki APIs for SQLite. The Gemini Live API had echos, so we replaced it with Pipecat.
+==Prototyping early paid off.== We swapped Notion/Anki APIs for SQLite. The Gemini Live API had echos, so we replaced it with Pipecat.
 
 ## building
 
@@ -56,7 +56,7 @@ I primarily worked on the live chat feature, but also helped out wherever I coul
 
 ## deploying
 
-A core feature of the app was extracting vocab from YouTube videos. Hours before the deadline, the YouTube Transcript API stopped working. Turns out YouTube actively blocks third-party APIs.
+A core feature of the app was extracting vocab from YouTube videos. ==Hours before the deadline, the YouTube Transcript API stopped working.== Turns out YouTube actively blocks third-party APIs.
 
 We scrambled through residential proxies before landing on an [Apify Actor](https://apify.com/topaz_sharingan/youtube-transcript-scraper) (a managed scraping service). It worked!
 
@@ -66,6 +66,6 @@ We scrambled through residential proxies before landing on an [Apify Actor](http
 
 This is my first time leading a hackathon team, and I learned a lot.
 
-I feel like I had a tendency to want to control every detail, but the team actually did its best work when I stepped back and trusted people with their slices. Quang and Cherry designed the voice chat UI; Terry and Kat built the video dashboard. Those turned out to be some of the best parts of the app - things I could never have built on my own.
+I feel like I had a tendency to want to control every detail, but ==the team actually did its best work when I stepped back and trusted people with their slices==. Quang and Cherry designed the voice chat UI; Terry and Kat built the video dashboard. Those turned out to be some of the best parts of the app - things I could never have built on my own.
 
 Three weeks of running online meetings, talking in the group chat, and contributing to features. For most of it I was quietly worried the project could fall apart. But here we are! We built something in three weeks that we’re truly proud of.
