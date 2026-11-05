@@ -1,6 +1,6 @@
 // YouTube videos, embedded like images: ![alt](https://youtu.be/ID), as Obsidian writes them.
-// They render as a thumbnail button; Base's script swaps in the player on click, so nothing
-// from YouTube loads (and no cookies are set) until someone presses play.
+// They render as the YouTube player itself (privacy-enhanced nocookie embed, lazy-loaded,
+// no autoplay), so nothing loads from YouTube until the player scrolls near view.
 
 const HOSTS = /^(?:www\.|m\.)?youtube\.com$/;
 const ID = /^[\w-]{11}$/;
@@ -31,14 +31,13 @@ export function parseYoutube(href) {
 
 const attr = (text) => text.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 
-/** The thumbnail button; Base's script reads data-id / data-start / data-title to build the player */
+/** The player iframe; `.yt` in global.css gives it the 16:9 box */
 export function youtubeHtml({ id, start }, alt = "") {
-  const label = attr(alt ? `Play: ${alt}` : "Play video");
-  const extra = (start ? ` data-start="${start}"` : "") + (alt ? ` data-title="${attr(alt)}"` : "");
-  return `<button type="button" class="yt" data-id="${id}"${extra} aria-label="${label}"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy" /></button>`;
+  const src = `https://www.youtube-nocookie.com/embed/${id}${start ? `?start=${start}` : ""}`;
+  return `<iframe class="yt" src="${src}" title="${attr(alt || "Video")}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
 }
 
-/** Sätteri plugin: a Markdown image whose URL is a YouTube video becomes a click-to-play thumbnail */
+/** Sätteri plugin: a Markdown image whose URL is a YouTube video becomes the embedded player */
 export const youtube = {
   name: "youtube",
   image(node, ctx) {
