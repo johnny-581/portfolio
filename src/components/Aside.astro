@@ -34,13 +34,29 @@ const { current } = Astro.props;
   // The aside is kept between pages, so point its "current" marks at the new page, and keep
   // its scroll position (moving a node can reset it)
   let scroll = 0;
+  let startOver = false;
 
-  document.addEventListener("astro:before-swap", () => {
+  document.addEventListener("astro:before-swap", (e) => {
     scroll = document.querySelector<HTMLElement>("[data-aside]")?.scrollTop ?? 0;
+    // One column (below lg): the window scrolls and the index sits at the bottom of it. The
+    // tapped index link keeps focus across the swap and the router re-focuses it, which scrolls
+    // it into view, so the new page would open at the index. Drop that focus first. (Back and
+    // forward keep it, along with the scroll position they restore.)
+    startOver = e.navigationType !== "traverse" && !matchMedia("(min-width: 1024px)").matches;
+    if (startOver && document.activeElement?.closest("[data-aside]")) {
+      (document.activeElement as HTMLElement).blur();
+    }
   });
   document.addEventListener("astro:after-swap", () => {
     const aside = document.querySelector<HTMLElement>("[data-aside]");
     if (aside) aside.scrollTop = scroll;
+    // Start focus (and the next Tab) at the top of the new page, not on a link that's out of view
+    const main = document.querySelector<HTMLElement>("main");
+    if (startOver && main) {
+      main.tabIndex = -1;
+      main.style.outline = "none";
+      main.focus({ preventScroll: true });
+    }
   });
   document.addEventListener("astro:page-load", () => {
     const slug = location.pathname.replace(/^\/|\/$/g, "");
