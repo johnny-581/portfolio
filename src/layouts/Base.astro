@@ -52,6 +52,24 @@ const fullTitle = title ? `${title} — ${site.name}` : site.name;
 </html>
 
 <script>
+  // YouTube thumbnails (see lib/youtube.mjs) become the player on click. One delegated listener,
+  // bound once, so it survives the router's page swaps.
+  document.addEventListener("click", (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>("button.yt");
+    if (!button) return;
+    const { id, start, title } = button.dataset;
+    const frame = document.createElement("iframe");
+    frame.className = "yt";
+    frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1${start ? `&start=${start}` : ""}`;
+    frame.title = title || "Video";
+    frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    frame.allowFullscreen = true;
+    button.replaceWith(frame);
+    frame.focus();
+  });
+</script>
+
+<script>
   // Clips (see lib/video.mjs) play like GIFs. Offscreen they pause, so a long page doesn't decode
   // every clip at once; with reduced motion they show their first frame and wait for a tap.
   document.addEventListener("astro:page-load", () => {

@@ -12,6 +12,9 @@ embed it like an image, `![what it shows](../images/my-thing-demo.mp4)`. It play
 like a GIF. Keep clips short (5–15 s), silent and under ~3 MB; MP4 (H.264) plays everywhere.
 If the first image in an entry is a clip, the homepage preview plays it.
 
+YouTube videos embed the same way, `![what it is](https://youtu.be/…)`, and show as a thumbnail
+that plays on click.
+
 - `title`: optional. Without it the title is the file name with spaces for dashes
   (`podcast-recs.md` is "podcast recs"). Add it for punctuation or extra words: "tokyo, in december".
 - `tag`: projects use work, shipped, club, hackathon or personal; journal uses journal, place or list.

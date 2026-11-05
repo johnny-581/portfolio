@@ -10,7 +10,7 @@ links:
 
 ![whisk's video page with a vocabulary list, and a café practice scene with a word checklist, laid over a purple background](../images/whisk-app-overview.jpg)
 
-[watch the demo](https://youtu.be/ehOObTde4LM?si=8GoAFnVaubaGwjVb)
+![whisk demo](https://youtu.be/ehOObTde4LM)
 
 ## I lead a hackathon team
 
