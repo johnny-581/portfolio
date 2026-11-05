@@ -3,31 +3,70 @@ title: whisk
 tag: hackathon
 when: "2026"
 published: 2026-03-08
-summary: An AI conversation partner for Japanese learners that changes the screen while you speak.
+summary: "A Japanese AI language app: a live chat that manipulates the UI as you speak."
 links:
-  - "[github](https://github.com/TODO/whisk)"
+  - "[devpost](https://devpost.com/software/whisk-o8x0b5)"
+  - "[site](https://gemini-whisk.vercel.app/)"
 ---
 
-I've been learning Japanese since 2024, and speaking is the one skill that hasn't improved. Flashcards taught me to recognize 牛乳 on a carton. They didn't teach me to ask someone where the milk was.
+![whisk's video page with a vocabulary list, and a café practice scene with a word checklist, laid over a purple background](../images/whisk-app-overview.jpg)
 
-whisk is what four of us built between `jan 10` and `feb 21`. You paste a YouTube video you actually want to watch. It pulls the transcript, builds a vocabulary list with readings, and then puts you in a café with someone who wants to talk about it. In Japanese, out loud.
+[watch the demo](https://youtu.be/ehOObTde4LM?si=8GoAFnVaubaGwjVb)
 
-![whisk: a café practice scene over a video's vocabulary list](../images/whisk-1.png)
-<small>left: the practice scene. right: a video's vocabulary list and past conversations.</small>
+## i lead a hackathon team
 
-The idea we kept coming back to was ==the screen should react to what you say, not what you click.== When you use a word from the list, it gets checked off. When you go quiet for a few seconds, a hint panel slides in with the words you haven't used yet. When you switch to English, the character waits for you to come back. She doesn't correct you.
+I joined the Gemini hackathon with some friends from UX Hub and found out I was the only developer on a team of designers. We pulled in more devs from UBC LunchPad, but suddenly everyone looked to me to lead. I took on the challenge.
 
-What I worked on:
+## brainstorming
 
-- the realtime loop: mic → transcript → model → UI events, in under a second most of the time
-- tool calls that let the model move the interface (`show_hints`, `check_word`, `end_scene`) instead of only replying with text
-- the vocabulary extractor, which turned out to be mostly about deciding what _not_ to show
+![a video call of the five team members during the Gemini 3 Hackathon, with the hackathon rules page shared on screen](../images/whisk-team-call.png)
 
-`@mina` did the illustrations and most of the scene design. `@daniel` and `@sora` built the video pipeline and the conversation history. We demoed on `feb 21` and the first question we got was "can I use this tonight." That was the best feedback we got.
+Designing an app like this feels magical, like abstract shapes sharpening into something real. As the UX took shape on FigJam, I scoped our project components and assigned each developer a portion of the prototype.
 
-Things I'd change:
+![early brainstorm notes for a voice mode language practice app with Gemini: three characters acting out a scenario, video context, and audio features like greying out words once the user says them](../images/whisk-brainstorm-notes.png)
+![a flow diagram from onboarding quiz to vocab extraction to a SQLite database, then to live chat and an optional quiz, with a difficulty level loop and a name on each box](../images/whisk-figjam-first-flow.png)
+![a user flow diagram from clicking into a YouTube video, to subtitles and a vocabulary summary, to a stored vocabulary database, to reviewing it as flashcards or a podcast, with a Minecraft video screenshot as an example](../images/whisk-figjam-user-flow.png)
 
-- latency matters more than accuracy. A slightly wrong reply in 600ms feels like a conversation. A perfect one in 3s feels like a form.
-- we spent a week on a scoring system nobody looked at. Nobody wants a grade from a friend.
+Prototyping early paid off. We swapped Notion/Anki APIs for SQLite. The Gemini Live API had echos, so we replaced it with Pipecat.
 
-I still use it a few nights a week, mostly with cooking videos.
+## building
+
+```txt
+frontend/
+app/
+├── (conversation)/
+│   └── conversations/
+│       └── [conversationId]/
+├── (dashboard)/
+│   ├── dashboard/
+│   └── videos/
+│       ├── [videoId]/
+│       └── new/
+├── (onboarding)/
+└── api/
+    └── ...
+```
+
+The hardest part of a 7-person team was collaboration. I set up the repo structure early so people wouldn't step on each other. The frontend split into three feature groups using Next.js route groups 👆
+
+I primarily worked on the live chat feature, but also helped out wherever I could. I felt like I had to hold everything together - but the app was complex and feature-rich, and there was no way I could handle it all alone.
+
+![the final architecture diagram: onboarding quiz, vocab extraction using Apify and Gemini 3 Flash, a SQLite database feeding a video dashboard and live chat, with live chat built on Pipecat, Gemini Live and Daily for WebRTC](../images/whisk-architecture.png)
+
+![the whisk practice scene: a smiling character holding a coffee in a café, a Japanese speech bubble, and a checklist of vocabulary words with the ones already used crossed out](../images/whisk-practice-scene.png)
+
+## deploying
+
+A core feature of the app was extracting vocab from YouTube videos. Hours before the deadline, the YouTube Transcript API stopped working. Turns out YouTube actively blocks third-party APIs.
+
+We scrambled through residential proxies before landing on an [Apify Actor](https://apify.com/topaz_sharingan/youtube-transcript-scraper) (a managed scraping service). It worked!
+
+![a Railway service card for the whisk app showing it online, with an attached whisk-volume](../images/whisk-railway-deploy.png)
+
+## reflection
+
+This is my first time leading a hackathon team, and I learned a lot.
+
+I feel like I had a tendency to want to control every detail, but the team actually did its best work when I stepped back and trusted people with their slices. Quang and Cherry designed the voice chat UI; Terry and Kat built the video dashboard. Those turned out to be some of the best parts of the app - things I could never have built on my own.
+
+Three weeks of running online meetings, talking in the group chat, and contributing to features. For most of it I was quietly worried the project could fall apart. But here we are! We built something in three weeks that we’re truly proud of.
