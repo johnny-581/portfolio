@@ -1,0 +1,17 @@
+---
+title: access buddy
+tag: hackathon
+when: "2025"
+published: 2025-01-26
+summary: A Chrome extension for browsing with only your voice. Won nwHacks 2025.
+links:
+  - "[devpost](https://devpost.com/TODO)"
+---
+
+An accessibility-focused Chrome extension that lets people with physical impairments navigate the web using only their voice. It won nwHacks 2025.
+
+![access buddy: the extension listening for a voice command](../images/access-buddy-1.png)
+
+==The goal was to make every click something you can say.==
+
+![access buddy: voice navigation on a web page](../images/access-buddy-2.png)
