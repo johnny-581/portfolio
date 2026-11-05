@@ -8,6 +8,9 @@ links:
   - "[github](https://github.com/johnny-581)"
 ---
 
+![the name picker writing out a name by hand, then the list of names to pick from](../images/name-picker-demo.mp4)
+<small>each name is written out by hand; only checked names get picked.</small>
+
 I was a TA for a first-year design course, and every week we picked students to present. The usual wheel-of-names site worked, but it felt like a game show. People flinched when it stopped.
 
 So I made one that writes the name instead. The pen wanders across the page for a moment, then commits to a first letter, and the name appears stroke by stroke in handwriting. It takes about two seconds. ==Slow enough to feel considered, fast enough that nobody waits.==

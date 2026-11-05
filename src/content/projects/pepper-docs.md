@@ -3,7 +3,7 @@ title: pepper docs
 tag: shipped
 when: 2026-
 published: 2026-11-01
-summary: A Notion-like editor for PDF documents. Giving user complete control over
+summary: A Notion-like rich text editor for PDF documents.
 links:
   - "[pepperdocs.app](https://pepperdocs.app)"
 ---

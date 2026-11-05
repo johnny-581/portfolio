@@ -3,19 +3,31 @@ title: e-commerce data agent
 tag: shipped
 when: "2026"
 published: 2026-07-18
-summary: "An agent and its MCP servers built from scratch with ADK and Next.js: live SSE streaming, multi-session sidebar, file upload."
+summary: "An agent harness and custom e-commerce MCP servers built from scratch with ADK and Next.js: live SSE streaming, multi-session sidebar, file attachments."
 ---
 
-An agent and its MCP servers, built from scratch with ADK and Next.js. You ask a question about a store's data in plain language, and the agent works out which tools to call.
+This is the main project I lead during my internship at Customer Maps. An enterprise search for small e-commerce businesses
+
+An agent and its MCP servers, built from scratch with ADK and Next.js. You ask a question about a store's data in plain language and gets back and gets back a product catalog with real prices
 
 ![e-commerce data agent: the chat view](../images/e-commerce-data-agent-1.png)
 
-Replies stream in over SSE, so you watch the agent work instead of waiting on a spinner. The sidebar keeps multiple sessions, so a long investigation doesn't get lost when you start a new question.
+Replies stream in over SSE, so you watch the agent work. It supports multiple sessions running simultaneously.
 
 ![e-commerce data agent: the multi-session sidebar](../images/e-commerce-data-agent-2.png)
 
-==The hard part wasn't the model, it was deciding what the tools should be.== You can also upload a file and ask about that instead.
+==The hard part wasn't the agent, it was aggregating and filtering the right data for the agent.==
+
+We built custom MCP Servers so users can connect (OAuth) their data sources. Written in python with FastMCP.
+
+- Shopify MCP
+- Google Analytics MCP
+- Google Drive MCP
+
+The Google Drive MCP indexes and searches PDFs. So any query returns with the exact quote with page reference.
 
 ![e-commerce data agent: uploading a file](../images/e-commerce-data-agent-3.png)
+
+dark mode
 
 ![e-commerce data agent: a finished answer](../images/e-commerce-data-agent-4.png)
