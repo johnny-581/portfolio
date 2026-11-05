@@ -6,7 +6,7 @@ published: 2026-07-18
 summary: "An agent harness and custom e-commerce MCP servers built from scratch with ADK and Next.js: live SSE streaming, multi-session sidebar, file attachments."
 ---
 
-This is the main project I lead during my internship at Customer Maps. An enterprise search for small e-commerce businesses.
+This is a project I lead during my internship at Customer Maps. An enterprise search prototype for small e-commerce businesses.
 
 An agent and its MCP servers, built from scratch with ADK and Next.js. You ask a question about a store's data in plain language and gets back and gets back a tailored product catalog with real prices.
 
