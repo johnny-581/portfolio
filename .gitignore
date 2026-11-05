@@ -29,5 +29,6 @@ src/content/.obsidian/*
 !src/content/.obsidian/app.json
 !src/content/.obsidian/templates.json
 
-# Claude Code's local session files
-.claude/
+# Claude Code's local session files; the repo's skills are kept
+.claude/*
+!.claude/skills/
