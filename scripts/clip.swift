@@ -2,14 +2,26 @@
 // at most 1456px wide (half a retina recording), streamable. Uses macOS's own AVFoundation.
 //
 //   npm run clip -- ~/Downloads/recording.mov pepper-docs-demo
+//   npm run clip -- ~/Downloads/recording.mov name-picker-demo --crop-top 201 --crop-bottom 61
 //
-// Also saves three frames next to the output's temp folder, so whoever adds the clip can see
+// --crop-top / --crop-bottom trim that many source pixels off the top / bottom (a window bar,
+// black strips), before scaling. Also saves three frames next to the output's temp folder, so whoever adds the clip can see
 // what it shows. Prints the Markdown line to paste into a note.
 import AVFoundation
+import CoreImage
 
-let args = CommandLine.arguments
+// Flags can sit anywhere after the video and name
+var args = CommandLine.arguments
+func flag(_ name: String) -> Int {
+  guard let i = args.firstIndex(of: name) else { return 0 }
+  guard i + 1 < args.count, let value = Int(args[i + 1]), value >= 0 else { print("\(name) needs a number of pixels"); exit(1) }
+  args.removeSubrange(i...(i + 1))
+  return value
+}
+let cropTop = flag("--crop-top")
+let cropBottom = flag("--crop-bottom")
 guard args.count == 3 else {
-  print("usage: npm run clip -- <video> <name>   (writes src/content/images/<name>.mp4)")
+  print("usage: npm run clip -- <video> <name> [--crop-top <px>] [--crop-bottom <px>]   (writes src/content/images/<name>.mp4)")
   exit(1)
 }
 let input = URL(fileURLWithPath: (args[1] as NSString).expandingTildeInPath)
@@ -27,8 +39,13 @@ guard !FileManager.default.fileExists(atPath: output.path) else {
 let asset = AVURLAsset(url: input)
 guard let track = asset.tracks(withMediaType: .video).first else { print("no video in \(input.path)"); exit(1) }
 let source = track.naturalSize.applying(track.preferredTransform)
+let cropped = cropTop + cropBottom > 0
+// Cropping works on the stored pixels, so it only makes sense for an upright recording
+guard !cropped || track.preferredTransform.isIdentity else { print("--crop-top/--crop-bottom need an unrotated video"); exit(1) }
+let visibleHeight = abs(source.height) - CGFloat(cropTop + cropBottom)
+guard visibleHeight > 0 else { print("the crop leaves nothing: the video is \(Int(abs(source.height))) px tall"); exit(1) }
 let width = min(Int(abs(source.width)), 1456) / 2 * 2
-let height = Int((abs(source.height) * CGFloat(width) / abs(source.width)).rounded()) / 2 * 2
+let height = Int((visibleHeight * CGFloat(width) / abs(source.width)).rounded()) / 2 * 2
 // About 1.8 bits per pixel per second: 2.4 Mbps at 1456x902, sharp enough for UI text
 let bitrate = min(max(width * height * 9 / 5, 800_000), 4_000_000)
 
@@ -45,16 +62,38 @@ let video = AVAssetWriterInput(mediaType: .video, outputSettings: [
   AVVideoCompressionPropertiesKey: [AVVideoAverageBitRateKey: bitrate, AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel],
 ])
 video.transform = track.preferredTransform
-let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: video, sourcePixelBufferAttributes: nil)
+let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: video, sourcePixelBufferAttributes: [
+  kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+  kCVPixelBufferWidthKey as String: width,
+  kCVPixelBufferHeightKey as String: height,
+])
 writer.add(video)
+
+// Crops and scales a frame in one pass; the writer would only scale, so cropping needs this.
+// Core Image's origin is the bottom-left, so the bottom crop is the y offset.
+let context = CIContext()
+func trimmed(_ pixels: CVPixelBuffer) -> CVPixelBuffer {
+  guard cropped, let pool = adaptor.pixelBufferPool else { return pixels }
+  var out: CVPixelBuffer?
+  CVPixelBufferPoolCreatePixelBuffer(nil, pool, &out)
+  guard let out else { return pixels }
+  let sourceHeight = CGFloat(CVPixelBufferGetHeight(pixels))
+  let image = CIImage(cvPixelBuffer: pixels)
+    .cropped(to: CGRect(x: 0, y: CGFloat(cropBottom), width: CGFloat(CVPixelBufferGetWidth(pixels)), height: sourceHeight - CGFloat(cropTop + cropBottom)))
+    .transformed(by: CGAffineTransform(translationX: 0, y: -CGFloat(cropBottom)))
+    .transformed(by: CGAffineTransform(scaleX: CGFloat(width) / CGFloat(CVPixelBufferGetWidth(pixels)), y: CGFloat(height) / (sourceHeight - CGFloat(cropTop + cropBottom))))
+  context.render(image, to: out)
+  return out
+}
 
 reader.startReading()
 writer.startWriting()
 writer.startSession(atSourceTime: .zero)
 var last: (CVPixelBuffer, CMTime)?
 while let sample = frames.copyNextSampleBuffer() {
-  guard let pixels = CMSampleBufferGetImageBuffer(sample) else { continue }
+  guard let original = CMSampleBufferGetImageBuffer(sample) else { continue }
   while !video.isReadyForMoreMediaData { usleep(1000) }
+  let pixels = trimmed(original)
   let time = CMSampleBufferGetPresentationTimeStamp(sample)
   adaptor.append(pixels, withPresentationTime: time)
   last = (pixels, time)
@@ -73,10 +112,10 @@ writer.finishWriting { done.signal() }
 done.wait()
 guard writer.status == .completed else { print("failed: \(writer.error?.localizedDescription ?? "unknown")"); exit(1) }
 
-// Three frames, for writing alt text without playing the clip
+// Three frames of the finished clip, for writing alt text without playing it
 let preview = FileManager.default.temporaryDirectory.appendingPathComponent("clip-\(name)")
 try? FileManager.default.createDirectory(at: preview, withIntermediateDirectories: true)
-let grabber = AVAssetImageGenerator(asset: asset)
+let grabber = AVAssetImageGenerator(asset: AVURLAsset(url: output))
 grabber.appliesPreferredTrackTransform = true
 grabber.maximumSize = CGSize(width: 1200, height: 1200)
 for (i, at) in [0.1, 0.5, 0.9].enumerated() {
