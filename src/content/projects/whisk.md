@@ -6,7 +6,6 @@ published: 2026-03-08
 summary: "A Japanese AI language app: a live chat that manipulates the UI as you speak."
 links:
   - "[devpost](https://devpost.com/software/whisk-o8x0b5)"
-  - "[site](https://gemini-whisk.vercel.app/)"
 ---
 
 ![whisk's video page with a vocabulary list, and a café practice scene with a word checklist, laid over a purple background](../images/whisk-app-overview.jpg)
