@@ -13,6 +13,10 @@ guard args.count == 3 else {
   exit(1)
 }
 let input = URL(fileURLWithPath: (args[1] as NSString).expandingTildeInPath)
+guard FileManager.default.fileExists(atPath: input.path) else {
+  print("no file at \(input.path)")
+  exit(1)
+}
 let name = args[2].replacingOccurrences(of: ".mp4", with: "")
 let output = URL(fileURLWithPath: "src/content/images/\(name).mp4")
 guard !FileManager.default.fileExists(atPath: output.path) else {
