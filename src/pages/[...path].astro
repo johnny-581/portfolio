@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
-import { getAllEntries, neighbours, titleOf } from "../lib/entries";
+import { getAllEntries, titleOf } from "../lib/entries";
 
 export const getStaticPaths = (async () => {
   const entries = await getAllEntries();
@@ -10,33 +10,14 @@ export const getStaticPaths = (async () => {
     // An entry's id is its path: projects/whisk, journal/tokyo, about
     entries.map(async (entry) => ({
       params: { path: entry.id },
-      props: { entry, ...(await neighbours(entry)) },
+      props: { entry },
     })),
   );
 }) satisfies GetStaticPaths;
 
-const { entry, older, newer } = Astro.props;
+const { entry } = Astro.props;
 ---
 
 <Base title={titleOf(entry)} description={entry.data.summary} current={entry.id}>
   <Entry entry={entry} />
-  {
-    (older || newer) && (
-      <nav
-        aria-label="more entries"
-        class="mt-16 hidden max-w-[620px] flex-col gap-2 border-t border-line pt-5 font-mono text-meta text-muted sm:flex-row sm:justify-between sm:gap-6 lg:flex"
-      >
-        {older && (
-          <a href={`/${older.id}`} class="hover:text-ink">
-            ← older: {titleOf(older)}
-          </a>
-        )}
-        {newer && (
-          <a href={`/${newer.id}`} class="hover:text-ink sm:ml-auto sm:text-right">
-            newer: {titleOf(newer)} →
-          </a>
-        )}
-      </nav>
-    )
-  }
 </Base>

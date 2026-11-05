@@ -59,11 +59,3 @@ export async function getAllEntries() {
 export async function getEntry(id: string) {
   return (await getAllEntries()).find((e) => e.id === id);
 }
-
-/** The listed entries either side of this one in its section of the index (older is further down) */
-export async function neighbours(entry: Entry) {
-  const entries = await getEntries(sectionOf(entry));
-  const i = entries.findIndex((e) => e.id === entry.id);
-  if (i === -1) return {};
-  return { older: entries[i + 1], newer: entries[i - 1] };
-}
