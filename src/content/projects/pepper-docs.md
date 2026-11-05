@@ -8,10 +8,8 @@ links:
   - "[pepperdocs.app](https://pepperdocs.app)"
 ---
 
-
-
-
-
+![pepper docs: switching between the resume, job posting and cover letter in one application](../images/pepper-docs-stage-manager.mp4)
+<small>one folder per application: the resume, the posting and the letter, a click apart.</small>
 
 Every co-op season I'd write about forty cover letters. Each one started as a copy of the last, and each one broke a little more of the formatting. By `aug 2025` I had a folder called `final_final_v3` and I was done.
 
