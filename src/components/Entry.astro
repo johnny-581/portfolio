@@ -18,11 +18,25 @@ const media = preview ? firstMedia(entry) : undefined;
 // A project without a tag still says what it is
 const kind = tag ?? (sectionOf(entry) === "projects" ? "project" : undefined);
 
+// Below lg, projects and journal entries trade the site header for a link home (global.css)
+const backHome = !preview && ["projects", "journal"].includes(sectionOf(entry));
+
 // The feed has many entries, so only a lone entry gets the page's h1
 const Heading = preview ? "h2" : "h1";
 ---
 
 <article class="max-w-[620px]">
+  {
+    backHome && (
+      <a
+        href="/"
+        class="mb-4 block w-fit font-mono text-meta text-muted hover:text-ink hover:underline hover:underline-offset-[3px] lg:hidden"
+        data-back-home
+      >
+        ← home
+      </a>
+    )
+  }
   <Heading class="font-serif text-[1.875rem]/[2.25rem] font-bold tracking-[-0.01em] text-ink sm:text-title">
     {
       preview ? (

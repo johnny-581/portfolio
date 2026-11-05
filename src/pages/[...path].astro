@@ -24,7 +24,7 @@ const { entry, older, newer } = Astro.props;
     (older || newer) && (
       <nav
         aria-label="more entries"
-        class="mt-16 flex max-w-[620px] flex-col gap-2 border-t border-line pt-5 font-mono text-meta text-muted sm:flex-row sm:justify-between sm:gap-6"
+        class="mt-16 hidden max-w-[620px] flex-col gap-2 border-t border-line pt-5 font-mono text-meta text-muted sm:flex-row sm:justify-between sm:gap-6 lg:flex"
       >
         {older && (
           <a href={`/${older.id}`} class="hover:text-ink">

@@ -21,7 +21,8 @@ const { current } = Astro.props;
   transition:persist="aside"
   data-aside
 >
-  <div class="column order-1 pt-6 lg:order-none lg:max-w-none lg:px-0 lg:pt-0">
+  <!-- Hidden below lg on project and journal pages, which have a "← home" link instead (global.css) -->
+  <div class="column order-1 pt-6 lg:order-none lg:max-w-none lg:px-0 lg:pt-0" data-aside-header>
     <Header current={current} />
   </div>
   <!-- Hidden below lg on the home page, which shows its own copy above the feed (global.css) -->

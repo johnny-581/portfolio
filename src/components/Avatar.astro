@@ -95,7 +95,9 @@ const frames = [
       "scroll",
       () => {
         window.clearTimeout(settle);
-        const { top, bottom } = avatar.getBoundingClientRect();
+        const { top, bottom, width } = avatar.getBoundingClientRect();
+        // Zero-size when the header is hidden (project and journal pages in one column)
+        if (!width) return;
         if (bottom <= 0) armed = true;
         else if (armed && top >= 0) {
           settle = later(SETTLE_MS, () => {
@@ -119,7 +121,7 @@ const frames = [
       const touch = e.touches[0];
       if (!touch) return;
       const r = avatar.getBoundingClientRect();
-      const over = touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom;
+      const over = r.width > 0 && touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom;
       if (over && !fingerOver) blink();
       fingerOver = over;
     };

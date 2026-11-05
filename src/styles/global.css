@@ -119,9 +119,10 @@
 
   /* Two panes: trim the page's first line down to its capitals, so its top sits exactly on
      main's top padding, level with the top of the avatar's head (see Aside). Browsers without
-     text-box sit a few pixels lower. */
+     text-box sit a few pixels lower. The "← home" link is hidden here, so the title under it
+     is the first line. */
   @media (min-width: 1024px) {
-    main > :nth-child(1 of :not(.sr-only)) > :first-child {
+    main > :nth-child(1 of :not(.sr-only)) > :is(:first-child:not([data-back-home]), [data-back-home] + *) {
       text-box: trim-start cap alphabetic;
     }
   }
@@ -130,6 +131,10 @@
      would repeat it. Checked from main because the aside persists across pages. */
   @media (max-width: 1023.98px) {
     :root:has([data-home-index]) [data-aside-index] {
+      display: none;
+    }
+    /* Likewise project and journal pages drop the header, leaving the "← home" link above the title */
+    :root:has([data-back-home]) [data-aside-header] {
       display: none;
     }
   }
