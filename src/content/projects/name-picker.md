@@ -13,19 +13,6 @@ links:
 
 I manage the dev team at UX Hub and hosts weekly standups. Sometime no one wants to go first, and picking a speaking order becomes a problem.
 
-I built this fun little project in a few hours using claude code and Procreate. It exists to make the process more fun
+I built this fun little project in a few hours using claude code and Procreate. I hoped it could make the weekly meetings more engaging and delightful. It uses Electron (runs on desktop) and React (UI).
 
-
-
-So I made one that writes the name instead. The pen wanders across the page for a moment, then commits to a first letter, and the name appears stroke by stroke in handwriting. It takes about two seconds. ==Slow enough to feel considered, fast enough that nobody waits.==
-
-## how it works
-
-- names are drawn with a single-line font, so each letter is a path the pen can trace rather than a filled shape
-- the pen's wobble comes from a little noise on the path, plus a slight slant that changes per name
-- the "thinking" scribble before each name is just the pen tracing a few random letters very lightly, then erasing them
-- picked names fade to grey and go to the bottom, so nobody gets picked twice in a row
-
-It's one HTML file with no build step, because the classroom computer would not let me install anything.
-
-Students started asking to be picked so they could see their name drawn. That was not the outcome I expected from a presentation tool.
+The animation flashes a sequence of shapes in UX Hub's theme colours, the last of which is a hand-drawn version of the UX Hub logo (orange one). ==Slow enough to feel considered, fast enough that nobody waits.==

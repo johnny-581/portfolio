@@ -1,9 +1,9 @@
 ---
 title: ux hub component library
 tag: shipped
-when: 2025-26
+when: "2026"
 published: 2026-04-11
-summary: Tokens, components and a Figma library shared by UX Hub's site, portal and event graphics.
+summary: I implemented a component library
 links:
   - "[ubcuxhub.ca/dev/components](https://ubcuxhub.ca/dev/components)"
 ---

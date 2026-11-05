@@ -14,7 +14,7 @@ An agent and its MCP servers, built from scratch with ADK and Next.js. You ask a
 
 Replies stream in over SSE, so you watch the agent work. It supports multiple sessions running simultaneously.
 
-![e-commerce data agent: the multi-session sidebar](../images/e-commerce-data-agent-2.png)
+![](../images/Pasted%20image%2020261105150105.png)
 
 ==The hard part wasn't the agent, it was aggregating and filtering the right data for the agent.==
 
@@ -26,7 +26,7 @@ We built custom MCP Servers so users can connect (OAuth) their data sources. Wri
 
 The Google Drive MCP indexes and searches PDFs. So any query returns with the exact quote with page reference.
 
-![e-commerce data agent: uploading a file](../images/e-commerce-data-agent-3.png)
+![](../images/Pasted%20image%2020261105150125.png)
 
 dark mode
 
