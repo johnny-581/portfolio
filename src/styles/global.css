@@ -176,7 +176,8 @@
     /* Code blocks: monochrome (no syntax highlighting, see astro.config.mjs), framed like an
        image, and scrolling sideways rather than wrapping */
     pre {
-      margin: 0 0 1.1em;
+      /* Same space around it as a figure (1.6em of body text) */
+      margin: 1.6rem 0;
       padding: 14px 16px;
       overflow-x: auto;
       background: color-mix(in srgb, var(--chip) 60%, transparent);
