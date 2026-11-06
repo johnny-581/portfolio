@@ -63,7 +63,7 @@ const Heading = preview ? "h2" : "h1";
       </p>
     )
   }
-  <div class:list={["prose", preview ? "mt-4" : "mt-7"]}>
+  <div class:list={["prose", preview ? "mt-4" : links.length ? "mt-2.5" : "mt-7"]}>
     {
       preview ? (
         <>
