@@ -11,12 +11,10 @@ interface Props {
 }
 
 const { entry, preview = false } = Astro.props;
-const { tag, when, links, summary } = entry.data;
+const { links, summary } = entry.data;
 const title = titleOf(entry);
 const { Content } = await render(entry);
 const media = preview ? firstMedia(entry) : undefined;
-// A project without a tag still says what it is
-const kind = tag ?? (sectionOf(entry) === "projects" ? "project" : undefined);
 
 // Below lg, projects and journal entries trade the site header for a link home (global.css)
 const backHome = !preview && ["projects", "journal"].includes(sectionOf(entry));
@@ -49,17 +47,15 @@ const Heading = preview ? "h2" : "h1";
     }
   </Heading>
   {
-    // The feed leaves the meta line to the entry's page; the index already shows tag and years
-    !preview && (
-      <p class="mt-1.5 flex flex-wrap gap-x-[1em] font-mono text-meta text-muted">
-        {kind && <span>{kind}</span>}
-        <span>{when}</span>
+    // Only the entry's own page lists its links; the index already shows tag and years
+    !preview && links.length > 0 && (
+      <p class="mt-2 flex flex-wrap gap-x-[1em] text-ui">
         {links.map((link) => (
           <a
             href={link.href}
             target={link.href.startsWith("http") ? "_blank" : undefined}
             rel={link.href.startsWith("http") ? "noopener" : undefined}
-            class="text-ink-soft hover:underline hover:underline-offset-[3px]"
+            class="text-ink-soft underline decoration-faint decoration-1 underline-offset-[3px] hover:text-ink hover:decoration-ink"
           >
             {link.label} ↗
           </a>
