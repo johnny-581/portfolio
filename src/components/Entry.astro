@@ -48,11 +48,13 @@ const Heading = preview ? "h2" : "h1";
       )
     }
   </Heading>
-  <p class="mt-1.5 flex flex-wrap gap-x-[1em] font-mono text-meta text-muted">
-    {kind && <span>{kind}</span>}<span>{when}</span>
-    {
-      links.map((link) => (
-        <>
+  {
+    // The feed leaves the meta line to the entry's page; the index already shows tag and years
+    !preview && (
+      <p class="mt-1.5 flex flex-wrap gap-x-[1em] font-mono text-meta text-muted">
+        {kind && <span>{kind}</span>}
+        <span>{when}</span>
+        {links.map((link) => (
           <a
             href={link.href}
             target={link.href.startsWith("http") ? "_blank" : undefined}
@@ -61,11 +63,11 @@ const Heading = preview ? "h2" : "h1";
           >
             {link.label} ↗
           </a>
-        </>
-      ))
-    }
-  </p>
-  <div class="prose mt-7">
+        ))}
+      </p>
+    )
+  }
+  <div class:list={["prose", preview ? "mt-4" : "mt-7"]}>
     {
       preview ? (
         <>
