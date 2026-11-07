@@ -23,7 +23,7 @@ const backHome = !preview && ["projects", "journal"].includes(sectionOf(entry));
 const Heading = preview ? "h2" : "h1";
 ---
 
-<article class="max-w-[620px]">
+<article class="max-w-[700px]">
   {
     backHome && (
       <a
@@ -73,7 +73,7 @@ const Heading = preview ? "h2" : "h1";
               {media.kind === "video" ? (
                 <Fragment set:html={videoHtml(media.src, media.alt)} />
               ) : (
-                <Image src={media.src} alt={media.alt} widths={[620, 1240]} sizes="(min-width: 1024px) 620px, 100vw" />
+                <Image src={media.src} alt={media.alt} widths={[700, 1400]} sizes="(min-width: 1024px) 700px, 100vw" />
               )}
             </a>
           )}
