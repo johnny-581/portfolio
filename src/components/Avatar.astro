@@ -12,7 +12,7 @@ const frames = [
 ];
 ---
 
-<!-- Blinks every few seconds on its own, and when the cursor enters it or the header around it, or clicks it; when a finger taps
+<!-- Blinks every few seconds on its own (sometimes twice), and when the cursor enters it or the header around it, or clicks it; when a finger taps
      or swipes across it; or when it scrolls back into view -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
@@ -79,11 +79,23 @@ const frames = [
       idle();
     };
 
-    // On its own, every 2–7 s like a person at rest; any blink restarts the wait
+    // On its own, like a person at rest: gaps cluster around 3.5 s with the odd quick one and
+    // the odd long stare (log-normal, as measured blink intervals are), and about one blink in
+    // seven comes as a double. Any blink restarts the wait
+    const DOUBLE_ODDS = 0.15;
+    const nextGap = () => {
+      const z = Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+      return Math.min(Math.max(3500 * Math.exp(0.5 * z), 1200), 10000);
+    };
     let idleTimer = 0;
     const idle = () => {
       window.clearTimeout(idleTimer);
-      idleTimer = later(2000 + Math.random() * 5000, () => (document.hidden ? idle() : blink()));
+      idleTimer = later(nextGap(), () => {
+        if (document.hidden) return idle();
+        blink();
+        // The second follows after a brief glimpse of open eyes, skipping the rest
+        if (Math.random() < DOUBLE_ODDS) later(CLOSED_MS + HALF_MS + 80 + Math.random() * 80, () => blink(false));
+      });
     };
     idle();
 
