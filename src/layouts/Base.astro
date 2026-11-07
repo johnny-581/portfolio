@@ -13,6 +13,7 @@ interface Props {
 
 const { title, description = site.tagline, current } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/"), Astro.site);
 ---
 
 <!-- Pages swap instantly, without the router's default cross-fade -->
@@ -23,8 +24,11 @@ const fullTitle = title ? `${title} — ${site.name}` : site.name;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
     <ClientRouter />
     <!-- Before first paint, so dark picked with the header toggle doesn't flash light first -->
     <script is:inline>
