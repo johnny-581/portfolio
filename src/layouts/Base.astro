@@ -42,6 +42,16 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
       // Page swaps replace <html>'s attributes with the new page's
       document.addEventListener("astro:after-swap", applyTheme);
     </script>
+    {/* Cloudflare Web Analytics: cookieless page views, production builds only. The beacon follows
+        the router's pushState navigations itself, and the head keeps it across page swaps. */}
+    {import.meta.env.PROD && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "2c1cb33b98eb46a7acb973f8525ddcac"}'
+      ></script>
+    )}
   </head>
   <body>
     <!-- Two panes from lg up (index left, page scrolls on the right); one column below,
