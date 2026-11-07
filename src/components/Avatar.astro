@@ -12,7 +12,7 @@ const frames = [
 ];
 ---
 
-<!-- Blinks when the cursor enters it or the header around it, or clicks it; when a finger taps
+<!-- Blinks every few seconds on its own, and when the cursor enters it or the header around it, or clicks it; when a finger taps
      or swipes across it; or when it scrolls back into view -->
 <div class="avatar relative h-[123px] w-[116px]" data-avatar data-frame="open">
   {
@@ -76,7 +76,16 @@ const frames = [
       avatar.dataset.frame = "closed";
       later(CLOSED_MS, () => (avatar.dataset.frame = "half"));
       later(CLOSED_MS + HALF_MS, () => (avatar.dataset.frame = "open"));
+      idle();
     };
+
+    // On its own, every 2–7 s like a person at rest; any blink restarts the wait
+    let idleTimer = 0;
+    const idle = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = later(2000 + Math.random() * 5000, () => (document.hidden ? idle() : blink()));
+    };
+    idle();
 
     // Mouse and pen, on the way in and on each click; touch is handled below. Entering the
     // header counts too, as if the face noticed you reaching for its links
