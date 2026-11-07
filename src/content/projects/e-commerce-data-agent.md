@@ -8,6 +8,8 @@ summary: "An agent harness and custom e-commerce MCP servers built from scratch 
 
 This is a project I lead during my internship at Customer Maps. An enterprise search prototype for small e-commerce businesses.
 
+testtest
+
 An agent and its MCP servers, built from scratch with ADK and Next.js. You ask a question about a store's data in plain language and gets back a tailored product catalog with real prices.
 
 ![e-commerce data agent: the chat view](../images/e-commerce-data-agent-1.png)
