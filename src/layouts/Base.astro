@@ -43,14 +43,28 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
       document.addEventListener("astro:after-swap", applyTheme);
     </script>
     {/* Cloudflare Web Analytics: cookieless page views, production builds only. The beacon follows
-        the router's pushState navigations itself, and the head keeps it across page swaps. */}
+        the router's pushState navigations itself, so it's added once per full page load.
+        Visiting any page with ?track=off stops counting this browser; ?track=on resumes it. */}
     {import.meta.env.PROD && (
-      <script
-        is:inline
-        defer
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon='{"token": "2c1cb33b98eb46a7acb973f8525ddcac"}'
-      ></script>
+      <script is:inline>
+        (() => {
+          if (window.__beacon) return;
+          window.__beacon = true;
+          let off = false;
+          try {
+            const track = new URLSearchParams(location.search).get("track");
+            if (track === "off") localStorage.setItem("analytics-off", "1");
+            if (track === "on") localStorage.removeItem("analytics-off");
+            off = localStorage.getItem("analytics-off") === "1";
+          } catch {}
+          if (off) return;
+          const beacon = document.createElement("script");
+          beacon.defer = true;
+          beacon.src = "https://static.cloudflareinsights.com/beacon.min.js";
+          beacon.dataset.cfBeacon = '{"token": "2c1cb33b98eb46a7acb973f8525ddcac"}';
+          document.head.append(beacon);
+        })();
+      </script>
     )}
   </head>
   <body>
