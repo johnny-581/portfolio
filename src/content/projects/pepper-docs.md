@@ -18,8 +18,8 @@ Pepper Docs is a TipTap based semi structured Rich-Text editor for PDF documents
 
 more info to come!
 
-![pepper docs: the editor with a live PDF preview beside it](../images/pepper-docs-2.png)
-<small>side by side: what you type, and what the recruiter gets.</small>
+![pepper docs: hovering the LinkedIn link on a resume to copy or unlink it, then editing its text and URL](../images/pepper-docs-edit-link.mp4)
+<small>hover a link to copy or remove it, or edit its text and url in place.</small>
 
 ![A diagram of how pepper docs fits together: AI writes the content as JSON into the editor, the editor structure as JSON, and the style as Typst for the PDF. The editor renders to the PDF instantly, and the PDF feeds measured text styles, colour and spacing back to the editor](../images/pepper-docs-architecture-diagram.png)
 <small>content, editor structure and style are three separate files, and the PDF tells the editor how to look.</small>
