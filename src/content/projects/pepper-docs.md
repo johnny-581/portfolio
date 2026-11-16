@@ -13,7 +13,7 @@ links:
 
 Pepper Docs is a TipTap based semi structured Rich-Text editor for PDF documents.
 
-![pepper docs: dragging a resume entry to a new section](../images/pepper-docs-1.png)
+![pepper docs: dragging the education section below experience while the PDF preview updates](../images/pepper-docs-drag-section.mp4)
 <small>drag a whole entry, or a whole section, and the PDF reflows.</small>
 
 more info to come!
