@@ -8,8 +8,8 @@ links:
   - "[pepperdocs.app](https://pepperdocs.app)"
 ---
 
-![pepper docs: switching between the resume, job posting and cover letter in one application](../images/pepper-docs-stage-manager.mp4)
-<small>one folder per application: the resume, the posting and the letter, a click apart.</small>
+![pepper docs: asking the chat to open three documents, then switching between them on the desk](../images/pepper-docs-desk.mp4)
+<small>ask for documents and they land on your desk, a click apart.</small>
 
 Pepper Docs is a TipTap based semi structured Rich-Text editor for PDF documents.
 
