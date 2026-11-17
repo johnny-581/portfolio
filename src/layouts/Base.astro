@@ -76,11 +76,11 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
       <Aside />
       {
         full ? (
-          <main class="mx-auto w-full max-w-[calc(700px+2*var(--gutter))] px-(--gutter) pt-10 pb-16 lg:pt-16 lg:pb-40" data-full>
+          <main class="mx-auto w-full max-w-[calc(var(--content)+2*var(--gutter))] px-(--gutter) pt-10 pb-16 lg:pt-16 lg:pb-40" data-full>
             <slot />
           </main>
         ) : (
-          <main class="column order-2 min-w-0 pt-10 pb-16 lg:order-none lg:max-w-none lg:px-14 lg:pb-40">
+          <main class="column order-2 min-w-0 pt-10 pb-16 lg:order-none lg:max-w-none lg:px-10 lg:pb-40">
             <slot />
           </main>
         )
