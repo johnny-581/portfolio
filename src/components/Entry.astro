@@ -28,9 +28,33 @@ const Heading = preview ? "h2" : "h1";
 <article class="max-w-[700px]">
   {
     !preview && (
-      <a href={back} class="mb-8 block w-fit text-ui text-ink underline decoration-1 underline-offset-[3px]">
-        back
-      </a>
+      <>
+        <a href={back} class="mb-8 block w-fit text-ui text-ink underline decoration-1 underline-offset-[3px]" data-back>
+          back
+        </a>
+        {/* The side margins work as back too, with the cursor turned into the word. Wide
+            screens with a mouse only; the link above is the one for keyboards and readers */}
+        {["left-0", "right-0"].map((side) => (
+          <a
+            href={back}
+            class:list={[
+              "fixed inset-y-0 z-10 hidden w-[max(0px,calc(50vw-350px-3rem))] cursor-none lg:pointer-fine:block",
+              side,
+            ]}
+            tabindex="-1"
+            aria-hidden="true"
+            data-back
+            data-back-margin
+          />
+        ))}
+        <span
+          class="pointer-events-none fixed top-0 left-0 z-20 hidden text-ui text-ink underline decoration-1 underline-offset-[3px]"
+          aria-hidden="true"
+          data-back-cursor
+        >
+          back
+        </span>
+      </>
     )
   }
   <Heading class="font-serif text-[1.875rem]/[2.25rem] font-bold tracking-[-0.01em] text-ink sm:text-title">
@@ -82,3 +106,36 @@ const Heading = preview ? "h2" : "h1";
     }
   </div>
 </article>
+
+<script>
+  // Back from an entry opened from the feed goes back in history, so home comes back at the
+  // exact scroll position it was left at (the router restores it). Opened any other way (a shared
+  // link, a link from another page), back is a plain link to the project's place in the feed.
+  let fromHome = false;
+  document.addEventListener("astro:before-preparation", (e) => {
+    fromHome = e.from.pathname === "/" && e.navigationType === "push";
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLAnchorElement>("a[data-back]").forEach((link) => {
+      // On the link itself, so it runs before the router's handler on document, which then
+      // leaves the click alone
+      link.addEventListener("click", (e) => {
+        if (!fromHome || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        history.back();
+      });
+    });
+
+    // The word follows the pointer over the margins, centred on it
+    const cursor = document.querySelector<HTMLElement>("[data-back-cursor]");
+    if (!cursor) return;
+    document.querySelectorAll<HTMLElement>("[data-back-margin]").forEach((margin) => {
+      margin.addEventListener("pointermove", (e) => {
+        cursor.style.display = "block";
+        cursor.style.transform = `translate(${e.clientX - cursor.offsetWidth / 2}px, ${e.clientY - cursor.offsetHeight / 2}px)`;
+      });
+      margin.addEventListener("pointerleave", () => (cursor.style.display = ""));
+    });
+  });
+</script>
