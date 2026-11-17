@@ -6,12 +6,30 @@
 // elements behave the same for keyboards and screen readers.
 ---
 
-<!-- On a patch of the page background with feathered edges, so the word reads on top of images
-     in either theme and the patch fades into them; over the page itself it doesn't show -->
+<!-- On a soft glow of the page background (see the style below), so the word reads on top of
+     images in either theme; over the page itself the glow doesn't show -->
 <span
-  class="pointer-events-none fixed top-0 left-0 z-20 hidden bg-bg px-1.5 shadow-[0_0_12px_10px_var(--bg)] text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
+  class="word-cursor-glow pointer-events-none fixed top-0 left-0 z-20 isolate hidden px-1.5 text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
   aria-hidden="true"
   data-cursor-word></span>
+
+<style>
+  /* An oval of the page background, solid behind the word and fading out evenly to nothing, so
+     there's no edge or inner outline where it meets the image */
+  .word-cursor-glow::before {
+    content: "";
+    position: absolute;
+    inset: -14px -22px;
+    z-index: -1;
+    background: radial-gradient(
+      closest-side,
+      var(--bg) 55%,
+      color-mix(in srgb, var(--bg) 70%, transparent) 72%,
+      color-mix(in srgb, var(--bg) 30%, transparent) 86%,
+      transparent
+    );
+  }
+</style>
 
 <script>
   // Same query as the word-cursor variant in global.css
