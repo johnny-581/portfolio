@@ -6,10 +6,10 @@
 // elements behave the same for keyboards and screen readers.
 ---
 
-<!-- On a pill of the page background, so the word reads on top of images in either theme; over
-     the page itself the pill doesn't show -->
+<!-- On a patch of the page background with feathered edges, so the word reads on top of images
+     in either theme and the patch fades into them; over the page itself it doesn't show -->
 <span
-  class="pointer-events-none fixed top-0 left-0 z-20 hidden rounded bg-bg px-1.5 text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
+  class="pointer-events-none fixed top-0 left-0 z-20 hidden bg-bg px-1.5 shadow-[0_0_12px_10px_var(--bg)] text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
   aria-hidden="true"
   data-cursor-word></span>
 
