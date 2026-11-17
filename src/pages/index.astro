@@ -22,6 +22,19 @@ const entries = await getEntries("projects");
       ))
     }
   </div>
+  {/* The space right of the feed goes back to the top, with the cursor turned into the word
+      (WordCursor), like an entry's margins go back. From a gap past the feed to the window's edge,
+      and at least main's own side padding on narrower screens. Hidden until the page has been
+      scrolled a screen down, since at the top there's nowhere to go. Wide screens with a mouse
+      only; without scripts it's a plain link to the top. */}
+  <a
+    href="#"
+    class="fixed inset-y-0 right-0 z-10 hidden w-[max(2.5rem,calc(100vw-var(--aside)-2.5rem-var(--content)-3rem))] word-cursor:block"
+    tabindex="-1"
+    aria-hidden="true"
+    data-cursor="top"
+    data-to-top
+  ></a>
 </Base>
 
 <script>
@@ -138,4 +151,28 @@ const entries = await getEntries("projects");
   });
 
   document.addEventListener("astro:before-swap", () => stop?.abort());
+</script>
+
+<script>
+  // The "top" zone right of the feed (above): shown once the page is a screen down, and a click
+  // scrolls back up, smoothly unless motion is reduced
+  let stopTop: AbortController | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    stopTop?.abort();
+    const zone = document.querySelector<HTMLAnchorElement>("[data-to-top]");
+    if (!zone) return;
+    stopTop = new AbortController();
+    // Inline, since the hidden attribute loses to the zone's display class
+    const show = () => (zone.style.display = scrollY < innerHeight ? "none" : "");
+    addEventListener("scroll", show, { passive: true, signal: stopTop.signal });
+    show();
+    zone.addEventListener("click", (e) => {
+      e.preventDefault();
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      scrollTo({ top: 0, behavior: still ? "instant" : "smooth" });
+    });
+  });
+
+  document.addEventListener("astro:before-swap", () => stopTop?.abort());
 </script>
