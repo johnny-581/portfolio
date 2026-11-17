@@ -6,45 +6,35 @@
 // elements behave the same for keyboards and screen readers.
 ---
 
-<!-- On a soft scrim (see the style below), so the word reads on top of images in either theme;
-     over the page itself the scrim doesn't show -->
+<!-- With a soft halo of the page colour around its letters (see the style below), so the word
+     reads on top of images in either theme; over the page itself the halo doesn't show -->
 <span
-  class="word-cursor-glow pointer-events-none fixed top-0 left-0 z-20 isolate hidden text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
+  class="word-cursor-halo pointer-events-none fixed top-0 left-0 z-20 hidden text-ui text-ink underline decoration-1 underline-offset-[3px] transition-[color,text-shadow] duration-150 data-faded:text-faint motion-reduce:transition-none"
   aria-hidden="true"
   data-cursor-word></span>
 
 <style>
-  /* A soft scrim behind the word, the same as pepper docs' thumbnail nameplates: 75% page colour
-     over a slight blur of whatever is behind, extending past the word so it has room to fade.
-     Two crossed linear gradients feather it, full coverage through the middle of each axis and
-     fading over the last 10% across and 20% down; an ellipse would pull coverage away from the
-     word's ends. The mask feathers the blur too, since an unmasked blur keeps a hard edge. Over
-     the page it matches the background, so it doesn't show. While the word is faded (scrolling),
-     the scrim fades with it. */
-  .word-cursor-glow::before {
-    --feather:
-      linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
-    content: "";
-    position: absolute;
-    inset: -12px -20px;
-    z-index: -1;
-    background: color-mix(in srgb, var(--bg) 75%, transparent);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    -webkit-mask-image: var(--feather);
-    -webkit-mask-composite: source-in;
-    mask-image: var(--feather);
-    mask-composite: intersect;
-    transition: opacity 150ms;
+  /* A glow that hugs the letters rather than a patch behind them, like a label on a map: no box
+     or edge to see over a busy image. Stacked shadows of growing blur keep it solid right at the
+     letters and fading out smoothly to about 50px; the wide ones are doubled, since a large blur thins out fast. While the word is faded (scrolling), the halo
+     thins with it. */
+  .word-cursor-halo {
+    --halo: var(--bg);
+    text-shadow:
+      0 0 1px var(--halo),
+      0 0 3px var(--halo),
+      0 0 6px var(--halo),
+      0 0 10px var(--halo),
+      0 0 16px var(--halo),
+      0 0 22px var(--halo),
+      0 0 30px var(--halo),
+      0 0 30px var(--halo),
+      0 0 40px var(--halo),
+      0 0 40px var(--halo),
+      0 0 52px var(--halo);
   }
-  .word-cursor-glow[data-faded]::before {
-    opacity: 0.4;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .word-cursor-glow::before {
-      transition: none;
-    }
+  .word-cursor-halo[data-faded] {
+    --halo: color-mix(in srgb, var(--bg) 40%, transparent);
   }
 </style>
 
