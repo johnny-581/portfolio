@@ -16,7 +16,7 @@ const entries = await getEntries("projects");
   <div class="mt-12">
     {
       entries.map((entry) => (
-        <div id={anchorOf(entry)} class="border-t border-line pt-12 pb-12 last:pb-0" data-feed={entry.id}>
+        <div id={anchorOf(entry)} class="pt-16 pb-16 last:pb-0" data-feed={entry.id}>
           <Entry entry={entry} preview />
         </div>
       ))
