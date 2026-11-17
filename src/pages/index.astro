@@ -26,7 +26,8 @@ const entries = await getEntries("projects");
 
 <script>
   // The index reads as the feed's table of contents: hovering a project lights up its row, and
-  // the row of the project being read is marked as you scroll
+  // the row of the project being read is marked as you scroll. On a keyboard, j and k move a
+  // project at a time and enter opens the marked one.
   let stop: AbortController | undefined;
 
   document.addEventListener("astro:page-load", () => {
@@ -48,13 +49,21 @@ const entries = await getEntries("projects");
       block.addEventListener("mouseleave", () => row(block)?.removeAttribute("data-linked"), { signal });
     });
 
-    // The project being read is the last one whose top has passed a third of the way down the
-    // window, or the last one once the page is scrolled to the end (it may be too short to get
-    // there). None while the intro is still on top.
+    // The project being read is the one sitting at the top of the window, where j and k (and the
+    // index's links) put it. Otherwise it's the last one whose top has passed a third of the way
+    // down, or the last one once the page is scrolled to the end (it may be too short to get
+    // there). None while the intro is still on top. The top comes first because a short project
+    // put there leaves the next one's top inside that third already.
+    const tops = () => blocks.map((b) => b.getBoundingClientRect().top);
+    const reading = () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) return blocks.at(-1);
+      const at = tops();
+      const i = at.findIndex((top) => Math.abs(top) < 1);
+      return blocks[i >= 0 ? i : at.findLastIndex((top) => top <= innerHeight / 3)];
+    };
     let current: Element | null | undefined;
     const mark = () => {
-      const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
-      const block = atEnd ? blocks.at(-1) : blocks.findLast((b) => b.getBoundingClientRect().top <= innerHeight / 3);
+      const block = reading();
       const next = block && row(block);
       if (next === current) return;
       current?.removeAttribute("aria-current");
@@ -73,6 +82,59 @@ const entries = await getEntries("projects");
     addEventListener("scroll", onScroll, { passive: true, signal });
     addEventListener("resize", onScroll, { passive: true, signal });
     mark();
+
+    // j brings the next project's top to the top of the window, which marks it; k goes to the
+    // one above, or back to the current one's own top when it's been read partway down. Both go
+    // by where the projects are rather than by which row is marked, so none is skipped, and k
+    // still works at the end of the page, where the last projects can't reach the top. Above the
+    // first project is the intro, at the top of the page (-1).
+    // While a smooth scroll is on its way, the next j or k counts from where it's headed rather
+    // than from wherever it has got to, so pressing twice moves two projects. That's forgotten
+    // once the scroll ends, or after a second for browsers without scrollend.
+    let headed: number | undefined;
+    let forget: number | undefined;
+    const settle = () => {
+      headed = undefined;
+      clearTimeout(forget);
+    };
+    addEventListener("scrollend", settle, { signal });
+    // Scrolling to the block's position rather than following its hash, so the URL stays as it is
+    const go = (to: number) => {
+      if (to < -1 || to >= blocks.length) return;
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const top = to < 0 ? 0 : blocks[to].getBoundingClientRect().top + scrollY;
+      scrollTo({ top, behavior: still ? "instant" : "smooth" });
+      clearTimeout(forget);
+      headed = still ? undefined : to;
+      if (headed !== undefined) forget = window.setTimeout(settle, 1000);
+    };
+
+    addEventListener(
+      "keydown",
+      (e) => {
+        if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+        const focus = document.activeElement as HTMLElement | null;
+        if (focus?.closest("input, textarea, select") || focus?.isContentEditable) return;
+
+        if (e.key === "j") {
+          // None below once the last project's top has passed the top of the window
+          const below = tops().findIndex((top) => top >= 1);
+          if (headed !== undefined) go(headed + 1);
+          else if (below >= 0) go(below);
+        } else if (e.key === "k") {
+          go(headed !== undefined ? headed - 1 : tops().findLastIndex((top) => top < -8));
+        } else if (e.key === "Enter") {
+          // Only from the page itself: a focused link or button already does its own thing.
+          // Clicking the title lets the router open the page as it would for the mouse.
+          if (e.repeat || (focus && focus !== document.body && focus.tagName !== "MAIN")) return;
+          const link = reading()?.querySelector<HTMLAnchorElement>("article h2 a");
+          if (!link) return;
+          link.click();
+        } else return;
+        e.preventDefault();
+      },
+      { signal },
+    );
   });
 
   document.addEventListener("astro:before-swap", () => stop?.abort());

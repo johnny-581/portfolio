@@ -21,3 +21,31 @@ const { entry } = Astro.props;
 <Base title={titleOf(entry)} description={entry.data.summary} full>
   <Entry entry={entry} />
 </Base>
+
+<script>
+  // Esc goes back, by clicking the back link so it does exactly what the link does (back in
+  // history when the entry was opened from the feed, so the feed keeps its place). The listener
+  // is on the document, which outlives the page, so it's dropped before the next page swaps in.
+  let stop: AbortController | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    stop?.abort();
+    const back = document.querySelector<HTMLAnchorElement>("a[data-back]");
+    if (!back) return;
+    stop = new AbortController();
+    document.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key !== "Escape" || e.repeat || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+        // Esc in a field belongs to the field
+        const focus = document.activeElement as HTMLElement | null;
+        if (focus?.closest("input, textarea, select") || focus?.isContentEditable) return;
+        e.preventDefault();
+        back.click();
+      },
+      { signal: stop.signal },
+    );
+  });
+
+  document.addEventListener("astro:before-swap", () => stop?.abort());
+</script>
