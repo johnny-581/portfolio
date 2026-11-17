@@ -53,7 +53,7 @@
   /* Side padding of the one-column layout */
   --gutter: 1rem;
   /* Width of the feed and of an entry's page: text, images and clips */
-  --content: 860px;
+  --content: 780px;
 
   /* Width of the index pane from lg up, fitted to the longest index row ("ux hub component
      library / shipped" and its date). The links row wraps after linkedin to fit (Header) */

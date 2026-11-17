@@ -95,7 +95,7 @@ const Heading = preview ? "h2" : "h1";
               {media.kind === "video" ? (
                 <Fragment set:html={videoHtml(media.src, media.alt)} />
               ) : (
-                <Image src={media.src} alt={media.alt} widths={[860, 1720]} sizes="(min-width: 1024px) 860px, 100vw" />
+                <Image src={media.src} alt={media.alt} widths={[780, 1560]} sizes="(min-width: 1024px) 780px, 100vw" />
               )}
             </a>
           )}
