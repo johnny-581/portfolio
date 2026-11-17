@@ -3,7 +3,7 @@ title: pepper docs
 tag: shipped
 when: 2026-
 published: 2026-11-01
-summary: A Notion-like rich text editor for PDF documents.
+summary: A Notion-like rich text editor for any PDF document.
 links:
   - "[pepperdocs.app](https://pepperdocs.app)"
 ---
@@ -11,6 +11,7 @@ links:
 ![pepper docs: asking the chat to open three documents, then switching between them on the desk](../images/pepper-docs-desk.mp4)
 <small>ask for documents and they land on your desk, a click apart.</small>
 
+Pepper Docs is a passion project I've worked on since January 2026
 Pepper Docs is a TipTap based semi structured Rich-Text editor for PDF documents.
 
 ![pepper docs: dragging the education section below experience while the PDF preview updates](../images/pepper-docs-drag-section.mp4)
