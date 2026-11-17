@@ -105,6 +105,16 @@ const Heading = preview ? "h2" : "h1";
       )
     }
   </div>
+  {
+    // An end mark under an entry's own page, so the last line reads as the end
+    !preview && (
+      <p class="mt-14 flex justify-center gap-[0.75em] text-[1.25rem] text-muted select-none" aria-hidden="true">
+        <span>*</span>
+        <span>*</span>
+        <span>*</span>
+      </p>
+    )
+  }
 </article>
 
 <script>
