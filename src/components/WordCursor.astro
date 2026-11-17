@@ -34,6 +34,11 @@
       0 0 40px var(--halo),
       0 0 52px var(--halo);
   }
+  /* Over an image or clip: light-mode colours in either theme, since the page's tokens are
+     light-dark() pairs that follow the element's colour scheme */
+  .word-cursor-halo[data-on-media] {
+    color-scheme: light;
+  }
   .word-cursor-halo[data-faded] {
     --halo: transparent;
   }
@@ -57,6 +62,9 @@
       return;
     }
     word.textContent = text;
+    // Screenshots and clips stay light in dark mode, so over them the word keeps its light-mode
+    // colours: dark text on a light halo (see the style above)
+    word.toggleAttribute("data-on-media", !!under?.closest("img, video"));
     word.style.display = "block";
     word.style.transform = `translate(${x - word.offsetWidth / 2}px, ${y - word.offsetHeight / 2}px)`;
   }
