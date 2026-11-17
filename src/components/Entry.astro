@@ -48,7 +48,7 @@ const Heading = preview ? "h2" : "h1";
           />
         ))}
         <span
-          class="pointer-events-none fixed top-0 left-0 z-20 hidden text-ui text-ink underline decoration-1 underline-offset-[3px]"
+          class="pointer-events-none fixed top-0 left-0 z-20 hidden text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
           aria-hidden="true"
           data-back-cursor
         >
@@ -122,6 +122,8 @@ const Heading = preview ? "h2" : "h1";
   // exact scroll position it was left at (the router restores it). Opened any other way (a shared
   // link, a link from another page), back is a plain link to the project's place in the feed.
   let fromHome = false;
+  // The margin cursor's scroll listener is on the window, which outlives the page
+  let stopFading: AbortController | undefined;
   document.addEventListener("astro:before-preparation", (e) => {
     fromHome = e.from.pathname === "/" && e.navigationType === "push";
   });
@@ -137,15 +139,27 @@ const Heading = preview ? "h2" : "h1";
       });
     });
 
-    // The word follows the pointer over the margins, centred on it
+    // The word follows the pointer over the margins, centred on it. Scrolling fades it, since a
+    // pointer parked in the margin while you read isn't reaching for back; moving the mouse
+    // brings it back. (Some browsers send a move after a scroll without the pointer moving, so
+    // only a new position counts.)
     const cursor = document.querySelector<HTMLElement>("[data-back-cursor]");
     if (!cursor) return;
+    let x = -1;
+    let y = -1;
     document.querySelectorAll<HTMLElement>("[data-back-margin]").forEach((margin) => {
       margin.addEventListener("pointermove", (e) => {
+        if (e.clientX !== x || e.clientY !== y) delete cursor.dataset.faded;
+        x = e.clientX;
+        y = e.clientY;
         cursor.style.display = "block";
-        cursor.style.transform = `translate(${e.clientX - cursor.offsetWidth / 2}px, ${e.clientY - cursor.offsetHeight / 2}px)`;
+        cursor.style.transform = `translate(${x - cursor.offsetWidth / 2}px, ${y - cursor.offsetHeight / 2}px)`;
       });
       margin.addEventListener("pointerleave", () => (cursor.style.display = ""));
     });
+    stopFading?.abort();
+    stopFading = new AbortController();
+    addEventListener("scroll", () => (cursor.dataset.faded = ""), { passive: true, signal: stopFading.signal });
   });
+  document.addEventListener("astro:before-swap", () => stopFading?.abort());
 </script>
