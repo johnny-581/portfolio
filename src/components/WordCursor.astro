@@ -17,7 +17,7 @@
   /* A glow that hugs the letters rather than a patch behind them, like a label on a map: no box
      or edge to see over a busy image. Stacked shadows of growing blur keep it solid right at the
      letters and fading out smoothly to about 50px; the wide ones are doubled, since a large blur thins out fast. While the word is faded (scrolling), the halo
-     thins with it. */
+     goes, so a resting pointer leaves nothing over the image. */
   .word-cursor-halo {
     --halo: var(--bg);
     text-shadow:
@@ -34,7 +34,7 @@
       0 0 52px var(--halo);
   }
   .word-cursor-halo[data-faded] {
-    --halo: color-mix(in srgb, var(--bg) 40%, transparent);
+    --halo: transparent;
   }
 </style>
 
