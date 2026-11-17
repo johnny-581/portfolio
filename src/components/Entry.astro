@@ -32,28 +32,18 @@ const Heading = preview ? "h2" : "h1";
         <a href={back} class="mb-8 block w-fit text-ui text-ink underline decoration-1 underline-offset-[3px]" data-back>
           back
         </a>
-        {/* The side margins work as back too, with the cursor turned into the word. Wide
-            screens with a mouse only; the link above is the one for keyboards and readers */}
+        {/* The side margins work as back too, with the cursor turned into the word (WordCursor).
+            Wide screens with a mouse only; the link above is the one for keyboards and readers */}
         {["left-0", "right-0"].map((side) => (
           <a
             href={back}
-            class:list={[
-              "fixed inset-y-0 z-10 hidden w-[max(0px,calc(50vw-var(--content)/2-3rem))] cursor-none lg:pointer-fine:block",
-              side,
-            ]}
+            class:list={["fixed inset-y-0 z-10 hidden w-[max(0px,calc(50vw-var(--content)/2-3rem))] word-cursor:block", side]}
             tabindex="-1"
             aria-hidden="true"
             data-back
-            data-back-margin
+            data-cursor="back"
           />
         ))}
-        <span
-          class="pointer-events-none fixed top-0 left-0 z-20 hidden text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
-          aria-hidden="true"
-          data-back-cursor
-        >
-          back
-        </span>
       </>
     )
   }
@@ -91,7 +81,7 @@ const Heading = preview ? "h2" : "h1";
         <>
           <p>{summary}</p>
           {media && (
-            <a href={`/${entry.id}`} class="mt-6 block" tabindex="-1" aria-hidden="true">
+            <a href={`/${entry.id}`} class="mt-6 block" tabindex="-1" aria-hidden="true" data-cursor="open">
               {media.kind === "video" ? (
                 <Fragment set:html={videoHtml(media.src, media.alt)} />
               ) : (
@@ -122,8 +112,6 @@ const Heading = preview ? "h2" : "h1";
   // exact scroll position it was left at (the router restores it). Opened any other way (a shared
   // link, a link from another page), back is a plain link to the project's place in the feed.
   let fromHome = false;
-  // The margin cursor's scroll listener is on the window, which outlives the page
-  let stopFading: AbortController | undefined;
   document.addEventListener("astro:before-preparation", (e) => {
     fromHome = e.from.pathname === "/" && e.navigationType === "push";
   });
@@ -138,28 +126,5 @@ const Heading = preview ? "h2" : "h1";
         history.back();
       });
     });
-
-    // The word follows the pointer over the margins, centred on it. Scrolling fades it, since a
-    // pointer parked in the margin while you read isn't reaching for back; moving the mouse
-    // brings it back. (Some browsers send a move after a scroll without the pointer moving, so
-    // only a new position counts.)
-    const cursor = document.querySelector<HTMLElement>("[data-back-cursor]");
-    if (!cursor) return;
-    let x = -1;
-    let y = -1;
-    document.querySelectorAll<HTMLElement>("[data-back-margin]").forEach((margin) => {
-      margin.addEventListener("pointermove", (e) => {
-        if (e.clientX !== x || e.clientY !== y) delete cursor.dataset.faded;
-        x = e.clientX;
-        y = e.clientY;
-        cursor.style.display = "block";
-        cursor.style.transform = `translate(${x - cursor.offsetWidth / 2}px, ${y - cursor.offsetHeight / 2}px)`;
-      });
-      margin.addEventListener("pointerleave", () => (cursor.style.display = ""));
-    });
-    stopFading?.abort();
-    stopFading = new AbortController();
-    addEventListener("scroll", () => (cursor.dataset.faded = ""), { passive: true, signal: stopFading.signal });
   });
-  document.addEventListener("astro:before-swap", () => stopFading?.abort());
 </script>

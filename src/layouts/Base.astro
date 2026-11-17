@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import Aside from "../components/Aside.astro";
+import WordCursor from "../components/WordCursor.astro";
 import { site } from "../site";
 import "../styles/global.css";
 
@@ -86,12 +87,20 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
         )
       }
     </div>
+    <WordCursor />
   </body>
 </html>
 
 <script>
   // Clips (see lib/video.mjs) play like GIFs. Offscreen they pause, so a long page doesn't decode
   // every clip at once; with reduced motion they show their first frame and wait for a tap.
+  // With a mouse on a wide screen, the cursor over a clip on an entry's page is pause or play
+  // (WordCursor), and clicking does that. A clip paused that way stays paused, on screen or off,
+  // until it's played again.
+  // Same query as the word-cursor variant in global.css
+  const wide = matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
+  const held = new WeakSet<HTMLVideoElement>();
+
   document.addEventListener("astro:page-load", () => {
     const clips = document.querySelectorAll<HTMLVideoElement>("video[data-clip]");
     if (!clips.length) return;
@@ -101,6 +110,8 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
         clip.autoplay = false;
         clip.pause();
         clip.controls = true;
+        // No word over the controls, not even the feed link's open
+        clip.closest("[data-cursor]")?.removeAttribute("data-cursor");
       });
       return;
     }
@@ -108,10 +119,28 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
     const onScreen = new IntersectionObserver((entries) => {
       entries.forEach(({ target, isIntersecting }) => {
         const clip = target as HTMLVideoElement;
-        if (isIntersecting) clip.play().catch(() => {});
+        if (isIntersecting && !held.has(clip)) clip.play().catch(() => {});
         else clip.pause();
       });
     });
-    clips.forEach((clip) => onScreen.observe(clip));
+    clips.forEach((clip) => {
+      onScreen.observe(clip);
+      // On the feed a clip is inside its entry's link, which says open
+      if (clip.closest("[data-cursor]")) return;
+      const word = () => (clip.dataset.cursor = clip.paused ? "play" : "pause");
+      word();
+      clip.addEventListener("play", word);
+      clip.addEventListener("pause", word);
+      clip.addEventListener("click", () => {
+        if (!wide.matches) return;
+        if (clip.paused) {
+          held.delete(clip);
+          clip.play().catch(() => {});
+        } else {
+          held.add(clip);
+          clip.pause();
+        }
+      });
+    });
   });
 </script>

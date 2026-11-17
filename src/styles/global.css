@@ -86,6 +86,10 @@
   --color-mark: var(--mark);
 }
 
+/* Where the cursor can turn into a word (WordCursor): wide screens with a mouse. Phones, tablets
+   and narrow windows keep the normal cursor. Its script repeats the query. */
+@custom-variant word-cursor (@media (min-width: 1024px) and (hover: hover) and (pointer: fine));
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -118,6 +122,12 @@
     outline: 2px solid var(--ink);
     outline-offset: 2px;
     border-radius: 2px;
+  }
+  /* The word stands in for the cursor (WordCursor) */
+  [data-cursor] {
+    @variant word-cursor {
+      cursor: none;
+    }
   }
 
   /* Two panes: trim the page's first line down to its capitals, so its top sits exactly on

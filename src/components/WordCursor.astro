@@ -1,0 +1,82 @@
+---
+// Word cursors: over an element with data-cursor="<word>", the mouse cursor turns into that word
+// (back in an entry's margins, open on the feed's images and clips, pause or play on an entry's
+// clips). Wide screens with a mouse only (the word-cursor variant in global.css, which also hides
+// the real cursor); elsewhere these elements keep the normal cursor. The word is decoration: the
+// elements behave the same for keyboards and screen readers.
+---
+
+<!-- On a pill of the page background, so the word reads on top of images in either theme; over
+     the page itself the pill doesn't show -->
+<span
+  class="pointer-events-none fixed top-0 left-0 z-20 hidden rounded bg-bg px-1.5 text-ui text-ink underline decoration-1 underline-offset-[3px] transition-colors duration-150 data-faded:text-faint motion-reduce:transition-none"
+  aria-hidden="true"
+  data-cursor-word></span>
+
+<script>
+  // Same query as the word-cursor variant in global.css
+  const wide = matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
+  // The span is replaced with the page, so it's looked up again after each swap
+  let word: HTMLElement | null = null;
+  // Where the pointer last was, or -1 once it has left the window (or was a finger)
+  let x = -1;
+  let y = -1;
+
+  /** Shows the word of the data-cursor element under the pointer, centred on it, or hides it */
+  function update(under: Element | null) {
+    if (!word) return;
+    const text = wide.matches && x >= 0 ? under?.closest<HTMLElement>("[data-cursor]")?.dataset.cursor : undefined;
+    if (!text) {
+      word.style.display = "";
+      return;
+    }
+    word.textContent = text;
+    word.style.display = "block";
+    word.style.transform = `translate(${x - word.offsetWidth / 2}px, ${y - word.offsetHeight / 2}px)`;
+  }
+  const updateInPlace = () => update(x >= 0 ? document.elementFromPoint(x, y) : null);
+
+  // Bound once for the session: this script runs once, and document and window outlive page swaps
+
+  // Scrolling fades the word, since a pointer parked over the page while you read isn't reaching
+  // for it; moving the mouse brings it back. (Some browsers send a move after a scroll without the
+  // pointer moving, so only a new position counts.)
+  document.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "touch") {
+      x = y = -1;
+    } else {
+      if (word && (e.clientX !== x || e.clientY !== y)) delete word.dataset.faded;
+      x = e.clientX;
+      y = e.clientY;
+    }
+    update(e.target as Element);
+  });
+  document.addEventListener("pointerout", (e) => {
+    if (e.relatedTarget) return;
+    x = y = -1;
+    update(null);
+  });
+  // The page moves under a still pointer, so check what's under it now
+  let frame = 0;
+  addEventListener(
+    "scroll",
+    () => {
+      if (word) word.dataset.faded = "";
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updateInPlace);
+    },
+    { passive: true },
+  );
+  // A word can change while the pointer is still, as when a click pauses a clip
+  new MutationObserver(updateInPlace).observe(document.documentElement, {
+    subtree: true,
+    attributeFilter: ["data-cursor"],
+  });
+  // After a page swap the pointer may already be over one, without moving. Until the router's
+  // view transition finishes, everything under the pointer reads as <html>, so check again then.
+  document.addEventListener("astro:before-swap", (e) => e.viewTransition.finished.then(updateInPlace, updateInPlace));
+  document.addEventListener("astro:page-load", () => {
+    word = document.querySelector("[data-cursor-word]");
+    updateInPlace();
+  });
+</script>
