@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { render } from "astro:content";
-import { firstMedia, sectionOf, titleOf, type Entry } from "../lib/entries";
+import { anchorOf, firstMedia, titleOf, type Entry } from "../lib/entries";
 import { videoHtml } from "../lib/video.mjs";
 
 interface Props {
@@ -16,8 +16,10 @@ const title = titleOf(entry);
 const { Content } = await render(entry);
 const media = preview ? firstMedia(entry) : undefined;
 
-// Below lg, projects and journal entries trade the site header for a link home (global.css)
-const backHome = !preview && ["projects", "journal"].includes(sectionOf(entry));
+// An entry's own page has no header or index, just a link back: to the project's place in the
+// feed, or the top of home for entries the feed doesn't show (journal, about)
+const anchor = anchorOf(entry);
+const back = anchor ? `/#${anchor}` : "/";
 
 // The feed has many entries, so only a lone entry gets the page's h1
 const Heading = preview ? "h2" : "h1";
@@ -25,13 +27,9 @@ const Heading = preview ? "h2" : "h1";
 
 <article class="max-w-[700px]">
   {
-    backHome && (
-      <a
-        href="/"
-        class="mb-8 block w-fit text-ui text-ink underline decoration-1 underline-offset-[3px] lg:hidden"
-        data-back-home
-      >
-        home
+    !preview && (
+      <a href={back} class="mb-8 block w-fit text-ui text-ink underline decoration-1 underline-offset-[3px]">
+        back
       </a>
     )
   }

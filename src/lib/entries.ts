@@ -14,6 +14,12 @@ export function sectionOf(entry: Entry): Section {
   return SECTIONS.find((s) => s === first) ?? "pages";
 }
 
+/** Where an entry sits in the home feed: "whisk" for projects/whisk, so /#whisk scrolls to it.
+ *  Only projects are in the feed */
+export function anchorOf(entry: Entry) {
+  return sectionOf(entry) === "projects" ? entry.id.split("/").at(-1)! : undefined;
+}
+
 /** The entry's title, or its file name with spaces for dashes: posture-reminder.md is "posture reminder" */
 export function titleOf(entry: Entry) {
   return entry.data.title ?? entry.id.split("/").at(-1)!.replaceAll("-", " ");

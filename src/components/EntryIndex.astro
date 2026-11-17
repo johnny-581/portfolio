@@ -1,15 +1,13 @@
 ---
-import { titleOf, type Entry } from "../lib/entries";
+import { anchorOf, titleOf, type Entry } from "../lib/entries";
 
 interface Props {
   /** The section's name, shown above its rows */
   label: string;
   entries: Entry[];
-  /** Path of the open entry; none on the home page */
-  current?: string;
 }
 
-const { label, entries, current } = Astro.props;
+const { label, entries } = Astro.props;
 ---
 
 <nav aria-label={label}>
@@ -19,26 +17,29 @@ const { label, entries, current } = Astro.props;
   </div>
   <ol>
     {
-      entries.map((entry) => (
-        <li>
-          {/* Title with its tag after a slash, then the date at the right edge. A trailing dash
-              ("2026-", still going) is dropped here; the entry page keeps it. */}
-          <a
-            href={`/${entry.id}`}
-            data-slug={entry.id}
-            aria-current={entry.id === current ? "page" : undefined}
-            class="group flex items-baseline justify-between gap-x-3 py-0.5 text-ui text-muted"
-          >
-            <span class="min-w-0">
-              <span class="transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-data-linked:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
-                {titleOf(entry)}
+      entries.map((entry) => {
+        // Projects scroll the home feed to their entry; journal entries aren't in it, so they open
+        const anchor = anchorOf(entry);
+        return (
+          <li>
+            {/* Title with its tag after a slash, then the date at the right edge, without the
+                trailing dash of one still going ("2026-") */}
+            <a
+              href={anchor ? `/#${anchor}` : `/${entry.id}`}
+              data-slug={entry.id}
+              class="group flex items-baseline justify-between gap-x-3 py-0.5 text-ui text-muted"
+            >
+              <span class="min-w-0">
+                <span class="transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-data-linked:text-ink group-aria-[current=location]:text-ink motion-reduce:transition-none">
+                  {titleOf(entry)}
+                </span>
+                {entry.data.tag && <span class="text-faint"> / {entry.data.tag}</span>}
               </span>
-              {entry.data.tag && <span class="text-faint"> / {entry.data.tag}</span>}
-            </span>
-            <span class="shrink-0 tabular-nums">{entry.data.when?.replace(/[-–—]+$/, "")}</span>
-          </a>
-        </li>
-      ))
+              <span class="shrink-0 tabular-nums">{entry.data.when?.replace(/[-–—]+$/, "")}</span>
+            </a>
+          </li>
+        );
+      })
     }
   </ol>
 </nav>

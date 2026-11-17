@@ -7,11 +7,11 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
-  /** Slug of the open entry, so the index and links row can mark it */
-  current?: string;
+  /** An entry's own page: full screen and centred, without the header and index */
+  full?: boolean;
 }
 
-const { title, description = site.tagline, current } = Astro.props;
+const { title, description = site.tagline, full = false } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/"), Astro.site);
 ---
@@ -68,13 +68,23 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, "").replace(/\/i
     )}
   </head>
   <body>
-    <!-- Two panes from lg up (index left, page scrolls on the right); one column below,
-         where the aside's header, main and index are ordered around each other -->
-    <div class="flex min-h-dvh flex-col lg:grid lg:grid-cols-[var(--aside)_minmax(0,1fr)] lg:items-start">
-      <Aside current={current} />
-      <main class="column order-2 min-w-0 pt-10 pb-16 lg:order-none lg:max-w-none lg:px-14 lg:pb-40">
-        <slot />
-      </main>
+    <!-- Home: two panes from lg up (index left, feed scrolls on the right); one column below,
+         where the aside's header, main and index are ordered around each other.
+         An entry's page: main alone, centred. The aside is still there but hidden (global.css),
+         so it persists across pages and the avatar and index don't re-render. -->
+    <div class:list={["flex min-h-dvh flex-col", !full && "lg:grid lg:grid-cols-[var(--aside)_minmax(0,1fr)] lg:items-start"]}>
+      <Aside />
+      {
+        full ? (
+          <main class="mx-auto w-full max-w-[calc(700px+2*var(--gutter))] px-(--gutter) pt-10 pb-16 lg:pt-16 lg:pb-40" data-full>
+            <slot />
+          </main>
+        ) : (
+          <main class="column order-2 min-w-0 pt-10 pb-16 lg:order-none lg:max-w-none lg:px-14 lg:pb-40">
+            <slot />
+          </main>
+        )
+      }
     </div>
   </body>
 </html>

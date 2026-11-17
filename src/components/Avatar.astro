@@ -117,7 +117,7 @@ const frames = [
       () => {
         window.clearTimeout(settle);
         const { top, bottom, width } = avatar.getBoundingClientRect();
-        // Zero-size when the header is hidden (project and journal pages in one column)
+        // Zero-size when the header is hidden (entry pages)
         if (!width) return;
         if (bottom <= 0) armed = true;
         else if (armed && top >= 0) {

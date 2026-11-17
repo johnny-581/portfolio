@@ -119,21 +119,19 @@
 
   /* Two panes: trim the page's first line down to its capitals, so its top sits exactly on
      main's top padding, level with the top of the avatar's head (see Aside). Browsers without
-     text-box sit a few pixels lower. The "home" link is hidden here, so the title under it
-     is the first line. */
+     text-box sit a few pixels lower. */
   @media (min-width: 1024px) {
-    main > :nth-child(1 of :not(.sr-only)) > :is(:first-child:not([data-back-home]), [data-back-home] + *) {
+    [data-aside] ~ main > :nth-child(1 of :not(.sr-only)) > :first-child {
       text-box: trim-start cap alphabetic;
     }
   }
+}
 
-  /* One column: project and journal pages drop the header, leaving the "home" link above the
-     title. Checked from main because the aside persists across pages. */
-  @media (max-width: 1023.98px) {
-    :root:has([data-back-home]) [data-aside-header] {
-      display: none;
-    }
-  }
+/* An entry's own page hides the aside. Checked from main because the aside persists across
+   pages, keeping the classes of the page it was first rendered on. Unlayered, so it beats the
+   aside's display utilities */
+:root:has(main[data-full]) [data-aside] {
+  display: none;
 }
 
 /* Entry text. Hand-written rather than a typography plugin: the Markdown only needs

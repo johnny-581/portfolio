@@ -18,6 +18,6 @@ export const getStaticPaths = (async () => {
 const { entry } = Astro.props;
 ---
 
-<Base title={titleOf(entry)} description={entry.data.summary} current={entry.id}>
+<Base title={titleOf(entry)} description={entry.data.summary} full>
   <Entry entry={entry} />
 </Base>

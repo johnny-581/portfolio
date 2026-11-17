@@ -2,17 +2,11 @@
 import Avatar from "./Avatar.astro";
 import { site } from "../site";
 
-interface Props {
-  /** Slug of the open page, so its link in the row is marked */
-  current?: string;
-}
-
-const { current } = Astro.props;
-// "home" is only for lg and up; below that the name above already links home. Its slug is empty,
-// matching the home page, where there is no current slug
+// The header only shows on home, so "home" is always the marked link. It's only for lg and up;
+// below that the name above already links home
 const links = [
-  { label: "home", href: "/", slug: "", wideOnly: true },
-  { label: "about", href: "/about", slug: "about" },
+  { label: "home", href: "/", current: true, wideOnly: true },
+  { label: "about", href: "/about" },
   ...site.links,
 ];
 ---
@@ -54,8 +48,7 @@ const links = [
         <>
           <a
             href={link.href}
-            aria-current={"slug" in link && link.slug === (current ?? "") ? "page" : undefined}
-            data-slug={"slug" in link ? link.slug : undefined}
+            aria-current={"current" in link ? "page" : undefined}
             target={link.href.startsWith("http") ? "_blank" : undefined}
             rel={link.href.startsWith("http") ? "noopener" : undefined}
             class:list={[
@@ -84,7 +77,7 @@ const links = [
   // Light until clicked; the choice is saved and Base applies it on load
   document.addEventListener("astro:page-load", () => {
     const toggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
-    // The header persists across pages, so bind once
+    // The header persists across pages (hidden on entry pages), so bind once
     if (!toggle || toggle.dataset.bound) return;
     toggle.dataset.bound = "1";
 

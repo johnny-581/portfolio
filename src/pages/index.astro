@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
-import { getEntries } from "../lib/entries";
+import { anchorOf, getEntries } from "../lib/entries";
 // The intro above the feed has its own file, so the about page can say something else
 import { Content as Intro } from "../content/intro.md";
 
@@ -16,7 +16,7 @@ const entries = await getEntries("projects");
   <div class="mt-12">
     {
       entries.map((entry) => (
-        <div class="border-t border-line pt-12 pb-12 last:pb-0" data-feed={entry.id}>
+        <div id={anchorOf(entry)} class="border-t border-line pt-12 pb-12 last:pb-0" data-feed={entry.id}>
           <Entry entry={entry} preview />
         </div>
       ))
@@ -25,15 +25,55 @@ const entries = await getEntries("projects");
 </Base>
 
 <script>
-  // Hovering a project in the feed lights up its row in the index, so it reads as the same list
-  document.addEventListener("astro:page-load", () => {
-    // The index persists across pages, so clear a mark left by clicking through from the feed
-    document.querySelectorAll("[data-aside] a[data-linked]").forEach((a) => a.removeAttribute("data-linked"));
+  // The index reads as the feed's table of contents: hovering a project lights up its row, and
+  // the row of the project being read is marked as you scroll
+  let stop: AbortController | undefined;
 
-    document.querySelectorAll<HTMLElement>("[data-feed]").forEach((block) => {
-      const row = () => document.querySelector(`[data-aside] a[data-slug="${block.dataset.feed}"]`);
-      block.addEventListener("mouseenter", () => row()?.setAttribute("data-linked", ""));
-      block.addEventListener("mouseleave", () => row()?.removeAttribute("data-linked"));
+  document.addEventListener("astro:page-load", () => {
+    stop?.abort();
+    // The index persists across pages, so clear marks left from the last visit
+    document.querySelectorAll("[data-aside] a[data-slug]").forEach((a) => {
+      a.removeAttribute("data-linked");
+      a.removeAttribute("aria-current");
     });
+    const blocks = [...document.querySelectorAll<HTMLElement>("[data-feed]")];
+    if (!blocks.length) return;
+    stop = new AbortController();
+    const { signal } = stop;
+    const row = (block: HTMLElement) =>
+      document.querySelector(`[data-aside] a[data-slug="${block.dataset.feed}"]`);
+
+    blocks.forEach((block) => {
+      block.addEventListener("mouseenter", () => row(block)?.setAttribute("data-linked", ""), { signal });
+      block.addEventListener("mouseleave", () => row(block)?.removeAttribute("data-linked"), { signal });
+    });
+
+    // The project being read is the last one whose top has passed a third of the way down the
+    // window, or the last one once the page is scrolled to the end (it may be too short to get
+    // there). None while the intro is still on top.
+    let current: Element | null | undefined;
+    const mark = () => {
+      const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+      const block = atEnd ? blocks.at(-1) : blocks.findLast((b) => b.getBoundingClientRect().top <= innerHeight / 3);
+      const next = block && row(block);
+      if (next === current) return;
+      current?.removeAttribute("aria-current");
+      next?.setAttribute("aria-current", "location");
+      current = next;
+    };
+    let queued = false;
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        mark();
+      });
+    };
+    addEventListener("scroll", onScroll, { passive: true, signal });
+    addEventListener("resize", onScroll, { passive: true, signal });
+    mark();
   });
+
+  document.addEventListener("astro:before-swap", () => stop?.abort());
 </script>
