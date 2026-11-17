@@ -65,6 +65,9 @@ const links = [
           >
             {link.label}
           </a>
+          {/* From lg up the pane is fitted to the index, too narrow for the row on one line, so
+              it breaks here on purpose rather than wherever it runs out */}
+          {link.label === "linkedin" && <span aria-hidden="true" class="hidden lg:block lg:basis-full" />}
         </>
       ))
     }
