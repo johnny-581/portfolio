@@ -52,9 +52,9 @@
 
   /* Side padding of the one-column layout */
   --gutter: 1rem;
-  /* Width of the index pane from lg up. 440px fits the links row on one line and index titles
-     like "leading engineering at ux hub" beside their date and tag at 16px */
-  --aside: clamp(440px, 34vw, 480px);
+  /* Width of the index pane from lg up: the narrowest that keeps the links row on one line
+     (it's wider than any index row, like "ux hub component library / shipped" and its date) */
+  --aside: 452px;
 
   /* 1 in dark mode, for what light-dark() can't do (flipping the avatar drawings) */
   --dark: 0;

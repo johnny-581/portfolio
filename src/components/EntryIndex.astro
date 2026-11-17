@@ -21,18 +21,21 @@ const { label, entries, current } = Astro.props;
     {
       entries.map((entry) => (
         <li>
-          {/* The tag column is fixed, so dates line up across sections; it fits "hackathon" */}
+          {/* Title with its tag after a slash, then the date at the right edge. A trailing dash
+              ("2026-", still going) is dropped here; the entry page keeps it. */}
           <a
             href={`/${entry.id}`}
             data-slug={entry.id}
             aria-current={entry.id === current ? "page" : undefined}
-            class="group grid grid-cols-[minmax(0,1fr)_60px_72px] items-baseline gap-x-3 py-0.5 text-muted"
+            class="group flex items-baseline justify-between gap-x-3 py-0.5 text-ui text-muted"
           >
-            <span class="text-ui transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-data-linked:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
-              {titleOf(entry)}
+            <span class="min-w-0">
+              <span class="transition-colors duration-120 group-hover:text-ink group-focus-visible:text-ink group-data-linked:text-ink group-aria-[current=page]:font-medium group-aria-[current=page]:text-ink motion-reduce:transition-none">
+                {titleOf(entry)}
+              </span>
+              {entry.data.tag && <span class="text-faint"> / {entry.data.tag}</span>}
             </span>
-            <span class="font-mono text-meta">{entry.data.when}</span>
-            <span class="font-mono text-meta">{entry.data.tag}</span>
+            <span class="shrink-0 tabular-nums">{entry.data.when?.replace(/[-–—]+$/, "")}</span>
           </a>
         </li>
       ))
