@@ -10,7 +10,7 @@ links:
   - "[github](https://github.com/johnny-581)"
   - "[linkedin](https://www.linkedin.com/in/johnny-dong-6ab2b027a/)"
   - "[email](mailto:dongjiayang123@gmail.com)"
-  - "[resume](/resume.pdf)"
+  - "[resume](https://pepperdocs.app/doc/cmwlc9od300000dlw55vjd851?from=gallery)"
 ---
 
 Settings for the whole site, read from the properties above. This text isn't shown anywhere.
