@@ -56,7 +56,7 @@
   --content: 780px;
 
   /* Width of the index pane from lg up, fitted to the longest index row ("ux hub component
-     library / shipped" and its date). The links row is two lines, home and about over the links off the site (Header) */
+     library / shipped" and its date). */
   --aside: 392px;
 
   /* 1 in dark mode, for what light-dark() can't do (flipping the avatar drawings) */

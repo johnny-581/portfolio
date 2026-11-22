@@ -2,11 +2,10 @@
 import Avatar from "./Avatar.astro";
 import { site } from "../site";
 
-// The header only shows on home, so "home" is always the marked link. It's only for lg and up;
-// below that the name above already links home. The site's own links (github, linkedin, email,
-// resume) lead off the site, so they get an arrow, like an entry's links
+// The header only shows on home, so "home" is always the marked link. The site's own links
+// (github, linkedin, email, resume) lead off the site, so they get an arrow, like an entry's links
 const links = [
-  { label: "home", href: "/", current: true, wideOnly: true },
+  { label: "home", href: "/", current: true },
   { label: "about", href: "/about" },
   ...site.links.map((link) => ({ ...link, away: true })),
 ];
@@ -43,25 +42,19 @@ const links = [
     </p>
   </div>
 
+  <!-- One row that wraps wherever it runs out of room, never between a link and its arrow -->
   <nav aria-label="elsewhere" class="col-span-full mt-[18px] flex flex-wrap gap-x-[0.6em] text-ui text-ink">
     {
       links.map((link) => (
-        <>
-          <a
-            href={link.href}
-            aria-current={"current" in link ? "page" : undefined}
-            target={link.href.startsWith("http") ? "_blank" : undefined}
-            rel={link.href.startsWith("http") ? "noopener" : undefined}
-            class:list={[
-              "hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]",
-              "wideOnly" in link && "hidden lg:inline",
-            ]}
-          >
-            {"away" in link ? `${link.label} ↗` : link.label}
-          </a>
-          {/* The site's own pages on the first line, the links off the site on the second */}
-          {link.label === "about" && <span aria-hidden="true" class="basis-full" />}
-        </>
+        <a
+          href={link.href}
+          aria-current={"current" in link ? "page" : undefined}
+          target={link.href.startsWith("http") ? "_blank" : undefined}
+          rel={link.href.startsWith("http") ? "noopener" : undefined}
+          class="whitespace-nowrap hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]"
+        >
+          {"away" in link ? `${link.label} ↗` : link.label}
+        </a>
       ))
     }
   </nav>
