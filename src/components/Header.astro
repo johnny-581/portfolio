@@ -2,10 +2,13 @@
 import Avatar from "./Avatar.astro";
 import { site } from "../site";
 
-// The header only shows on home, so "home" is always the marked link. The site's own links
-// (github, linkedin, email, resume) lead off the site, so they get an arrow, like an entry's links
+// The header shows on home and on pages like about; the one you're on is the marked link. The
+// aside persists across page swaps without re-rendering, so the script below moves the mark too.
+// The site's own links (github, linkedin, email, resume) lead off the site, so they get an arrow,
+// like an entry's links
+const here = Astro.url.pathname.replace(/\/$/, "") || "/";
 const links = [
-  { label: "home", href: "/", current: true },
+  { label: "home", href: "/" },
   { label: "about", href: "/about" },
   ...site.links.map((link) => ({ ...link, away: true })),
 ];
@@ -48,7 +51,8 @@ const links = [
       links.map((link) => (
         <a
           href={link.href}
-          aria-current={"current" in link ? "page" : undefined}
+          aria-current={link.href === here ? "page" : undefined}
+          data-nav-link
           target={link.href.startsWith("http") ? "_blank" : undefined}
           rel={link.href.startsWith("http") ? "noopener" : undefined}
           class="whitespace-nowrap hover:underline hover:decoration-1 hover:underline-offset-[3px] aria-[current=page]:underline aria-[current=page]:decoration-1 aria-[current=page]:underline-offset-[3px]"
@@ -83,6 +87,15 @@ const links = [
 </header>
 
 <script>
+  // The aside persists across page swaps, so mark the link of the page now showing
+  document.addEventListener("astro:page-load", () => {
+    const here = location.pathname.replace(/\/$/, "") || "/";
+    document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]").forEach((link) => {
+      if (link.getAttribute("href") === here) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  });
+
   // Light until clicked; the choice is saved and Base applies it on load
   document.addEventListener("astro:page-load", () => {
     const toggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");

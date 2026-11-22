@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import Base from "../layouts/Base.astro";
 import Entry from "../components/Entry.astro";
-import { getAllEntries, titleOf } from "../lib/entries";
+import { getAllEntries, sectionOf, titleOf } from "../lib/entries";
 
 export const getStaticPaths = (async () => {
   const entries = await getAllEntries();
@@ -18,7 +18,9 @@ export const getStaticPaths = (async () => {
 const { entry } = Astro.props;
 ---
 
-<Base title={titleOf(entry)} description={entry.data.summary} full>
+{/* Projects and journal entries are articles: full screen, with a way back. Pages (about) are top
+    level like home, beside the header and index */}
+<Base title={titleOf(entry)} description={entry.data.summary} full={sectionOf(entry) !== "pages"}>
   <Entry entry={entry} />
 </Base>
 

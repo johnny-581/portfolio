@@ -3,7 +3,7 @@ import Header from "./Header.astro";
 import Index from "./Index.astro";
 ---
 
-<!-- On home from lg up this is the left pane: sticky, scrolling on its own if the index is taller
+<!-- On home and pages like about, from lg up this is the left pane: sticky, scrolling on its own if the index is taller
      than the window. Below lg it has no box of its own, so the header and index become siblings
      of <main> and can be ordered around it (header, feed, index). Entry pages hide it (global.css)
      rather than leave it out, so it persists and the avatar and index don't re-render.
