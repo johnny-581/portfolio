@@ -8,7 +8,7 @@ links:
   - "[ubcuxhub.ca/portal](https://ubcuxhub.ca/portal)"
 ---
 
-The portal is where UBC UX Hub runs its year: outdents buy a membership, apply to events, and check in at the door with a QR code.
+The portal is where UBC UX Hub runs its year: students buy a membership, apply to events, and check in at the door with a QR code.
 
 ![ux hub portal: the member dashboard](../images/ubc-uxhub-portal-1.png)
 
