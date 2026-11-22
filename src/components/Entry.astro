@@ -96,13 +96,13 @@ const Heading = preview ? "h2" : "h1";
     }
   </div>
   {
-    // An end mark under an entry's own page, so the last line reads as the end
+    // An end mark under an entry's own page, so the last line reads as the end: three drawn stars,
+    // a mask filled with the muted text colour so it follows the theme
     !preview && (
-      <p class="mt-14 flex justify-center gap-[0.75em] text-[1.25rem] text-muted select-none" aria-hidden="true">
-        <span>*</span>
-        <span>*</span>
-        <span>*</span>
-      </p>
+      <div
+        class="mx-auto mt-14 aspect-[1457/298] h-4 bg-muted [mask:url(/icons/stars.png)_center/contain_no-repeat]"
+        aria-hidden="true"
+      />
     )
   }
 </article>
