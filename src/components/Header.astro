@@ -69,12 +69,14 @@ const links = [
   <!-- In the page's top-right corner: the moon in light, the sun in dark, so it shows the theme it
        switches to. The drawings are masks filled with the text colour, so they follow the theme.
        Below lg the aside has no box, so this sits at the top of the page and scrolls away; from lg
-       up the aside is sticky, so it's fixed to the window instead -->
+       up the aside is sticky, so it's fixed to the window instead. It and the aside sit above
+       home's back-to-top strip down the right edge (index.astro), so the icon gets the click and a
+       hand cursor rather than the word "top" -->
   <button
     type="button"
     data-theme-toggle
     aria-label="Switch theme"
-    class="absolute top-6 right-(--gutter) z-10 grid size-9 cursor-pointer place-items-center text-ink opacity-80 hover:opacity-100 lg:fixed lg:top-7 lg:right-8"
+    class="absolute top-6 right-(--gutter) z-20 grid size-9 cursor-pointer place-items-center text-ink opacity-80 hover:opacity-100 lg:fixed lg:top-7 lg:right-8"
   >
     <span
       aria-hidden="true"
