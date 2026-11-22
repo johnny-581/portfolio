@@ -15,3 +15,7 @@ The portal is where UBC UX Hub runs its year: outdents buy a membership, apply t
 more info to come :)
 
 ![](../images/Pasted%20image%2020261105101122.png)
+
+![ux hub portal: the admin events dashboard, with an event's registrations and applications at a glance in a side panel](../images/ubc-uxhub-portal-events-dashboard.png)
+
+![ux hub portal: an event's applications, with counts to review, offers out and seats held, and the list of applicants by status](../images/ubc-uxhub-portal-applications.png)
