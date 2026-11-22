@@ -29,4 +29,3 @@ more info to come!
 ![pepper docs: asking the chat to swap education and experience, which edits the resume and highlights the moved section](../images/pepper-docs-chat-edit.mp4)
 <small>ask for a change and the chat edits the document, with the change highlighted.</small>
 
-
