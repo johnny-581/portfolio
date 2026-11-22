@@ -3,11 +3,12 @@ import Avatar from "./Avatar.astro";
 import { site } from "../site";
 
 // The header only shows on home, so "home" is always the marked link. It's only for lg and up;
-// below that the name above already links home
+// below that the name above already links home. The site's own links (github, linkedin, email,
+// resume) lead off the site, so they get an arrow, like an entry's links
 const links = [
   { label: "home", href: "/", current: true, wideOnly: true },
   { label: "about", href: "/about" },
-  ...site.links,
+  ...site.links.map((link) => ({ ...link, away: true })),
 ];
 ---
 
@@ -56,11 +57,10 @@ const links = [
               "wideOnly" in link && "hidden lg:inline",
             ]}
           >
-            {link.label}
+            {"away" in link ? `${link.label} ↗` : link.label}
           </a>
-          {/* From lg up the pane is fitted to the index, too narrow for the row on one line, so
-              it breaks here on purpose rather than wherever it runs out */}
-          {link.label === "linkedin" && <span aria-hidden="true" class="hidden lg:block lg:basis-full" />}
+          {/* The site's own pages on the first line, the links off the site on the second */}
+          {link.label === "about" && <span aria-hidden="true" class="basis-full" />}
         </>
       ))
     }
