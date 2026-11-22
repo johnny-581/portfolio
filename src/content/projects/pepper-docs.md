@@ -11,7 +11,29 @@ links:
 ![pepper docs: asking the chat to open three documents, then switching between them on the desk](../images/pepper-docs-desk.mp4)
 <small>ask for documents and they land on your desk, a click apart.</small>
 
-Pepper Docs is a passion project I've worked on since January 2026. It generates a notion-style editor that looks just like the PDF it renders to
+I like Notion because of it's intuitiveness (`-` + `space` creates a bullet item) and flexibility (combine any blocks, page inside page).
+
+==I wanted to build something like notion but for resume's and cover letters.==
+
+The idea is this:
+[image]
+
+There are some unique problems that a block-based editor has to solve to accommodate a pdf document like resume
+- there is an unknown number of sections and entries so I can't have a placeholder for every entry, or I have to add a placeholder to the style every time I add an entry to the editor.
+	- solved by `reapeats`, an extensible and drag-and-droppable structure defined in the style
+- There are two column resumes, three column resumes, resume's with wired layouts
+	- solved by giving the editor basic building blocks, and allow them to be freely composed like lego (similar to how notion works). opinionated editor, un-opinionated (PDF) output
+		- field, list, inline list, repeat
+
+## Mistakes I made and fixed
+
+==making it to complicated==
+
+If there's one thing that this project taught me then that would be 
+
+==latex vs typst==
+
+
 
 ![pepper docs: dragging the education section below experience while the PDF preview updates](../images/pepper-docs-drag-section.mp4)
 <small>drag a whole entry, or a whole section, and the PDF reflows.</small>
