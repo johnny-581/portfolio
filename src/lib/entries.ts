@@ -18,9 +18,10 @@ export function sectionOf(entry: Entry): Section {
 }
 
 /** Where an entry sits in the home feed: "whisk" for projects/whisk, so /#whisk scrolls to it.
- *  Only projects are in the feed */
+ *  Only the projects order.md lists are in the feed */
 export function anchorOf(entry: Entry) {
-  return sectionOf(entry) === "projects" ? entry.id.split("/").at(-1)! : undefined;
+  const shown = sectionOf(entry) === "projects" && !entry.data.unlisted && projectOrder().has(entry.id);
+  return shown ? entry.id.split("/").at(-1)! : undefined;
 }
 
 /** The entry's title, or its file name with spaces for dashes: posture-reminder.md is "posture reminder" */
@@ -48,45 +49,60 @@ export function firstMedia(entry: Entry) {
 // Paths that belong to routes or sections, so a page can't take them
 const RESERVED = ["404", ...SECTIONS];
 
-/** Listed entries (not draft, not unlisted), optionally from one section. Projects follow the
- *  list in order.md, then any it leaves out, newest first; everything else is newest first */
+/** Listed entries (not draft, not unlisted), optionally from one section, newest first. Projects
+ *  are the ones order.md lists, in its order; one it leaves out is hidden like an unlisted one */
 export async function getEntries(section?: Section) {
+  await checkOrder();
+  const rank = projectOrder();
   const entries = await getCollection(
     "entries",
-    (entry) => !entry.data.draft && !entry.data.unlisted && (!section || sectionOf(entry) === section),
+    (entry) =>
+      !entry.data.draft &&
+      !entry.data.unlisted &&
+      (sectionOf(entry) !== "projects" || rank.has(entry.id)) &&
+      (!section || sectionOf(entry) === section),
   );
-  const rank = await projectRanks();
   const place = (entry: Entry) => rank.get(entry.id) ?? Infinity;
   return entries.sort(
     (a, b) => place(a) - place(b) || b.data.published.getTime() - a.data.published.getTime(),
   );
 }
 
-/** Each project in order.md's list, by id ("projects/whisk"), to its place in the list. Only the
- *  list's items are read, each one a link to a project's note, so the note can say what it's for
- *  around them. An item that links no project stops the build, naming it, so a typo or a deleted
- *  project can't quietly leave the order wrong. A listed draft or unlisted project is skipped. */
-async function projectRanks() {
+/** The items of order.md's list, each with the project id it links ("projects/whisk"), if any.
+ *  Only the list's items are read, so the note can say what it's for around them */
+function orderItems() {
+  return orderNote()
+    .split("\n")
+    .map((line) => line.match(/^\s*(?:[-*+]|\d+[.)])\s+(.*)$/)?.[1].trim())
+    // Empty items, and checkboxes, which aren't part of the order
+    .filter((item): item is string => !!item && !/^\[[ xX]\]/.test(item))
+    .map((item) => {
+      const path = linkedNote(item);
+      return { item, path, id: path && (path.startsWith("projects/") ? path : `projects/${path}`) };
+    });
+}
+
+/** Each project order.md lists, by id, to its place in the list */
+function projectOrder() {
+  const rank = new Map<string, number>();
+  for (const { id } of orderItems()) if (id && !rank.has(id)) rank.set(id, rank.size);
+  return rank;
+}
+
+/** Stops the build, naming the item, when one of order.md's items links no project: a typo or a
+ *  deleted project would otherwise quietly hide a project or leave a gap */
+async function checkOrder() {
   const projects = new Set(
     (await getCollection("entries", (entry) => sectionOf(entry) === "projects")).map((e) => e.id),
   );
-  const rank = new Map<string, number>();
-  for (const line of orderNote().split("\n")) {
-    const item = line.match(/^\s*(?:[-*+]|\d+[.)])\s+(.*)$/)?.[1].trim();
-    // Empty items, and checkboxes, which aren't part of the order
-    if (!item || /^\[[ xX]\]/.test(item)) continue;
-    const path = linkedNote(item);
-    const id = path && (path.startsWith("projects/") ? path : `projects/${path}`);
-    if (!id || !projects.has(id)) {
-      throw new Error(
-        path
-          ? `order.md lists "${path}", but there's no project with that name`
-          : `order.md has "${item}" in its list, which isn't a link to a project`,
-      );
-    }
-    if (!rank.has(id)) rank.set(id, rank.size);
+  for (const { item, path, id } of orderItems()) {
+    if (id && projects.has(id)) continue;
+    throw new Error(
+      path
+        ? `order.md lists "${path}", but there's no project with that name`
+        : `order.md has "${item}" in its list, which isn't a link to a project`,
+    );
   }
-  return rank;
 }
 
 /** Every page to build: listed entries plus unlisted ones like about */

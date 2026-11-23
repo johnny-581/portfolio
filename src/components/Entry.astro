@@ -17,7 +17,7 @@ const { Content } = await render(entry);
 const media = preview ? firstMedia(entry) : undefined;
 
 // An article's own page has no header or index, just a link back: to the project's place in the
-// feed, or the top of home for journal entries, which the feed doesn't show. Pages (about) sit
+// feed, or the top of home for entries the feed doesn't show (journal, hidden projects). Pages (about) sit
 // beside the header and index like home, so they need none
 const anchor = anchorOf(entry);
 const back = anchor ? `/#${anchor}` : "/";

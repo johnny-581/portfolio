@@ -1,4 +1,4 @@
-<!-- The order of projects in the index and on the homepage, top to bottom. Move a line to move a project. Add one by linking its note. Projects left out go after these, newest first. A line that doesn't link to a project stops the site from building, with an error naming it. -->
+<!-- The order of projects in the index and on the homepage, top to bottom. Move a line to move a project. Add one by linking its note. A project left out is hidden from the index and the homepage, but its page still works for anyone with the link. A line that doesn't link to a project stops the site from building, with an error naming it. -->
 
 - [pepper docs](projects/pepper-docs.md)
 - [scalepad desktop agent](projects/scalepad-desktop-agent.md)
