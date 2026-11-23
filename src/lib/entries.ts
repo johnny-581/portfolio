@@ -1,5 +1,6 @@
 import type { ImageMetadata } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import { site } from "../site";
 import { VIDEO, mediaUrl } from "./video.mjs";
 
 export type Entry = CollectionEntry<"entries">;
@@ -45,13 +46,36 @@ export function firstMedia(entry: Entry) {
 // Paths that belong to routes or sections, so a page can't take them
 const RESERVED = ["404", ...SECTIONS];
 
-/** Listed entries (not draft, not unlisted), newest first, optionally from one section */
+/** Listed entries (not draft, not unlisted), optionally from one section. Projects follow the
+ *  order in site.md, then any it leaves out, newest first; everything else is newest first */
 export async function getEntries(section?: Section) {
   const entries = await getCollection(
     "entries",
     (entry) => !entry.data.draft && !entry.data.unlisted && (!section || sectionOf(entry) === section),
   );
-  return entries.sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+  const rank = await projectRanks();
+  const place = (entry: Entry) => rank.get(entry.id) ?? Infinity;
+  return entries.sort(
+    (a, b) => place(a) - place(b) || b.data.published.getTime() - a.data.published.getTime(),
+  );
+}
+
+/** Each project in site.md's list, by id ("projects/whisk"), to its place in the list. Its links
+ *  can be "[[whisk]]" or "[[projects/whisk]]"; one to no project stops the build, so a typo can't
+ *  quietly leave a project out of place. A listed draft or unlisted project is just skipped. */
+async function projectRanks() {
+  const projects = new Set(
+    (await getCollection("entries", (entry) => sectionOf(entry) === "projects")).map((e) => e.id),
+  );
+  const rank = new Map<string, number>();
+  site.projects.forEach((path) => {
+    const id = path.startsWith("projects/") ? path : `projects/${path}`;
+    if (!projects.has(id)) {
+      throw new Error(`site.md lists "${path}" under projects, but there's no project with that name`);
+    }
+    if (!rank.has(id)) rank.set(id, rank.size);
+  });
+  return rank;
 }
 
 /** Every page to build: listed entries plus unlisted ones like about */
