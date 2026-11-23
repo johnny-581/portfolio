@@ -1,6 +1,8 @@
 import type { ImageMetadata } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-import { site } from "../site";
+// The order of the projects, a note in the vault beside site.md
+import { rawContent as orderNote } from "../content/order.md";
+import { linkedNote } from "./markdown-link";
 import { VIDEO, mediaUrl } from "./video.mjs";
 
 export type Entry = CollectionEntry<"entries">;
@@ -47,7 +49,7 @@ export function firstMedia(entry: Entry) {
 const RESERVED = ["404", ...SECTIONS];
 
 /** Listed entries (not draft, not unlisted), optionally from one section. Projects follow the
- *  order in site.md, then any it leaves out, newest first; everything else is newest first */
+ *  list in order.md, then any it leaves out, newest first; everything else is newest first */
 export async function getEntries(section?: Section) {
   const entries = await getCollection(
     "entries",
@@ -60,21 +62,30 @@ export async function getEntries(section?: Section) {
   );
 }
 
-/** Each project in site.md's list, by id ("projects/whisk"), to its place in the list. Its links
- *  can be "[[whisk]]" or "[[projects/whisk]]"; one to no project stops the build, so a typo can't
- *  quietly leave a project out of place. A listed draft or unlisted project is just skipped. */
+/** Each project in order.md's list, by id ("projects/whisk"), to its place in the list. Only the
+ *  list's items are read, each one a link to a project's note, so the note can say what it's for
+ *  around them. An item that links no project stops the build, naming it, so a typo or a deleted
+ *  project can't quietly leave the order wrong. A listed draft or unlisted project is skipped. */
 async function projectRanks() {
   const projects = new Set(
     (await getCollection("entries", (entry) => sectionOf(entry) === "projects")).map((e) => e.id),
   );
   const rank = new Map<string, number>();
-  site.projects.forEach((path) => {
-    const id = path.startsWith("projects/") ? path : `projects/${path}`;
-    if (!projects.has(id)) {
-      throw new Error(`site.md lists "${path}" under projects, but there's no project with that name`);
+  for (const line of orderNote().split("\n")) {
+    const item = line.match(/^\s*(?:[-*+]|\d+[.)])\s+(.*)$/)?.[1].trim();
+    // Empty items, and checkboxes, which aren't part of the order
+    if (!item || /^\[[ xX]\]/.test(item)) continue;
+    const path = linkedNote(item);
+    const id = path && (path.startsWith("projects/") ? path : `projects/${path}`);
+    if (!id || !projects.has(id)) {
+      throw new Error(
+        path
+          ? `order.md lists "${path}", but there's no project with that name`
+          : `order.md has "${item}" in its list, which isn't a link to a project`,
+      );
     }
     if (!rank.has(id)) rank.set(id, rank.size);
-  });
+  }
   return rank;
 }
 
