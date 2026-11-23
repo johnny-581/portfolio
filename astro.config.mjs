@@ -6,6 +6,7 @@ import { highlight } from './src/lib/highlight.mjs';
 import { gallery } from './src/lib/gallery.mjs';
 import { video, media } from './src/lib/video.mjs';
 import { youtube } from './src/lib/youtube.mjs';
+import { noteLinks } from './src/lib/note-links.mjs';
 import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
@@ -17,7 +18,8 @@ export default defineConfig({
   integrations: [media(), sitemap()],
   markdown: {
     // Gallery first: it reads the images' files before video and youtube swap them for HTML
-    processor: satteri({ mdastPlugins: [highlight, gallery, video, youtube] }),
+    // Note links: a link to another note's .md file goes to that note's page
+    processor: satteri({ mdastPlugins: [highlight, gallery, video, youtube, noteLinks] }),
     // Code blocks stay plain text, styled by the site (.prose pre) rather than a Shiki theme
     syntaxHighlight: false,
   },
